@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Road to Platinum</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0a0d13;
+    color: #f2f2f2;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+  }
+
+  #topo {
+    text-align: center;
+    padding: 26px 20px 6px 20px;
+  }
+
+  #topo h1 {
+    margin: 0;
+    font-size: 46px;
+    letter-spacing: 2px;
+    color: #dfe6ee;
+    text-transform: uppercase;
+  }
+
+  #topo .subtitulo {
+    margin-top: 6px;
+    font-size: 20px;
+    color: #6d7d90;
+  }
+
+  #areaGauge {
+    text-align: center;
+    padding-top: 6px;
+  }
+
+  #textoGaugeCentro {
+    margin-top: -70px;
+    font-size: 64px;
+    font-weight: bold;
+    color: #dfe6ee;
+  }
+
+  #textoGaugeValores {
+    margin-top: 6px;
+    font-size: 26px;
+    color: #9fb0c2;
+  }
+
+  #textoGaugeValores .atual { color: #52d18a; font-weight: bold; }
+  #textoGaugeValores .meta  { color: #dfe6ee; font-weight: bold; }
+
+  #grade {
+    padding: 10px 40px 20px 40px;
+  }
+
+  .card {
+    background-color: #12161f;
+    border: 2px solid #202632;
+    border-radius: 16px;
+    width: 22%;
+    margin: 1.5%;
+    padding: 24px 10px;
+    float: left;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  .card .rotulo {
+    font-size: 22px;
+    color: #6d7d90;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .card .valor {
+    font-size: 42px;
+    font-weight: bold;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+
+  .card .valor.alerta   { color: #ff6b6b; }
+  .card .valor.atencao  { color: #ffb648; }
+  .card .valor.neutro   { color: #dfe6ee; }
+  .card .valor.encerrado { font-size: 30px; color: #6d7d90; }
+
+  .clearfix { clear: both; }
+</style>
+</head>
+<body>
+
+  <div id="topo">
+    <h1>Road to Platinum</h1>
+    <div class="subtitulo">Progresso dos ultimos 12 meses</div>
+  </div>
+
+  <div id="areaGauge">
+    <canvas id="gauge" width="900" height="480"></canvas>
+    <div id="textoGaugeCentro">0%</div>
+    <div id="textoGaugeValores">
+      Atual: <span class="atual" id="valGaugeAtual">$0</span>
+      &nbsp;&nbsp;/&nbsp;&nbsp;
+      Meta: <span class="meta" id="valGaugeMeta">$0</span>
+    </div>
+  </div>
+
+  <div id="grade">
+
+    <div class="card">
+      <div class="rotulo">Dias sem Vender</div>
+      <div class="valor atencao" id="valDiasSemVender">0</div>
+    </div>
+
+    <div class="card">
+      <div class="rotulo">Faltava Ontem</div>
+      <div class="valor neutro" id="valFaltanteOntem">$0</div>
+    </div>
+
+    <div class="card">
+      <div class="rotulo">Falta Hoje</div>
+      <div class="valor neutro" id="valFaltanteHoje">$0</div>
+    </div>
+
+    <div class="card">
+      <div class="rotulo">Necessario / Dia</div>
+      <div class="valor neutro" id="valPorDia">$0</div>
+    </div>
+
+    <div class="clearfix"></div>
+  </div>
+
+<script>
+  // =========================================================================
+  // CONFIGURACAO — as duas variaveis que definem a meta e o prazo.
+  // Mude aqui quando o ano/meta mudar; nada mais no codigo precisa ser tocado.
+  // =========================================================================
+
+  var META_RECEITA = 750000; // USD
+  var DATA_LIMITE = new Date(2026, 11, 25); // 25 de dezembro de 2026 (mes 11 = dezembro, base 0)
+
+  // =========================================================================
+  // FONTE DE DADOS
+  //
+  // Este repositorio e PUBLICO (necessario pra ativar o GitHub Pages de
+  // graca), entao os numeros de venda NUNCA ficam gravados aqui. Eles moram
+  // no Google Sheets e sao servidos por um Apps Script Web App — o dashboard
+  // busca direto de la, entre origens (CORS), sem passar pelo GitHub.
+  //
+  // Troque APPS_SCRIPT_URL pela URL de implantacao do seu Web App
+  // (formato https://script.google.com/macros/s/XXXXX/exec) quando o
+  // Apps Script estiver pronto.
+  //
+  // Usa XMLHttpRequest em vez de fetch() de proposito: navegadores de Smart
+  // TV antigos (ex: Tizen 2014) costumam nao ter fetch()/Promise nativos.
+  // =========================================================================
+
+  var APPS_SCRIPT_URL = 'SUBSTITUA_PELA_URL_DO_APPS_SCRIPT';
+
+  function buscarDados(callback) {
+    var xhr = new XMLHttpRequest();
+    // cache-bust: sem isso, o navegador pode servir uma resposta antiga
+    // em vez de buscar a mais recente do Apps Script
+    xhr.open('GET', APPS_SCRIPT_URL + '?_=' + new Date().getTime(), true);
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          try {
+            var dados = JSON.parse(xhr.responseText);
+            callback(dados);
+          } catch (erroParse) {
+            if (window.console && console.error) console.error('Resposta do Apps Script invalida:', erroParse);
+          }
+        } else {
+          if (window.console && console.error) console.error('Falha ao buscar dados, status:', xhr.status);
+        }
+      }
+    };
+    xhr.send();
+  }
+
+  // =========================================================================
+  // UTILITARIOS
+  //
+  // Nota de compatibilidade: este arquivo evita de proposito recursos de JS
+  // recentes (arrow functions, async/await, const/let, fetch, Promise nativa)
+  // porque o alvo declarado e um navegador de Smart TV de 2014 (Tizen), que
+  // nao suporta a maior parte disso — um erro de sintaxe nesses recursos
+  // quebraria a pagina inteira, nao so a parte que os usa. Intl.NumberFormat
+  // e Wake Lock sao usados quando o navegador suporta, com fallback manual
+  // quando nao suporta.
+  // =========================================================================
+
+  var formatadorUSD = null;
+  if (window.Intl && window.Intl.NumberFormat) {
+    try {
+      formatadorUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    } catch (e) {
+      formatadorUSD = null;
+    }
+  }
+
+  function formatarUSD(valor) {
+    if (formatadorUSD) {
+      return formatadorUSD.format(valor);
+    }
+    // fallback manual (sem Intl): separador de milhar na mao, sem centavos
+    var inteiro = String(Math.round(valor));
+    var negativo = inteiro.charAt(0) === '-';
+    if (negativo) inteiro = inteiro.substring(1);
+    var invertido = inteiro.split('').reverse().join('');
+    var comVirgulas = invertido.replace(/(\d{3})(?=\d)/g, '$1,');
+    var resultado = comVirgulas.split('').reverse().join('');
+    return (negativo ? '-$' : '$') + resultado;
+  }
+
+  function diasRestantesAte(dataLimite) {
+    var agora = new Date();
+    var inicioHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
+    var diffMs = dataLimite.getTime() - inicioHoje.getTime();
+    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  function calcularReceitaPorDia(receitaAtual) {
+    var diasRestantes = diasRestantesAte(DATA_LIMITE);
+    if (diasRestantes <= 0) {
+      return null; // meta encerrada
+    }
+    var faltante = META_RECEITA - receitaAtual;
+    if (faltante <= 0) {
+      return 0; // meta ja batida
+    }
+    return faltante / diasRestantes;
+  }
+
+  // =========================================================================
+  // GAUGE (semicirculo) — desenhado em Canvas, sem depender de imagens/SVG
+  // =========================================================================
+
+  function corDoGauge(pct) {
+    if (pct >= 1) return '#52d18a';
+    if (pct >= 0.6) return '#7fd1c9';
+    if (pct >= 0.3) return '#ffb648';
+    return '#ff6b6b';
+  }
+
+  function desenharGauge(pct) {
+    var canvas = document.getElementById('gauge');
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+    var cx = w / 2;
+    var cy = h * 0.92;
+    var raio = Math.min(w / 2, h) * 0.8;
+    var espessura = 46;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // trilha de fundo
+    ctx.beginPath();
+    ctx.arc(cx, cy, raio, Math.PI, 0, false);
+    ctx.lineWidth = espessura;
+    ctx.strokeStyle = '#1b212c';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // progresso
+    var pctClamp = pct;
+    if (pctClamp < 0) pctClamp = 0;
+    if (pctClamp > 1) pctClamp = 1;
+
+    if (pctClamp > 0) {
+      var anguloFim = Math.PI + pctClamp * Math.PI;
+      ctx.beginPath();
+      ctx.arc(cx, cy, raio, Math.PI, anguloFim, false);
+      ctx.lineWidth = espessura;
+      ctx.strokeStyle = corDoGauge(pctClamp);
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+  }
+
+  // =========================================================================
+  // RENDERIZACAO
+  // =========================================================================
+
+  function renderizarDashboard(dados) {
+    var pct = dados.receitaAtual / META_RECEITA;
+    var pctExibicao = Math.round(pct * 1000) / 10; // 1 casa decimal
+
+    desenharGauge(pct);
+    document.getElementById('textoGaugeCentro').innerHTML = pctExibicao + '%';
+    document.getElementById('valGaugeAtual').innerHTML = formatarUSD(dados.receitaAtual);
+    document.getElementById('valGaugeMeta').innerHTML = formatarUSD(META_RECEITA);
+
+    var elDias = document.getElementById('valDiasSemVender');
+    elDias.innerHTML = dados.diasSemVender;
+    elDias.className = 'valor ' + (dados.diasSemVender >= 3 ? 'alerta' : 'atencao');
+
+    document.getElementById('valFaltanteOntem').innerHTML = formatarUSD(dados.receitaFaltanteOntem);
+    document.getElementById('valFaltanteHoje').innerHTML = formatarUSD(dados.receitaFaltanteHoje);
+
+    var porDia = calcularReceitaPorDia(dados.receitaAtual);
+    var elPorDia = document.getElementById('valPorDia');
+    if (porDia === null) {
+      elPorDia.innerHTML = 'Meta encerrada';
+      elPorDia.className = 'valor encerrado';
+    } else {
+      elPorDia.innerHTML = formatarUSD(porDia);
+      elPorDia.className = 'valor neutro';
+    }
+  }
+
+  // =========================================================================
+  // REQUISITO 2 — auto-refresh dos dados a cada 5 minutos, sem reload de pagina
+  // =========================================================================
+
+  function atualizarDados() {
+    buscarDados(function (dados) {
+      renderizarDashboard(dados);
+    });
+  }
+
+  atualizarDados();
+  setInterval(atualizarDados, 5 * 60 * 1000);
+
+  // =========================================================================
+  // REQUISITO 3 — reload completo a cada 6 horas
+  // =========================================================================
+
+  setInterval(function () {
+    location.reload();
+  }, 6 * 60 * 60 * 1000);
+
+  // =========================================================================
+  // REQUISITO 4 — Wake Lock (manter tela ativa), quando suportado
+  // =========================================================================
+
+  function manterTelaAtiva() {
+    if (navigator.wakeLock && navigator.wakeLock.request) {
+      try {
+        navigator.wakeLock.request('screen')['catch'](function () {
+          // sem problema se falhar (ex: TV sem suporte real, so a API presente)
+        });
+      } catch (erro) {
+        // sem problema se o navegador da TV nao suportar
+      }
+    }
+  }
+
+  manterTelaAtiva();
+
+  // =========================================================================
+  // REQUISITO 5 — auto-recuperacao de erro (recarrega sozinho se travar)
+  // =========================================================================
+
+  window.addEventListener('error', function () {
+    setTimeout(function () {
+      location.reload();
+    }, 5000);
+  });
+
+  // =========================================================================
+  // REQUISITO 1 — fullscreen automatico, com fallback pro primeiro clique/toque
+  // =========================================================================
+
+  function pedirTelaCheia() {
+    var el = document.documentElement;
+    var metodo = el.requestFullscreen ||
+                 el.webkitRequestFullscreen ||
+                 el.webkitRequestFullScreen ||
+                 el.mozRequestFullScreen ||
+                 el.msRequestFullscreen;
+
+    if (!metodo) {
+      armarFallbackDeClique();
+      return;
+    }
+
+    try {
+      var resultado = metodo.call(el);
+      if (resultado && typeof resultado.then === 'function') {
+        resultado['catch'](function () {
+          armarFallbackDeClique();
+        });
+      }
+    } catch (erro) {
+      armarFallbackDeClique();
+    }
+  }
+
+  function armarFallbackDeClique() {
+    function aoClicar() {
+      document.removeEventListener('click', aoClicar, false);
+      pedirTelaCheia();
+    }
+    document.addEventListener('click', aoClicar, false);
+  }
+
+  window.addEventListener('load', function () {
+    pedirTelaCheia();
+    armarFallbackDeClique();
+  });
+</script>
+
+</body>
+</html>
