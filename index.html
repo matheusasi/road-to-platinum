@@ -332,12 +332,19 @@
   setInterval(atualizarDados, 5 * 60 * 1000);
 
   // =========================================================================
-  // REQUISITO 3 — reload completo a cada 6 horas
+  // REQUISITO 3 — reload completo da pagina a cada 5 minutos.
+  //
+  // Em vez de confiar so no refresh silencioso via XHR (REQUISITO 2), a
+  // pagina inteira recarrega nesse intervalo. Isso e mais bruto, mas muito
+  // mais confiavel em navegadores de TV antigos, onde um timer em segundo
+  // plano pode travar/parar silenciosamente apos um tempo — um reload
+  // completo sempre busca tudo do zero, sem depender de estado de JS que
+  // ficou rodando por horas.
   // =========================================================================
 
   setInterval(function () {
     location.reload();
-  }, 6 * 60 * 60 * 1000);
+  }, 5 * 60 * 1000);
 
   // =========================================================================
   // REQUISITO 4 — Wake Lock (manter tela ativa), quando suportado
