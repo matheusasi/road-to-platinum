@@ -10,8 +10,10 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    background-color: #0a0d13;
-    color: #f2f2f2;
+    background-color: #050914;
+    background-image: radial-gradient(circle at 88% 12%, rgba(46,142,255,0.10), transparent 42%),
+                       radial-gradient(circle at 8% 92%, rgba(0,217,192,0.06), transparent 38%);
+    color: #eaf1ff;
     font-family: Arial, Helvetica, sans-serif;
     overflow: hidden;
   }
@@ -25,14 +27,14 @@
     margin: 0;
     font-size: 46px;
     letter-spacing: 2px;
-    color: #dfe6ee;
+    color: #f5f8ff;
     text-transform: uppercase;
   }
 
   #topo .subtitulo {
     margin-top: 6px;
     font-size: 20px;
-    color: #6d7d90;
+    color: #7c8fb3;
   }
 
   #areaGauge {
@@ -44,25 +46,25 @@
     margin-top: -70px;
     font-size: 64px;
     font-weight: bold;
-    color: #dfe6ee;
+    color: #f5f8ff;
   }
 
   #textoGaugeValores {
     margin-top: 6px;
     font-size: 26px;
-    color: #9fb0c2;
+    color: #8a9bc0;
   }
 
-  #textoGaugeValores .atual { color: #52d18a; font-weight: bold; }
-  #textoGaugeValores .meta  { color: #dfe6ee; font-weight: bold; }
+  #textoGaugeValores .atual { color: #29e0c8; font-weight: bold; }
+  #textoGaugeValores .meta  { color: #f5f8ff; font-weight: bold; }
 
   #grade {
     padding: 10px 40px 20px 40px;
   }
 
   .card {
-    background-color: #12161f;
-    border: 2px solid #202632;
+    background-color: #0d1424;
+    border: 2px solid rgba(46,142,255,0.25);
     border-radius: 16px;
     width: 22%;
     margin: 1.5%;
@@ -70,11 +72,12 @@
     float: left;
     box-sizing: border-box;
     text-align: center;
+    box-shadow: 0 0 24px rgba(46,142,255,0.08);
   }
 
   .card .rotulo {
     font-size: 22px;
-    color: #6d7d90;
+    color: #7c8fb3;
     margin-bottom: 14px;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -83,14 +86,14 @@
   .card .valor {
     font-size: 42px;
     font-weight: bold;
-    color: #ffffff;
+    color: #eaf1ff;
     white-space: nowrap;
   }
 
   .card .valor.alerta   { color: #ff6b6b; }
   .card .valor.atencao  { color: #ffb648; }
-  .card .valor.neutro   { color: #dfe6ee; }
-  .card .valor.encerrado { font-size: 30px; color: #6d7d90; }
+  .card .valor.neutro   { color: #eaf1ff; }
+  .card .valor.encerrado { font-size: 30px; color: #7c8fb3; }
 
   .clearfix { clear: both; }
 </style>
@@ -225,8 +228,8 @@
   // =========================================================================
 
   function corDoGauge(pct) {
-    if (pct >= 1) return '#52d18a';
-    if (pct >= 0.6) return '#7fd1c9';
+    if (pct >= 1) return '#00d9c0';
+    if (pct >= 0.6) return '#4da8ff';
     if (pct >= 0.3) return '#ffb648';
     return '#ff6b6b';
   }
@@ -247,7 +250,7 @@
     ctx.beginPath();
     ctx.arc(cx, cy, raio, Math.PI, 0, false);
     ctx.lineWidth = espessura;
-    ctx.strokeStyle = '#1b212c';
+    ctx.strokeStyle = '#111a2e';
     ctx.lineCap = 'round';
     ctx.stroke();
 
@@ -308,8 +311,11 @@
   // texto na tela via XHR.
   // =========================================================================
 
+  var ultimoSucesso = Date.now();
+
   function atualizarDados() {
     buscarDados(function (dados) {
+      ultimoSucesso = Date.now();
       renderizarDashboard(dados);
     });
   }
@@ -318,19 +324,22 @@
   setInterval(atualizarDados, 1 * 60 * 1000);
 
   // =========================================================================
-  // REQUISITO 3 — reload completo da pagina a cada 30 minutos.
+  // REQUISITO 3 — reload completo APENAS se os dados pararem de atualizar.
   //
-  // So existe como rede de seguranca para navegadores de TV antigos, onde um
-  // timer em segundo plano pode travar/parar silenciosamente apos um tempo —
-  // um reload completo sempre busca tudo do zero, sem depender de estado de
-  // JS que ficou rodando por horas. O intervalo e longo de proposito: cada
-  // reload arrisca sair do fullscreen (ver REQUISITO 2), entao so vale a
-  // pena pagar esse preco raramente, nao a cada minuto.
+  // Nao existe mais reload programado por horario: todo reload sai do
+  // fullscreen na TV (nenhum navegador re-entra em fullscreen sozinho depois
+  // de uma navegacao, nem o dela) e a TV nao tem controle remoto por perto pra
+  // tocar na tela de novo. Entao so recarrega em ULTIMO CASO: se 5 minutos
+  // se passarem sem nenhuma atualizacao de dados bem-sucedida (sinal de que o
+  // JS realmente travou), ai sim vale a pena pagar o preco de perder o
+  // fullscreen pra sair do estado travado.
   // =========================================================================
 
   setInterval(function () {
-    location.reload();
-  }, 30 * 60 * 1000);
+    if (Date.now() - ultimoSucesso > 5 * 60 * 1000) {
+      location.reload();
+    }
+  }, 1 * 60 * 1000);
 
   // =========================================================================
   // REQUISITO 4 — Wake Lock (manter tela ativa), quando suportado
