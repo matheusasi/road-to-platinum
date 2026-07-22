@@ -139,35 +139,34 @@
 
 <script>
   // =========================================================================
-  // CONFIGURACAO — as duas variaveis que definem a meta e o prazo.
-  // Mude aqui quando o ano/meta mudar; nada mais no codigo precisa ser tocado.
+  // CONFIGURACAO
+  //
+  // O prazo (25/dez/2026) e o calculo de dias uteis restantes agora vivem
+  // no workflow do n8n, nao aqui — mude por la se o prazo mudar.
   // =========================================================================
 
   var META_RECEITA = 750000; // USD
-  var DATA_LIMITE = new Date(2026, 11, 25); // 25 de dezembro de 2026 (mes 11 = dezembro, base 0)
 
   // =========================================================================
   // FONTE DE DADOS
   //
   // Este repositorio e PUBLICO (necessario pra ativar o GitHub Pages de
   // graca), entao os numeros de venda NUNCA ficam gravados aqui. Eles moram
-  // no Google Sheets e sao servidos por um Apps Script Web App — o dashboard
-  // busca direto de la, entre origens (CORS), sem passar pelo GitHub.
-  //
-  // Troque APPS_SCRIPT_URL pela URL de implantacao do seu Web App
-  // (formato https://script.google.com/macros/s/XXXXX/exec) quando o
-  // Apps Script estiver pronto.
+  // no monday.com e sao servidos por um webhook do n8n, que ja calcula tudo
+  // (incluindo dias uteis restantes) e devolve so o JSON pronto — o
+  // dashboard busca direto de la, entre origens (CORS), sem passar pelo
+  // GitHub.
   //
   // Usa XMLHttpRequest em vez de fetch() de proposito: navegadores de Smart
   // TV antigos (ex: Tizen 2014) costumam nao ter fetch()/Promise nativos.
   // =========================================================================
 
-  var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjh457IG2flIS-2xm5HbL6BPAD-YtqyhFp6F3o_FdbN6GR0XvJhr59gl3zH-qXKrx0/exec';
+  var APPS_SCRIPT_URL = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
 
   function buscarDados(callback) {
     var xhr = new XMLHttpRequest();
     // cache-bust: sem isso, o navegador pode servir uma resposta antiga
-    // em vez de buscar a mais recente do Apps Script
+    // em vez de buscar a mais recente do webhook
     xhr.open('GET', APPS_SCRIPT_URL + '?_=' + new Date().getTime(), true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
@@ -219,25 +218,6 @@
     var comVirgulas = invertido.replace(/(\d{3})(?=\d)/g, '$1,');
     var resultado = comVirgulas.split('').reverse().join('');
     return (negativo ? '-$' : '$') + resultado;
-  }
-
-  function diasRestantesAte(dataLimite) {
-    var agora = new Date();
-    var inicioHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate());
-    var diffMs = dataLimite.getTime() - inicioHoje.getTime();
-    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  }
-
-  function calcularReceitaPorDia(receitaAtual) {
-    var diasRestantes = diasRestantesAte(DATA_LIMITE);
-    if (diasRestantes <= 0) {
-      return null; // meta encerrada
-    }
-    var faltante = META_RECEITA - receitaAtual;
-    if (faltante <= 0) {
-      return 0; // meta ja batida
-    }
-    return faltante / diasRestantes;
   }
 
   // =========================================================================
@@ -307,13 +287,12 @@
     document.getElementById('valFaltanteOntem').innerHTML = formatarUSD(dados.receitaFaltanteOntem);
     document.getElementById('valFaltanteHoje').innerHTML = formatarUSD(dados.receitaFaltanteHoje);
 
-    var porDia = calcularReceitaPorDia(dados.receitaAtual);
     var elPorDia = document.getElementById('valPorDia');
-    if (porDia === null) {
-      elPorDia.innerHTML = 'Meta encerrada';
+    if (dados.receitaFaltanteHoje <= 0) {
+      elPorDia.innerHTML = 'Meta atingida';
       elPorDia.className = 'valor encerrado';
     } else {
-      elPorDia.innerHTML = formatarUSD(porDia);
+      elPorDia.innerHTML = formatarUSD(dados.necessarioPorDia);
       elPorDia.className = 'valor neutro';
     }
   }
