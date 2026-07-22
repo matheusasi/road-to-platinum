@@ -298,7 +298,14 @@
   }
 
   // =========================================================================
-  // REQUISITO 2 — auto-refresh dos dados a cada 5 minutos, sem reload de pagina
+  // REQUISITO 2 — auto-refresh dos dados a cada 1 minuto, sem reload de pagina
+  //
+  // Este e o mecanismo PRINCIPAL de atualizacao. Um reload completo derruba
+  // o fullscreen (nenhum navegador preserva fullscreen atraves de uma
+  // navegacao real, nem o da TV) e, depois de recarregar, requestFullscreen()
+  // exige um gesto do usuario pra funcionar de novo — que a TV nao tem
+  // sozinha. Por isso a atualizacao de dados normal NUNCA navega: so troca o
+  // texto na tela via XHR.
   // =========================================================================
 
   function atualizarDados() {
@@ -308,22 +315,22 @@
   }
 
   atualizarDados();
-  setInterval(atualizarDados, 5 * 60 * 1000);
+  setInterval(atualizarDados, 1 * 60 * 1000);
 
   // =========================================================================
-  // REQUISITO 3 — reload completo da pagina a cada 5 minutos.
+  // REQUISITO 3 — reload completo da pagina a cada 30 minutos.
   //
-  // Em vez de confiar so no refresh silencioso via XHR (REQUISITO 2), a
-  // pagina inteira recarrega nesse intervalo. Isso e mais bruto, mas muito
-  // mais confiavel em navegadores de TV antigos, onde um timer em segundo
-  // plano pode travar/parar silenciosamente apos um tempo — um reload
-  // completo sempre busca tudo do zero, sem depender de estado de JS que
-  // ficou rodando por horas.
+  // So existe como rede de seguranca para navegadores de TV antigos, onde um
+  // timer em segundo plano pode travar/parar silenciosamente apos um tempo —
+  // um reload completo sempre busca tudo do zero, sem depender de estado de
+  // JS que ficou rodando por horas. O intervalo e longo de proposito: cada
+  // reload arrisca sair do fullscreen (ver REQUISITO 2), entao so vale a
+  // pena pagar esse preco raramente, nao a cada minuto.
   // =========================================================================
 
   setInterval(function () {
     location.reload();
-  }, 1 * 60 * 1000);
+  }, 30 * 60 * 1000);
 
   // =========================================================================
   // REQUISITO 4 — Wake Lock (manter tela ativa), quando suportado
@@ -394,6 +401,24 @@
     pedirTelaCheia();
     armarFallbackDeClique();
   });
+
+  // =========================================================================
+  // REQUISITO 6 — auto-recuperacao de fullscreen, caso saia por qualquer
+  // motivo (nao so reload) sem ninguem por perto pra tocar na tela de novo.
+  // =========================================================================
+
+  function estaEmTelaCheia() {
+    return !!(document.fullscreenElement ||
+              document.webkitFullscreenElement ||
+              document.mozFullScreenElement ||
+              document.msFullscreenElement);
+  }
+
+  setInterval(function () {
+    if (!estaEmTelaCheia()) {
+      pedirTelaCheia();
+    }
+  }, 30 * 1000);
 </script>
 
 </body>
