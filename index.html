@@ -18,6 +18,57 @@
     overflow: hidden;
   }
 
+  /* =======================================================================
+     SLIDES — cada dashboard e um ".slide" empilhado no mesmo lugar. Um timer
+     (ver JS) alterna qual esta ".ativo". Isso troca de dashboard SEM navegar,
+     entao o fullscreen nunca cai. position:absolute empilha todos no mesmo
+     espaco; opacity + visibility fazem o fade (com fallback pro snap seco caso
+     o navegador da TV nao suporte transition).
+     ======================================================================= */
+  .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    visibility: hidden;
+    -webkit-transition: opacity 0.6s ease;
+    transition: opacity 0.6s ease;
+  }
+
+  .slide.ativo {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* placeholder do proximo dashboard (ainda nao construido) */
+  .placeholder {
+    height: 100%;
+    display: table;
+    width: 100%;
+    text-align: center;
+  }
+
+  .placeholder .centro {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .placeholder .titulo {
+    font-size: 52px;
+    font-weight: bold;
+    color: #f5f8ff;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .placeholder .legenda {
+    margin-top: 14px;
+    font-size: 24px;
+    color: #7c8fb3;
+  }
+
   #topo {
     text-align: center;
     padding: 26px 20px 6px 20px;
@@ -100,44 +151,64 @@
 </head>
 <body>
 
-  <div id="topo">
-    <h1>Road to Platinum</h1>
-    <div class="subtitulo">Progresso dos ultimos 12 meses</div>
+  <!-- ===================================================================
+       SLIDE 1 — Road to Platinum. Comeca ".ativo" (primeiro a aparecer).
+       =================================================================== -->
+  <div class="slide ativo" data-slide="road-to-platinum">
+
+    <div id="topo">
+      <h1>Road to Platinum</h1>
+      <div class="subtitulo">Progresso dos ultimos 12 meses</div>
+    </div>
+
+    <div id="areaGauge">
+      <canvas id="gauge" width="900" height="480"></canvas>
+      <div id="textoGaugeCentro">0%</div>
+      <div id="textoGaugeValores">
+        Atual: <span class="atual" id="valGaugeAtual">$0</span>
+        &nbsp;&nbsp;/&nbsp;&nbsp;
+        Meta: <span class="meta" id="valGaugeMeta">$0</span>
+      </div>
+    </div>
+
+    <div id="grade">
+
+      <div class="card">
+        <div class="rotulo">Dias sem Vender</div>
+        <div class="valor atencao" id="valDiasSemVender">0</div>
+      </div>
+
+      <div class="card">
+        <div class="rotulo">Faltava Ontem</div>
+        <div class="valor neutro" id="valFaltanteOntem">$0</div>
+      </div>
+
+      <div class="card">
+        <div class="rotulo">Falta Hoje</div>
+        <div class="valor neutro" id="valFaltanteHoje">$0</div>
+      </div>
+
+      <div class="card">
+        <div class="rotulo">Necessario / Dia</div>
+        <div class="valor neutro" id="valPorDia">$0</div>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
   </div>
 
-  <div id="areaGauge">
-    <canvas id="gauge" width="900" height="480"></canvas>
-    <div id="textoGaugeCentro">0%</div>
-    <div id="textoGaugeValores">
-      Atual: <span class="atual" id="valGaugeAtual">$0</span>
-      &nbsp;&nbsp;/&nbsp;&nbsp;
-      Meta: <span class="meta" id="valGaugeMeta">$0</span>
+  <!-- ===================================================================
+       SLIDE 2 — placeholder do proximo dashboard (ainda nao construido).
+       Quando o novo dashboard existir, e so trocar o conteudo deste div.
+       =================================================================== -->
+  <div class="slide" data-slide="proximo">
+    <div class="placeholder">
+      <div class="centro">
+        <div class="titulo">Proximo Dashboard</div>
+        <div class="legenda">Em breve</div>
+      </div>
     </div>
-  </div>
-
-  <div id="grade">
-
-    <div class="card">
-      <div class="rotulo">Dias sem Vender</div>
-      <div class="valor atencao" id="valDiasSemVender">0</div>
-    </div>
-
-    <div class="card">
-      <div class="rotulo">Faltava Ontem</div>
-      <div class="valor neutro" id="valFaltanteOntem">$0</div>
-    </div>
-
-    <div class="card">
-      <div class="rotulo">Falta Hoje</div>
-      <div class="valor neutro" id="valFaltanteHoje">$0</div>
-    </div>
-
-    <div class="card">
-      <div class="rotulo">Necessario / Dia</div>
-      <div class="valor neutro" id="valPorDia">$0</div>
-    </div>
-
-    <div class="clearfix"></div>
   </div>
 
 <script>
@@ -149,6 +220,9 @@
   // =========================================================================
 
   var META_RECEITA = 750000; // USD
+
+  // Quantos segundos cada dashboard fica na tela antes de trocar pro proximo.
+  var SEGUNDOS_POR_SLIDE = 15;
 
   // =========================================================================
   // FONTE DE DADOS
@@ -322,6 +396,30 @@
 
   atualizarDados();
   setInterval(atualizarDados, 1 * 60 * 1000);
+
+  // =========================================================================
+  // ROTACAO DE DASHBOARDS (slides)
+  //
+  // Alterna qual ".slide" esta ".ativo" num ciclo, a cada SEGUNDOS_POR_SLIDE.
+  // Nao navega nem recarrega — so troca a classe CSS — entao o fullscreen
+  // continua intacto. Os dados do Road to Platinum seguem se atualizando por
+  // baixo mesmo com o slide escondido, entao quando ele volta ja esta fresco.
+  //
+  // Pra adicionar mais um dashboard: crie outro <div class="slide"> no HTML.
+  // Este codigo pega todos automaticamente, sem precisar mudar nada aqui.
+  // =========================================================================
+
+  var slides = document.getElementsByClassName('slide');
+  var slideAtual = 0;
+
+  function trocarSlide() {
+    if (slides.length < 2) return; // com 1 so nao ha o que rotacionar
+    slides[slideAtual].className = 'slide';
+    slideAtual = (slideAtual + 1) % slides.length;
+    slides[slideAtual].className = 'slide ativo';
+  }
+
+  setInterval(trocarSlide, SEGUNDOS_POR_SLIDE * 1000);
 
   // =========================================================================
   // REQUISITO 3 — reload completo APENAS se os dados pararem de atualizar.
