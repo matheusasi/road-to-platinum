@@ -69,6 +69,39 @@
     color: #7c8fb3;
   }
 
+  #btnTelaCheia {
+    position: fixed;
+    right: 22px;
+    top: 22px;
+    z-index: 50;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: rgba(13, 20, 36, 0.55);
+    border: 1px solid rgba(46, 142, 255, 0.35);
+    color: #8a9bc0;
+    display: block;
+    text-align: center;
+    line-height: 44px;
+    opacity: 0.35;
+    cursor: pointer;
+    -webkit-transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease;
+  }
+
+  #btnTelaCheia svg {
+    vertical-align: middle;
+  }
+
+  #btnTelaCheia:hover {
+    opacity: 1;
+    color: #eaf1ff;
+  }
+
+  #btnTelaCheia.oculto {
+    display: none;
+  }
+
   #topo {
     text-align: center;
     padding: 26px 20px 6px 20px;
@@ -210,6 +243,18 @@
         <div class="legenda">Em breve</div>
       </div>
     </div>
+  </div>
+
+  <!-- ===================================================================
+       Botao sutil pra entrar em fullscreen. Fica fixo no canto, por cima
+       dos slides. O clique nele conta como "gesto do usuario" — que e o
+       que o navegador exige pra permitir requestFullscreen. Some sozinho
+       quando ja esta em tela cheia.
+       =================================================================== -->
+  <div id="btnTelaCheia" title="Tela cheia">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>
+    </svg>
   </div>
 
 <script>
@@ -541,6 +586,34 @@
       pedirTelaCheia();
     }
   }, 30 * 1000);
+
+  // =========================================================================
+  // BOTAO SUTIL DE TELA CHEIA
+  //
+  // O clique aqui e um gesto explicito do usuario, que e exatamente o que o
+  // navegador exige pra deixar entrar em fullscreen (o pedido automatico no
+  // load costuma ser bloqueado sem esse gesto). O botao some quando ja esta
+  // em tela cheia e reaparece se sair.
+  // =========================================================================
+
+  var btnTelaCheia = document.getElementById('btnTelaCheia');
+
+  if (btnTelaCheia) {
+    btnTelaCheia.onclick = function () {
+      pedirTelaCheia();
+    };
+  }
+
+  function atualizarVisibilidadeBotao() {
+    if (!btnTelaCheia) return;
+    btnTelaCheia.className = estaEmTelaCheia() ? 'oculto' : '';
+  }
+
+  atualizarVisibilidadeBotao();
+  document.addEventListener('fullscreenchange', atualizarVisibilidadeBotao, false);
+  document.addEventListener('webkitfullscreenchange', atualizarVisibilidadeBotao, false);
+  document.addEventListener('mozfullscreenchange', atualizarVisibilidadeBotao, false);
+  document.addEventListener('MSFullscreenChange', atualizarVisibilidadeBotao, false);
 </script>
 
 </body>
