@@ -141,6 +141,7 @@
     white-space: nowrap;
   }
 
+  .card .valor.sucesso  { color: #3ddc84; }
   .card .valor.alerta   { color: #ff6b6b; }
   .card .valor.atencao  { color: #ffb648; }
   .card .valor.neutro   { color: #eaf1ff; }
@@ -348,6 +349,12 @@
   // RENDERIZACAO
   // =========================================================================
 
+  function corPorDiasSemVender(dias) {
+    if (dias >= 3) return 'alerta';   // vermelho
+    if (dias >= 1) return 'atencao';  // amarelo (1 ou 2 dias)
+    return 'sucesso';                 // verde (0 dias)
+  }
+
   function renderizarDashboard(dados) {
     var pct = dados.receitaAtual / META_RECEITA;
     var pctExibicao = Math.round(pct * 1000) / 10; // 1 casa decimal
@@ -357,12 +364,20 @@
     document.getElementById('valGaugeAtual').innerHTML = formatarUSD(dados.receitaAtual);
     document.getElementById('valGaugeMeta').innerHTML = formatarUSD(META_RECEITA);
 
+    // Cor guiada so pelos Dias sem Vender — "Dias sem Vender" e "Falta Hoje"
+    // usam a MESMA cor: 0 dias = verde, 1-2 = amarelo, 3+ = vermelho (e fica
+    // vermelho pra frente ate alguem registrar venda e zerar os dias).
+    var classeCor = corPorDiasSemVender(dados.diasSemVender);
+
     var elDias = document.getElementById('valDiasSemVender');
     elDias.innerHTML = dados.diasSemVender;
-    elDias.className = 'valor ' + (dados.diasSemVender >= 3 ? 'alerta' : 'atencao');
+    elDias.className = 'valor ' + classeCor;
 
     document.getElementById('valFaltanteOntem').innerHTML = formatarUSD(dados.receitaFaltanteOntem);
-    document.getElementById('valFaltanteHoje').innerHTML = formatarUSD(dados.receitaFaltanteHoje);
+
+    var elFaltaHoje = document.getElementById('valFaltanteHoje');
+    elFaltaHoje.innerHTML = formatarUSD(dados.receitaFaltanteHoje);
+    elFaltaHoje.className = 'valor ' + classeCor;
 
     var elPorDia = document.getElementById('valPorDia');
     if (dados.receitaFaltanteHoje <= 0) {
