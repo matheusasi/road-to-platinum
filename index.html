@@ -42,33 +42,6 @@
     visibility: visible;
   }
 
-  /* placeholder do proximo dashboard (ainda nao construido) */
-  .placeholder {
-    height: 100%;
-    display: table;
-    width: 100%;
-    text-align: center;
-  }
-
-  .placeholder .centro {
-    display: table-cell;
-    vertical-align: middle;
-  }
-
-  .placeholder .titulo {
-    font-size: 52px;
-    font-weight: bold;
-    color: #f5f8ff;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .placeholder .legenda {
-    margin-top: 14px;
-    font-size: 24px;
-    color: #7c8fb3;
-  }
-
   #btnTelaCheia {
     position: fixed;
     right: 22px;
@@ -233,17 +206,21 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 2 — placeholder do proximo dashboard (ainda nao construido).
-       Quando o novo dashboard existir, e so trocar o conteudo deste div.
+       PROXIMOS DASHBOARDS
+
+       Hoje so existe o slide de cima, entao a rotacao fica parada (o JS so
+       rotaciona quando ha 2 ou mais slides) — nada de tela vazia ou de
+       "em breve" na TV.
+
+       Pra ligar a rotacao, basta colar mais um bloco abaixo, sem a classe
+       "ativo" (so o primeiro slide comeca ativo). O JS pega automaticamente:
+
+       <div class="slide" data-slide="nome-do-novo">
+         ... conteudo do novo dashboard ...
+       </div>
+
+       O tempo de cada slide na tela e o SEGUNDOS_POR_SLIDE la no script.
        =================================================================== -->
-  <div class="slide" data-slide="proximo">
-    <div class="placeholder">
-      <div class="centro">
-        <div class="titulo">Proximo Dashboard</div>
-        <div class="legenda">Em breve</div>
-      </div>
-    </div>
-  </div>
 
   <!-- ===================================================================
        Botao sutil pra entrar em fullscreen. Fica fixo no canto, por cima
