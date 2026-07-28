@@ -154,6 +154,182 @@
   .card .valor.encerrado { font-size: 30px; color: #7c8fb3; }
 
   .clearfix { clear: both; }
+
+  /* =======================================================================
+     SLIDE 2 — Vendas de Cursos (Eduzz + Digital Manager Guru)
+     Mesma paleta do slide 1. Layout em float de proposito: o navegador da
+     TV e de 2014 e flexbox nele e imprevisivel.
+     ======================================================================= */
+  #topoVendas {
+    text-align: center;
+    padding: 26px 20px 6px 20px;
+  }
+
+  #topoVendas h1 {
+    margin: 0;
+    font-size: 52px;
+    letter-spacing: 2px;
+    color: #f5f8ff;
+    text-transform: uppercase;
+  }
+
+  #topoVendas .subtitulo {
+    margin-top: 6px;
+    font-size: 24px;
+    color: #7c8fb3;
+  }
+
+  #vendasResumo {
+    padding: 14px 34px 0 34px;
+  }
+
+  .blocoVendas {
+    background-color: #0d1424;
+    border: 2px solid rgba(46,142,255,0.25);
+    border-radius: 16px;
+    box-shadow: 0 0 24px rgba(46,142,255,0.08);
+    float: left;
+    box-sizing: border-box;
+    padding: 26px 30px;
+    margin: 0 1%;
+  }
+
+  .blocoVendas.meta   { width: 48%; margin-left: 0; }
+  .blocoVendas.metade { width: 23%; text-align: center; }
+  .blocoVendas.metade:last-of-type { margin-right: 0; }
+
+  .blocoVendas .rotulo {
+    font-size: 22px;
+    color: #7c8fb3;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+
+  .blocoVendas .valor {
+    font-size: 58px;
+    font-weight: bold;
+    color: #eaf1ff;
+    white-space: nowrap;
+  }
+
+  .blocoVendas .valorGrande {
+    font-size: 70px;
+    font-weight: bold;
+    color: #29e0c8;
+    white-space: nowrap;
+  }
+
+  /* barra de progresso do faturamento contra a meta */
+  .barraFundo {
+    margin-top: 16px;
+    height: 22px;
+    border-radius: 11px;
+    background-color: #111a2e;
+    overflow: hidden;
+  }
+
+  .barraProgresso {
+    height: 100%;
+    width: 0;
+    border-radius: 11px;
+    background-color: #2e8eff;
+  }
+
+  .metaLegenda {
+    margin-top: 12px;
+    font-size: 22px;
+    color: #8a9bc0;
+  }
+
+  .metaLegenda b { color: #eaf1ff; }
+
+  #vendasBaixo {
+    padding: 24px 34px 20px 34px;
+  }
+
+  .painelVendas {
+    background-color: #0d1424;
+    border: 2px solid rgba(46,142,255,0.25);
+    border-radius: 16px;
+    box-shadow: 0 0 24px rgba(46,142,255,0.08);
+    float: left;
+    box-sizing: border-box;
+    padding: 22px 26px;
+  }
+
+  #painelGrafico { width: 56%; margin-right: 2%; }
+  #painelTabela  { width: 42%; }
+
+  .tituloSecao {
+    font-size: 22px;
+    color: #7c8fb3;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+  }
+
+  #tabelaCursos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 26px;
+  }
+
+  #tabelaCursos td {
+    padding: 13px 6px;
+    border-bottom: 1px solid rgba(46,142,255,0.12);
+    color: #eaf1ff;
+  }
+
+  #tabelaCursos td.qtd {
+    text-align: center;
+    color: #8a9bc0;
+    width: 72px;
+    white-space: nowrap;
+  }
+
+  #tabelaCursos td.fat {
+    text-align: right;
+    color: #29e0c8;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 168px;
+  }
+
+  #tabelaCursos td.nome {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  #tabelaCursos tr.vazio td {
+    color: #7c8fb3;
+    text-align: center;
+    border-bottom: 0;
+    padding-top: 22px;
+  }
+
+  /* O slide 2 foi dimensionado pra TV 1080p. Se a tela for mais baixa
+     (720p, ou janela reduzida), encolhe tudo pra nao cortar o rodape. */
+  @media (max-height: 850px) {
+    #topoVendas { padding: 14px 20px 2px 20px; }
+    #topoVendas h1 { font-size: 34px; }
+    #topoVendas .subtitulo { font-size: 17px; }
+    #vendasResumo { padding: 8px 24px 0 24px; }
+    .blocoVendas { padding: 14px 18px; }
+    .blocoVendas .rotulo { font-size: 15px; margin-bottom: 6px; }
+    .blocoVendas .valor { font-size: 34px; }
+    .blocoVendas .valorGrande { font-size: 40px; }
+    .barraFundo { margin-top: 9px; height: 14px; border-radius: 7px; }
+    .barraProgresso { border-radius: 7px; }
+    .metaLegenda { margin-top: 7px; font-size: 15px; }
+    #vendasBaixo { padding: 12px 24px 12px 24px; }
+    .painelVendas { padding: 12px 16px; }
+    .tituloSecao { font-size: 15px; margin-bottom: 8px; }
+    #tabelaCursos { font-size: 17px; }
+    #tabelaCursos td { padding: 6px 4px; }
+    #tabelaCursos td.qtd { width: 48px; }
+    #tabelaCursos td.fat { width: 110px; }
+  }
 </style>
 </head>
 <body>
@@ -206,20 +382,65 @@
   </div>
 
   <!-- ===================================================================
-       PROXIMOS DASHBOARDS
+       SLIDE 2 — Vendas de Cursos (Eduzz + Digital Manager Guru).
+       Os numeros vem prontos do n8n (VENDAS_URL): a TV nao faz conta.
+       =================================================================== -->
+  <div class="slide" data-slide="vendas-cursos">
 
-       Hoje so existe o slide de cima, entao a rotacao fica parada (o JS so
-       rotaciona quando ha 2 ou mais slides) — nada de tela vazia ou de
-       "em breve" na TV.
+    <div id="topoVendas">
+      <h1>Vendas de Cursos</h1>
+      <div class="subtitulo" id="vendasRotuloMes">&nbsp;</div>
+    </div>
 
-       Pra ligar a rotacao, basta colar mais um bloco abaixo, sem a classe
-       "ativo" (so o primeiro slide comeca ativo). O JS pega automaticamente:
+    <div id="vendasResumo">
 
-       <div class="slide" data-slide="nome-do-novo">
-         ... conteudo do novo dashboard ...
-       </div>
+      <div class="blocoVendas meta">
+        <div class="rotulo">Faturamento do mes</div>
+        <div class="valorGrande" id="vendasFaturamento">R$ 0</div>
+        <div class="barraFundo"><div class="barraProgresso" id="vendasBarra"></div></div>
+        <div class="metaLegenda">
+          Meta: <b id="vendasMeta">R$ 0</b>
+          &nbsp;&middot;&nbsp;
+          <b id="vendasPercentual">0%</b> da meta
+        </div>
+      </div>
 
-       O tempo de cada slide na tela e o SEGUNDOS_POR_SLIDE la no script.
+      <div class="blocoVendas metade">
+        <div class="rotulo">Vendas no mes</div>
+        <div class="valor" id="vendasQtd">0</div>
+      </div>
+
+      <div class="blocoVendas metade">
+        <div class="rotulo">Ticket medio</div>
+        <div class="valor" id="vendasTicket">R$ 0</div>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+    <div id="vendasBaixo">
+
+      <div class="painelVendas" id="painelGrafico">
+        <div class="tituloSecao">Faturamento semanal</div>
+        <canvas id="graficoSemanal" width="880" height="430"></canvas>
+      </div>
+
+      <div class="painelVendas" id="painelTabela">
+        <div class="tituloSecao">Cursos &mdash; mes atual</div>
+        <table id="tabelaCursos"><tbody id="corpoTabelaCursos"></tbody></table>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================
+       Pra adicionar um terceiro dashboard, cole outro bloco assim (sem a
+       classe "ativo" — so o primeiro comeca ativo). A rotacao pega
+       sozinha, nao precisa mexer no JS:
+
+       <div class="slide" data-slide="nome-do-novo"> ... </div>
        =================================================================== -->
 
   <!-- ===================================================================
@@ -248,41 +469,44 @@
   var SEGUNDOS_POR_SLIDE = 15;
 
   // =========================================================================
-  // FONTE DE DADOS
+  // FONTES DE DADOS
   //
   // Este repositorio e PUBLICO (necessario pra ativar o GitHub Pages de
-  // graca), entao os numeros de venda NUNCA ficam gravados aqui. Eles moram
-  // no monday.com e sao servidos por um webhook do n8n, que ja calcula tudo
-  // (incluindo dias uteis restantes) e devolve so o JSON pronto — o
-  // dashboard busca direto de la, entre origens (CORS), sem passar pelo
-  // GitHub.
+  // graca), entao numero de venda NUNCA fica gravado aqui. Tudo mora no
+  // monday.com e e servido por webhooks do n8n, que ja fazem as contas e
+  // devolvem so o JSON pronto — o dashboard busca direto de la, entre
+  // origens (CORS), sem passar pelo GitHub.
   //
   // Usa XMLHttpRequest em vez de fetch() de proposito: navegadores de Smart
   // TV antigos (ex: Tizen 2014) costumam nao ter fetch()/Promise nativos.
   // =========================================================================
 
-  var APPS_SCRIPT_URL = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
+  var URL_ROAD_TO_PLATINUM = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
+  var URL_VENDAS_CURSOS    = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/vendas-cursos';
 
-  function buscarDados(callback) {
+  function buscarJSON(url, callback) {
     var xhr = new XMLHttpRequest();
     // cache-bust: sem isso, o navegador pode servir uma resposta antiga
     // em vez de buscar a mais recente do webhook
-    xhr.open('GET', APPS_SCRIPT_URL + '?_=' + new Date().getTime(), true);
+    xhr.open('GET', url + '?_=' + new Date().getTime(), true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           try {
-            var dados = JSON.parse(xhr.responseText);
-            callback(dados);
+            callback(JSON.parse(xhr.responseText));
           } catch (erroParse) {
-            if (window.console && console.error) console.error('Resposta do Apps Script invalida:', erroParse);
+            if (window.console && console.error) console.error('Resposta invalida de ' + url, erroParse);
           }
         } else {
-          if (window.console && console.error) console.error('Falha ao buscar dados, status:', xhr.status);
+          if (window.console && console.error) console.error('Falha ao buscar ' + url + ', status:', xhr.status);
         }
       }
     };
     xhr.send();
+  }
+
+  function buscarDados(callback) {
+    buscarJSON(URL_ROAD_TO_PLATINUM, callback);
   }
 
   // =========================================================================
@@ -412,6 +636,175 @@
   }
 
   // =========================================================================
+  // SLIDE 2 — VENDAS DE CURSOS
+  //
+  // O n8n manda tudo mastigado (faturamento do mes, meta, ticket medio,
+  // serie semanal e tabela por curso). Aqui so pinta na tela.
+  // =========================================================================
+
+  var formatadorBRL = null;
+  if (window.Intl && window.Intl.NumberFormat) {
+    try {
+      formatadorBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+    } catch (e) {
+      formatadorBRL = null;
+    }
+  }
+
+  function formatarBRL(valor) {
+    if (formatadorBRL) return formatadorBRL.format(valor);
+    // fallback manual (sem Intl): milhar com ponto, igual ao padrao br
+    var inteiro = String(Math.round(valor));
+    var negativo = inteiro.charAt(0) === '-';
+    if (negativo) inteiro = inteiro.substring(1);
+    var invertido = inteiro.split('').reverse().join('');
+    var comPontos = invertido.replace(/(\d{3})(?=\d)/g, '$1.');
+    return (negativo ? '-R$ ' : 'R$ ') + comPontos.split('').reverse().join('');
+  }
+
+  function desenharGraficoSemanal(semanas) {
+    var canvas = document.getElementById('graficoSemanal');
+    if (!canvas || !canvas.getContext) return;
+
+    // O canvas precisa caber no painel, que e uma porcentagem da tela — numa
+    // TV 1080p ou numa janela pequena a largura muda. Sem isso o grafico
+    // vaza por cima do painel da tabela.
+    var painel = document.getElementById('painelGrafico');
+    if (painel && painel.clientWidth > 0) {
+      var disponivel = painel.clientWidth - 44; // desconta o padding do painel
+      if (disponivel > 100 && canvas.width !== disponivel) canvas.width = disponivel;
+    }
+    // a altura vem de atributo HTML, que o CSS do @media nao encolhe —
+    // entao acompanha aqui o mesmo corte de 850px usado no CSS
+    var alturaAlvo = (window.innerHeight <= 850) ? 220 : 430;
+    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
+
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+
+    ctx.clearRect(0, 0, w, h);
+    if (!semanas || semanas.length === 0) return;
+
+    var margemEsq = 12, margemDir = 12, margemTopo = 18, margemBaixo = 40;
+    var largura = w - margemEsq - margemDir;
+    var altura = h - margemTopo - margemBaixo;
+
+    var maior = 0;
+    var i;
+    for (i = 0; i < semanas.length; i++) {
+      if (semanas[i].total > maior) maior = semanas[i].total;
+    }
+    if (maior <= 0) maior = 1; // evita divisao por zero quando nao houve venda
+
+    function coordX(indice) {
+      if (semanas.length === 1) return margemEsq + largura / 2;
+      return margemEsq + (largura * indice) / (semanas.length - 1);
+    }
+    function coordY(valor) {
+      return margemTopo + altura - (altura * valor) / maior;
+    }
+
+    // linhas de grade horizontais
+    ctx.strokeStyle = 'rgba(46,142,255,0.10)';
+    ctx.lineWidth = 1;
+    for (i = 0; i <= 3; i++) {
+      var y = margemTopo + (altura * i) / 3;
+      ctx.beginPath();
+      ctx.moveTo(margemEsq, y);
+      ctx.lineTo(w - margemDir, y);
+      ctx.stroke();
+    }
+
+    // area sob a linha
+    ctx.beginPath();
+    ctx.moveTo(coordX(0), margemTopo + altura);
+    for (i = 0; i < semanas.length; i++) {
+      ctx.lineTo(coordX(i), coordY(semanas[i].total));
+    }
+    ctx.lineTo(coordX(semanas.length - 1), margemTopo + altura);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(46,142,255,0.14)';
+    ctx.fill();
+
+    // a linha
+    ctx.beginPath();
+    for (i = 0; i < semanas.length; i++) {
+      var x = coordX(i);
+      var yv = coordY(semanas[i].total);
+      if (i === 0) ctx.moveTo(x, yv); else ctx.lineTo(x, yv);
+    }
+    ctx.strokeStyle = '#4da8ff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // pontos
+    for (i = 0; i < semanas.length; i++) {
+      ctx.beginPath();
+      ctx.arc(coordX(i), coordY(semanas[i].total), 4, 0, Math.PI * 2, false);
+      ctx.fillStyle = '#29e0c8';
+      ctx.fill();
+    }
+
+    // rotulos do eixo x (mostra 1 a cada 2 pra nao embolar na TV)
+    ctx.fillStyle = '#7c8fb3';
+    ctx.font = '19px Arial, Helvetica, sans-serif';
+    ctx.textAlign = 'center';
+    for (i = 0; i < semanas.length; i++) {
+      if (i % 2 === 0 || i === semanas.length - 1) {
+        ctx.fillText(semanas[i].rotulo, coordX(i), h - 12);
+      }
+    }
+  }
+
+  function renderizarVendas(dados) {
+    document.getElementById('vendasRotuloMes').innerHTML = dados.rotuloMes || '&nbsp;';
+    document.getElementById('vendasFaturamento').innerHTML = formatarBRL(dados.faturamentoMes);
+    document.getElementById('vendasMeta').innerHTML = formatarBRL(dados.metaMensal);
+    document.getElementById('vendasPercentual').innerHTML = dados.percentualMeta + '%';
+    document.getElementById('vendasQtd').innerHTML = dados.vendasMes;
+    document.getElementById('vendasTicket').innerHTML = formatarBRL(dados.ticketMedio);
+
+    var pct = dados.percentualMeta;
+    if (pct < 0) pct = 0;
+    if (pct > 100) pct = 100;
+    var barra = document.getElementById('vendasBarra');
+    barra.style.width = pct + '%';
+    // mesma escala de cor do gauge do slide 1, pra leitura ficar consistente
+    barra.style.backgroundColor = corDoGauge(dados.percentualMeta / 100);
+
+    desenharGraficoSemanal(dados.semanal);
+
+    var corpo = document.getElementById('corpoTabelaCursos');
+    var html = '';
+    var cursos = dados.cursos || [];
+    if (cursos.length === 0) {
+      html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mes</td></tr>';
+    } else {
+      // cabe cerca de 7 linhas no painel da TV sem cortar
+      var limite = cursos.length > 7 ? 7 : cursos.length;
+      for (var i = 0; i < limite; i++) {
+        var c = cursos[i];
+        html += '<tr>' +
+                  '<td class="qtd">' + c.vendas + 'x</td>' +
+                  '<td class="nome">' + c.curso + '</td>' +
+                  '<td class="fat">' + formatarBRL(c.faturamento) + '</td>' +
+                '</tr>';
+      }
+      if (cursos.length > limite) {
+        var resto = 0;
+        for (var j = limite; j < cursos.length; j++) resto += cursos[j].faturamento;
+        html += '<tr>' +
+                  '<td class="qtd">&nbsp;</td>' +
+                  '<td class="nome">+ ' + (cursos.length - limite) + ' outros cursos</td>' +
+                  '<td class="fat">' + formatarBRL(resto) + '</td>' +
+                '</tr>';
+      }
+    }
+    corpo.innerHTML = html;
+  }
+
+  // =========================================================================
   // REQUISITO 2 — auto-refresh dos dados a cada 1 minuto, sem reload de pagina
   //
   // Este e o mecanismo PRINCIPAL de atualizacao. Um reload completo derruba
@@ -431,8 +824,19 @@
     });
   }
 
+  function atualizarVendas() {
+    buscarJSON(URL_VENDAS_CURSOS, function (dados) {
+      // de proposito NAO mexe em ultimoSucesso: o watchdog de reload existe
+      // pra destravar a pagina, e o slide 1 e a fonte de verdade disso. Se so
+      // o webhook de vendas cair, nao vale recarregar (e perder o fullscreen).
+      renderizarVendas(dados);
+    });
+  }
+
   atualizarDados();
+  atualizarVendas();
   setInterval(atualizarDados, 1 * 60 * 1000);
+  setInterval(atualizarVendas, 1 * 60 * 1000);
 
   // =========================================================================
   // ROTACAO DE DASHBOARDS (slides)
