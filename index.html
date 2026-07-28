@@ -481,8 +481,10 @@
   // TV antigos (ex: Tizen 2014) costumam nao ter fetch()/Promise nativos.
   // =========================================================================
 
+  // Cada dashboard e servido pela instancia de n8n onde o workflow dele vive —
+  // por isso os dois hosts diferentes aqui embaixo, nao e engano.
   var URL_ROAD_TO_PLATINUM = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
-  var URL_VENDAS_CURSOS    = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/vendas-cursos';
+  var URL_VENDAS_CURSOS    = 'https://squadhub.app.n8n.cloud/webhook/vendas-cursos';
 
   function buscarJSON(url, callback) {
     var xhr = new XMLHttpRequest();
