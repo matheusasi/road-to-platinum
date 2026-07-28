@@ -308,28 +308,51 @@
     padding-top: 22px;
   }
 
-  /* O slide 2 foi dimensionado pra TV 1080p. Se a tela for mais baixa
-     (720p, ou janela reduzida), encolhe tudo pra nao cortar o rodape. */
-  @media (max-height: 850px) {
-    #topoVendas { padding: 14px 20px 2px 20px; }
-    #topoVendas h1 { font-size: 34px; }
-    #topoVendas .subtitulo { font-size: 17px; }
-    #vendasResumo { padding: 8px 24px 0 24px; }
-    .blocoVendas { padding: 14px 18px; }
-    .blocoVendas .rotulo { font-size: 15px; margin-bottom: 6px; }
-    .blocoVendas .valor { font-size: 34px; }
-    .blocoVendas .valorGrande { font-size: 40px; }
-    .barraFundo { margin-top: 9px; height: 14px; border-radius: 7px; }
-    .barraProgresso { border-radius: 7px; }
-    .metaLegenda { margin-top: 7px; font-size: 15px; }
-    #vendasBaixo { padding: 12px 24px 12px 24px; }
-    .painelVendas { padding: 12px 16px; }
-    .tituloSecao { font-size: 15px; margin-bottom: 8px; }
-    #tabelaCursos { font-size: 17px; }
-    #tabelaCursos td { padding: 6px 4px; }
-    #tabelaCursos td.qtd { width: 48px; }
-    #tabelaCursos td.fat { width: 110px; }
-  }
+  /* =======================================================================
+     AJUSTE AUTOMATICO DE TAMANHO
+     Navegador de TV nao entrega a resolucao logica que a gente espera (o
+     mesmo 1080p fisico pode reportar viewport bem menor, e o texto sai
+     gigante). Em vez de chutar por @media, o JS MEDE o conteudo depois de
+     desenhar e, se nao couber, marca o body com .compacto — e se ainda
+     assim estourar, com .muitoCompacto.
+     ======================================================================= */
+  body.compacto #topoVendas { padding: 14px 20px 2px 20px; }
+  body.compacto #topoVendas h1 { font-size: 36px; }
+  body.compacto #topoVendas .subtitulo { font-size: 18px; }
+  body.compacto #vendasResumo { padding: 8px 24px 0 24px; }
+  body.compacto .blocoVendas { padding: 15px 19px; }
+  body.compacto .blocoVendas .rotulo { font-size: 16px; margin-bottom: 6px; }
+  body.compacto .blocoVendas .valor { font-size: 38px; }
+  body.compacto .blocoVendas .valorGrande { font-size: 46px; }
+  body.compacto .barraFundo { margin-top: 10px; height: 15px; border-radius: 8px; }
+  body.compacto .barraProgresso { border-radius: 8px; }
+  body.compacto .metaLegenda { margin-top: 8px; font-size: 16px; }
+  body.compacto #vendasBaixo { padding: 13px 24px 12px 24px; }
+  body.compacto .painelVendas { padding: 13px 17px; }
+  body.compacto .tituloSecao { font-size: 16px; margin-bottom: 8px; }
+  body.compacto #tabelaCursos { font-size: 19px; }
+  body.compacto #tabelaCursos td { padding: 8px 4px; }
+  body.compacto #tabelaCursos td.qtd { width: 52px; }
+  body.compacto #tabelaCursos td.fat { width: 118px; }
+
+  body.muitoCompacto #topoVendas { padding: 8px 16px 0 16px; }
+  body.muitoCompacto #topoVendas h1 { font-size: 26px; }
+  body.muitoCompacto #topoVendas .subtitulo { font-size: 14px; }
+  body.muitoCompacto #vendasResumo { padding: 6px 18px 0 18px; }
+  body.muitoCompacto .blocoVendas { padding: 10px 14px; }
+  body.muitoCompacto .blocoVendas .rotulo { font-size: 13px; margin-bottom: 4px; }
+  body.muitoCompacto .blocoVendas .valor { font-size: 27px; }
+  body.muitoCompacto .blocoVendas .valorGrande { font-size: 32px; }
+  body.muitoCompacto .barraFundo { margin-top: 7px; height: 11px; border-radius: 6px; }
+  body.muitoCompacto .barraProgresso { border-radius: 6px; }
+  body.muitoCompacto .metaLegenda { margin-top: 6px; font-size: 13px; }
+  body.muitoCompacto #vendasBaixo { padding: 9px 18px 8px 18px; }
+  body.muitoCompacto .painelVendas { padding: 9px 13px; }
+  body.muitoCompacto .tituloSecao { font-size: 13px; margin-bottom: 6px; }
+  body.muitoCompacto #tabelaCursos { font-size: 15px; }
+  body.muitoCompacto #tabelaCursos td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaCursos td.qtd { width: 42px; }
+  body.muitoCompacto #tabelaCursos td.fat { width: 96px; }
 </style>
 </head>
 <body>
@@ -664,6 +687,47 @@
     return (negativo ? '-R$ ' : 'R$ ') + comPontos.split('').reverse().join('');
   }
 
+  // ---- ajuste automatico de tamanho (ver bloco .compacto no CSS) ----------
+
+  function temClasseNoBody(nome) {
+    return (' ' + document.body.className + ' ').indexOf(' ' + nome + ' ') >= 0;
+  }
+
+  function definirNivelCompacto(nivel) {
+    var c = ' ' + document.body.className + ' ';
+    c = c.split(' compacto ').join(' ').split(' muitoCompacto ').join(' ');
+    if (nivel) c += nivel + ' ';
+    document.body.className = c.replace(/^\s+|\s+$/g, '');
+  }
+
+  function alturaDaTela() {
+    return window.innerHeight ||
+           (document.documentElement && document.documentElement.clientHeight) ||
+           document.body.clientHeight;
+  }
+
+  function conteudoVendasCabe() {
+    var baixo = document.getElementById('vendasBaixo');
+    if (!baixo) return true;
+    // o slide fica com visibility/opacity (nunca display:none), entao mede
+    // certo mesmo quando o slide 1 e o que esta na tela
+    return (baixo.offsetTop + baixo.offsetHeight) <= alturaDaTela();
+  }
+
+  var ultimasSemanas = [];
+
+  // Tenta o tamanho cheio; se estourar a tela, vai encolhendo. Medir e mais
+  // confiavel que adivinhar por resolucao — a TV reporta um viewport logico
+  // que nao bate com os 1080p fisicos, e ai o conteudo saia cortado.
+  function ajustarTamanhoVendas() {
+    var niveis = [null, 'compacto', 'muitoCompacto'];
+    for (var i = 0; i < niveis.length; i++) {
+      definirNivelCompacto(niveis[i]);
+      desenharGraficoSemanal(ultimasSemanas);
+      if (conteudoVendasCabe()) return;
+    }
+  }
+
   function desenharGraficoSemanal(semanas) {
     var canvas = document.getElementById('graficoSemanal');
     if (!canvas || !canvas.getContext) return;
@@ -676,9 +740,11 @@
       var disponivel = painel.clientWidth - 44; // desconta o padding do painel
       if (disponivel > 100 && canvas.width !== disponivel) canvas.width = disponivel;
     }
-    // a altura vem de atributo HTML, que o CSS do @media nao encolhe —
-    // entao acompanha aqui o mesmo corte de 850px usado no CSS
-    var alturaAlvo = (window.innerHeight <= 850) ? 220 : 430;
+    // a altura vem de atributo HTML, que o CSS nao encolhe — entao acompanha
+    // aqui o nivel de compactacao que o ajuste automatico decidiu
+    var alturaAlvo = 430;
+    if (temClasseNoBody('muitoCompacto')) alturaAlvo = 190;
+    else if (temClasseNoBody('compacto')) alturaAlvo = 265;
     if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
 
     var ctx = canvas.getContext('2d');
@@ -750,12 +816,18 @@
 
     // rotulos do eixo x (mostra 1 a cada 2 pra nao embolar na TV)
     ctx.fillStyle = '#7c8fb3';
-    ctx.font = '19px Arial, Helvetica, sans-serif';
-    ctx.textAlign = 'center';
+    ctx.font = (h < 240 ? 14 : 19) + 'px Arial, Helvetica, sans-serif';
     for (i = 0; i < semanas.length; i++) {
-      if (i % 2 === 0 || i === semanas.length - 1) {
-        ctx.fillText(semanas[i].rotulo, coordX(i), h - 12);
-      }
+      if (i % 2 !== 0 && i !== semanas.length - 1) continue;
+      // o ultimo e sempre desenhado; se o penultimo escolhido cair colado
+      // nele, pula pra os dois nao se sobreporem
+      if (i === semanas.length - 2) continue;
+      // o primeiro e o ultimo ficam nas bordas do canvas: centralizados,
+      // metade do texto vazaria pra fora (era o "27/0" cortado na TV)
+      if (i === 0) ctx.textAlign = 'left';
+      else if (i === semanas.length - 1) ctx.textAlign = 'right';
+      else ctx.textAlign = 'center';
+      ctx.fillText(semanas[i].rotulo, coordX(i), h - 12);
     }
   }
 
@@ -775,7 +847,7 @@
     // mesma escala de cor do gauge do slide 1, pra leitura ficar consistente
     barra.style.backgroundColor = corDoGauge(dados.percentualMeta / 100);
 
-    desenharGraficoSemanal(dados.semanal);
+    ultimasSemanas = dados.semanal || [];
 
     var corpo = document.getElementById('corpoTabelaCursos');
     var html = '';
@@ -804,6 +876,11 @@
       }
     }
     corpo.innerHTML = html;
+
+    // por ultimo: a tabela ja esta preenchida, entao da pra medir a altura
+    // real do slide e decidir se precisa encolher (isso tambem desenha o
+    // grafico, no tamanho do nivel escolhido)
+    ajustarTamanhoVendas();
   }
 
   // =========================================================================
