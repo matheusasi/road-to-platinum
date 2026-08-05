@@ -160,12 +160,12 @@
      Mesma paleta do slide 1. Layout em float de proposito: o navegador da
      TV e de 2014 e flexbox nele e imprevisivel.
      ======================================================================= */
-  #topoVendas {
+  #topoVendas, #topoArr {
     text-align: center;
     padding: 26px 20px 6px 20px;
   }
 
-  #topoVendas h1 {
+  #topoVendas h1, #topoArr h1 {
     margin: 0;
     font-size: 52px;
     letter-spacing: 2px;
@@ -173,13 +173,13 @@
     text-transform: uppercase;
   }
 
-  #topoVendas .subtitulo {
+  #topoVendas .subtitulo, #topoArr .subtitulo {
     margin-top: 6px;
     font-size: 24px;
     color: #7c8fb3;
   }
 
-  #vendasResumo {
+  #vendasResumo, #arrResumo {
     padding: 14px 34px 0 34px;
   }
 
@@ -244,7 +244,7 @@
 
   .metaLegenda b { color: #eaf1ff; }
 
-  #vendasBaixo {
+  #vendasBaixo, #arrBaixo {
     padding: 24px 34px 20px 34px;
   }
 
@@ -258,8 +258,8 @@
     padding: 22px 26px;
   }
 
-  #painelGrafico { width: 56%; margin-right: 2%; }
-  #painelTabela  { width: 42%; }
+  #painelGrafico, #painelGraficoArr { width: 56%; margin-right: 2%; }
+  #painelTabela, #painelTabelaArr { width: 42%; }
 
   .tituloSecao {
     font-size: 22px;
@@ -316,10 +316,10 @@
      desenhar e, se nao couber, marca o body com .compacto — e se ainda
      assim estourar, com .muitoCompacto.
      ======================================================================= */
-  body.compacto #topoVendas { padding: 14px 20px 2px 20px; }
-  body.compacto #topoVendas h1 { font-size: 36px; }
-  body.compacto #topoVendas .subtitulo { font-size: 18px; }
-  body.compacto #vendasResumo { padding: 8px 24px 0 24px; }
+  body.compacto #topoVendas, body.compacto #topoArr { padding: 14px 20px 2px 20px; }
+  body.compacto #topoVendas h1, body.compacto #topoArr h1 { font-size: 36px; }
+  body.compacto #topoVendas .subtitulo, body.compacto #topoArr .subtitulo { font-size: 18px; }
+  body.compacto #vendasResumo, body.compacto #arrResumo { padding: 8px 24px 0 24px; }
   body.compacto .blocoVendas { padding: 15px 19px; }
   body.compacto .blocoVendas .rotulo { font-size: 16px; margin-bottom: 6px; }
   body.compacto .blocoVendas .valor { font-size: 38px; }
@@ -327,7 +327,7 @@
   body.compacto .barraFundo { margin-top: 10px; height: 15px; border-radius: 8px; }
   body.compacto .barraProgresso { border-radius: 8px; }
   body.compacto .metaLegenda { margin-top: 8px; font-size: 16px; }
-  body.compacto #vendasBaixo { padding: 13px 24px 12px 24px; }
+  body.compacto #vendasBaixo, body.compacto #arrBaixo { padding: 13px 24px 12px 24px; }
   body.compacto .painelVendas { padding: 13px 17px; }
   body.compacto .tituloSecao { font-size: 16px; margin-bottom: 8px; }
   body.compacto #tabelaCursos { font-size: 19px; }
@@ -335,10 +335,10 @@
   body.compacto #tabelaCursos td.qtd { width: 52px; }
   body.compacto #tabelaCursos td.fat { width: 118px; }
 
-  body.muitoCompacto #topoVendas { padding: 8px 16px 0 16px; }
-  body.muitoCompacto #topoVendas h1 { font-size: 26px; }
-  body.muitoCompacto #topoVendas .subtitulo { font-size: 14px; }
-  body.muitoCompacto #vendasResumo { padding: 6px 18px 0 18px; }
+  body.muitoCompacto #topoVendas, body.muitoCompacto #topoArr { padding: 8px 16px 0 16px; }
+  body.muitoCompacto #topoVendas h1, body.muitoCompacto #topoArr h1 { font-size: 26px; }
+  body.muitoCompacto #topoVendas .subtitulo, body.muitoCompacto #topoArr .subtitulo { font-size: 14px; }
+  body.muitoCompacto #vendasResumo, body.muitoCompacto #arrResumo { padding: 6px 18px 0 18px; }
   body.muitoCompacto .blocoVendas { padding: 10px 14px; }
   body.muitoCompacto .blocoVendas .rotulo { font-size: 13px; margin-bottom: 4px; }
   body.muitoCompacto .blocoVendas .valor { font-size: 27px; }
@@ -346,13 +346,65 @@
   body.muitoCompacto .barraFundo { margin-top: 7px; height: 11px; border-radius: 6px; }
   body.muitoCompacto .barraProgresso { border-radius: 6px; }
   body.muitoCompacto .metaLegenda { margin-top: 6px; font-size: 13px; }
-  body.muitoCompacto #vendasBaixo { padding: 9px 18px 8px 18px; }
+  body.muitoCompacto #vendasBaixo, body.muitoCompacto #arrBaixo { padding: 9px 18px 8px 18px; }
   body.muitoCompacto .painelVendas { padding: 9px 13px; }
   body.muitoCompacto .tituloSecao { font-size: 13px; margin-bottom: 6px; }
   body.muitoCompacto #tabelaCursos { font-size: 15px; }
   body.muitoCompacto #tabelaCursos td { padding: 5px 3px; }
   body.muitoCompacto #tabelaCursos td.qtd { width: 42px; }
   body.muitoCompacto #tabelaCursos td.fat { width: 96px; }
+
+  /* =======================================================================
+     SLIDE 3 — ARR monday.com mes a mes. Reaproveita as classes do slide 2
+     (blocoVendas, painelVendas, tituloSecao) pra manter a mesma cara.
+     ======================================================================= */
+  #tabelaArr {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 26px;
+  }
+
+  #tabelaArr td {
+    padding: 13px 6px;
+    border-bottom: 1px solid rgba(46,142,255,0.12);
+    color: #eaf1ff;
+  }
+
+  #tabelaArr td.quando {
+    color: #8a9bc0;
+    width: 86px;
+    white-space: nowrap;
+  }
+
+  #tabelaArr td.conta {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  #tabelaArr td.arr {
+    text-align: right;
+    color: #29e0c8;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 140px;
+  }
+
+  #tabelaArr tr.vazio td {
+    color: #7c8fb3;
+    text-align: center;
+    border-bottom: 0;
+    padding-top: 22px;
+  }
+
+  body.compacto #tabelaArr { font-size: 19px; }
+  body.compacto #tabelaArr td { padding: 8px 4px; }
+  body.compacto #tabelaArr td.quando { width: 66px; }
+  body.compacto #tabelaArr td.arr { width: 104px; }
+
+  body.muitoCompacto #tabelaArr { font-size: 15px; }
+  body.muitoCompacto #tabelaArr td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaArr td.quando { width: 54px; }
+  body.muitoCompacto #tabelaArr td.arr { width: 86px; }
 </style>
 </head>
 <body>
@@ -459,7 +511,60 @@
   </div>
 
   <!-- ===================================================================
-       Pra adicionar um terceiro dashboard, cole outro bloco assim (sem a
+       SLIDE 3 — ARR da monday.com, mes a mes. Os dados vem dos subelementos
+       do Road to Platinum (uma venda de conta/expansao por subelemento).
+       =================================================================== -->
+  <div class="slide" data-slide="arr-monday">
+
+    <div id="topoArr">
+      <h1>ARR monday.com</h1>
+      <div class="subtitulo" id="arrRotuloMes">&nbsp;</div>
+    </div>
+
+    <div id="arrResumo">
+
+      <div class="blocoVendas meta">
+        <div class="rotulo">ARR gerado no mes</div>
+        <div class="valorGrande" id="arrMesAtual">$0</div>
+        <div class="metaLegenda">
+          <b id="arrVendasMes">0</b> contas no mes
+          &nbsp;&middot;&nbsp;
+          melhor mes: <b id="arrMelhorMes">-</b>
+        </div>
+      </div>
+
+      <div class="blocoVendas metade">
+        <div class="rotulo">Total no periodo</div>
+        <div class="valor" id="arrTotal">$0</div>
+      </div>
+
+      <div class="blocoVendas metade">
+        <div class="rotulo">Contas registradas</div>
+        <div class="valor" id="arrRegistros">0</div>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+    <div id="arrBaixo">
+
+      <div class="painelVendas" id="painelGraficoArr">
+        <div class="tituloSecao">ARR por mes</div>
+        <canvas id="graficoArr" width="880" height="430"></canvas>
+      </div>
+
+      <div class="painelVendas" id="painelTabelaArr">
+        <div class="tituloSecao">Ultimas contas</div>
+        <table id="tabelaArr"><tbody id="corpoTabelaArr"></tbody></table>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================
+       Pra adicionar mais um dashboard, cole outro bloco assim (sem a
        classe "ativo" — so o primeiro comeca ativo). A rotacao pega
        sozinha, nao precisa mexer no JS:
 
@@ -508,6 +613,7 @@
   // por isso os dois hosts diferentes aqui embaixo, nao e engano.
   var URL_ROAD_TO_PLATINUM = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
   var URL_VENDAS_CURSOS    = 'https://squadhub.app.n8n.cloud/webhook/vendas-cursos';
+  var URL_ARR_MENSAL       = 'https://squadhub.app.n8n.cloud/webhook/arr-mensal';
 
   function buscarJSON(url, callback) {
     var xhr = new XMLHttpRequest();
@@ -706,12 +812,19 @@
            document.body.clientHeight;
   }
 
-  function conteudoVendasCabe() {
-    var baixo = document.getElementById('vendasBaixo');
-    if (!baixo) return true;
-    // o slide fica com visibility/opacity (nunca display:none), entao mede
-    // certo mesmo quando o slide 1 e o que esta na tela
-    return (baixo.offsetTop + baixo.offsetHeight) <= alturaDaTela();
+  // Checa os dois slides que usam esse layout. O nivel de compactacao e do
+  // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
+  // slide cortaria o rodape de um deles.
+  function conteudoCabe() {
+    var alvos = ['vendasBaixo', 'arrBaixo'];
+    var tela = alturaDaTela();
+    for (var i = 0; i < alvos.length; i++) {
+      // os slides ficam com visibility/opacity (nunca display:none), entao
+      // medem certo mesmo escondidos
+      var el = document.getElementById(alvos[i]);
+      if (el && (el.offsetTop + el.offsetHeight) > tela) return false;
+    }
+    return true;
   }
 
   var ultimasSemanas = [];
@@ -724,7 +837,8 @@
     for (var i = 0; i < niveis.length; i++) {
       definirNivelCompacto(niveis[i]);
       desenharGraficoSemanal(ultimasSemanas);
-      if (conteudoVendasCabe()) return;
+      if (ultimoArr) desenharGraficoArr(ultimoArr.mensal);
+      if (conteudoCabe()) return;
     }
   }
 
@@ -884,6 +998,119 @@
   }
 
   // =========================================================================
+  // SLIDE 3 — ARR DA MONDAY.COM, MES A MES
+  //
+  // Cada subelemento do Road to Platinum e uma venda de conta/expansao. O n8n
+  // soma por mes e manda pronto. Valores em USD, mesma moeda do slide 1.
+  // =========================================================================
+
+  var ultimoArr = null;
+
+  function desenharGraficoArr(meses) {
+    var canvas = document.getElementById('graficoArr');
+    if (!canvas || !canvas.getContext) return;
+
+    var painel = document.getElementById('painelGraficoArr');
+    if (painel && painel.clientWidth > 0) {
+      var disponivel = painel.clientWidth - 44;
+      if (disponivel > 100 && canvas.width !== disponivel) canvas.width = disponivel;
+    }
+    var alturaAlvo = 430;
+    if (temClasseNoBody('muitoCompacto')) alturaAlvo = 190;
+    else if (temClasseNoBody('compacto')) alturaAlvo = 265;
+    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
+
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (!meses || meses.length === 0) return;
+
+    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 40;
+    var largura = w - margemEsq - margemDir;
+    var altura = h - margemTopo - margemBaixo;
+
+    var maior = 0, i;
+    for (i = 0; i < meses.length; i++) {
+      if (meses[i].total > maior) maior = meses[i].total;
+    }
+    if (maior <= 0) maior = 1;
+
+    // linhas de grade
+    ctx.strokeStyle = 'rgba(46,142,255,0.10)';
+    ctx.lineWidth = 1;
+    for (i = 0; i <= 3; i++) {
+      var y = margemTopo + (altura * i) / 3;
+      ctx.beginPath();
+      ctx.moveTo(margemEsq, y);
+      ctx.lineTo(w - margemDir, y);
+      ctx.stroke();
+    }
+
+    // barras — o mes corrente sai destacado, os fechados em azul
+    var fatia = largura / meses.length;
+    var larguraBarra = fatia * 0.56;
+    var fonteRotulo = (h < 240) ? 13 : 18;
+    var fonteValor = (h < 240) ? 12 : 17;
+
+    for (i = 0; i < meses.length; i++) {
+      var m = meses[i];
+      var centro = margemEsq + fatia * i + fatia / 2;
+      var alturaBarra = (altura * m.total) / maior;
+      if (m.total > 0 && alturaBarra < 3) alturaBarra = 3;
+      var topo = margemTopo + altura - alturaBarra;
+
+      ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
+      ctx.fillRect(centro - larguraBarra / 2, topo, larguraBarra, alturaBarra);
+
+      // valor em cima da barra
+      if (m.total > 0) {
+        ctx.fillStyle = '#eaf1ff';
+        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(formatarUSD(m.total), centro, topo - 7);
+      }
+
+      // rotulo do mes
+      ctx.fillStyle = '#7c8fb3';
+      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.rotulo, centro, h - 12);
+    }
+  }
+
+  function renderizarArr(dados) {
+    ultimoArr = dados;
+
+    document.getElementById('arrRotuloMes').innerHTML = dados.rotuloMes || '&nbsp;';
+    document.getElementById('arrMesAtual').innerHTML = formatarUSD(dados.arrMesAtual);
+    document.getElementById('arrVendasMes').innerHTML = dados.vendasMesAtual;
+    document.getElementById('arrMelhorMes').innerHTML =
+      dados.melhorMesRotulo + ' (' + formatarUSD(dados.melhorMesTotal) + ')';
+    document.getElementById('arrTotal').innerHTML = formatarUSD(dados.totalPeriodo);
+    document.getElementById('arrRegistros').innerHTML = dados.totalRegistros;
+
+    var corpo = document.getElementById('corpoTabelaArr');
+    var html = '';
+    var ultimas = dados.ultimas || [];
+    if (ultimas.length === 0) {
+      html = '<tr class="vazio"><td colspan="3">Nenhuma conta registrada ainda</td></tr>';
+    } else {
+      for (var i = 0; i < ultimas.length; i++) {
+        var u = ultimas[i];
+        html += '<tr>' +
+                  '<td class="quando">' + u.data + '</td>' +
+                  '<td class="conta">' + u.conta + '</td>' +
+                  '<td class="arr">' + formatarUSD(u.valor) + '</td>' +
+                '</tr>';
+      }
+    }
+    corpo.innerHTML = html;
+
+    ajustarTamanhoVendas();
+  }
+
+  // =========================================================================
   // REQUISITO 2 — auto-refresh dos dados a cada 1 minuto, sem reload de pagina
   //
   // Este e o mecanismo PRINCIPAL de atualizacao. Um reload completo derruba
@@ -912,10 +1139,19 @@
     });
   }
 
+  function atualizarArr() {
+    buscarJSON(URL_ARR_MENSAL, function (dados) {
+      // mesmo motivo do atualizarVendas: nao mexe no ultimoSucesso
+      renderizarArr(dados);
+    });
+  }
+
   atualizarDados();
   atualizarVendas();
+  atualizarArr();
   setInterval(atualizarDados, 1 * 60 * 1000);
   setInterval(atualizarVendas, 1 * 60 * 1000);
+  setInterval(atualizarArr, 1 * 60 * 1000);
 
   // =========================================================================
   // ROTACAO DE DASHBOARDS (slides)
