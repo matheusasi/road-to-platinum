@@ -1034,7 +1034,10 @@
       ctx.stroke();
     }
 
-    // barras — o mes corrente sai destacado, os fechados em azul
+    // Cores: periodo fechado em azul, o ultimo (corrente) em ciano. Quando o
+    // periodo ainda esta correndo — a semana atual — ele vem marcado como
+    // parcial e sai num ciano claro, pra ninguem ler a barra baixinha como
+    // queda de vendas quando e so a semana nao ter terminado.
     var fatia = largura / meses.length;
     var larguraBarra = fatia * 0.56;
     var fonteRotulo = (h < 240) ? 13 : 18;
@@ -1047,7 +1050,9 @@
       if (m.total > 0 && alturaBarra < 3) alturaBarra = 3;
       var topo = margemTopo + altura - alturaBarra;
 
-      ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
+      if (m.parcial) ctx.fillStyle = '#8df2e6';                       // em curso
+      else if (i === meses.length - 1) ctx.fillStyle = '#29e0c8';      // corrente
+      else ctx.fillStyle = '#2e8eff';                                  // fechado
       ctx.fillRect(centro - larguraBarra / 2, topo, larguraBarra, alturaBarra);
 
       // valor em cima da barra
