@@ -42,9 +42,12 @@
     visibility: visible;
   }
 
-  #btnTelaCheia {
+  /* =======================================================================
+     CONTROLES — tela cheia, avancar slide e pausar. Ficam discretos no canto
+     pra nao competir com os numeros, e acendem ao passar o mouse.
+     ======================================================================= */
+  .botaoTv {
     position: fixed;
-    right: 22px;
     top: 22px;
     z-index: 50;
     width: 44px;
@@ -62,18 +65,30 @@
     transition: opacity 0.3s ease;
   }
 
-  #btnTelaCheia svg {
+  .botaoTv svg {
     vertical-align: middle;
   }
 
-  #btnTelaCheia:hover {
+  .botaoTv:hover {
     opacity: 1;
     color: #eaf1ff;
   }
 
-  #btnTelaCheia.oculto {
+  .botaoTv.oculto {
     display: none;
   }
+
+  /* enquanto pausado o botao fica aceso, pra ficar obvio de longe que a
+     rotacao esta parada de proposito e nao travada */
+  .botaoTv.ligado {
+    opacity: 1;
+    color: #29e0c8;
+    border-color: rgba(41, 224, 200, 0.6);
+  }
+
+  #btnTelaCheia { right: 22px; }
+  #btnPausar    { right: 76px; }
+  #btnProximo   { right: 130px; }
 
   #topo {
     text-align: center;
@@ -601,12 +616,33 @@
        =================================================================== -->
 
   <!-- ===================================================================
-       Botao sutil pra entrar em fullscreen. Fica fixo no canto, por cima
-       dos slides. O clique nele conta como "gesto do usuario" — que e o
-       que o navegador exige pra permitir requestFullscreen. Some sozinho
-       quando ja esta em tela cheia.
+       CONTROLES no canto superior direito.
+
+       Tela cheia: o clique conta como "gesto do usuario", que e o que o
+       navegador exige pra permitir requestFullscreen. Some quando ja esta
+       em tela cheia.
+
+       Proximo / Pausar: pra quem estiver na frente da TV segurar um slide
+       que interessa ou pular pro proximo sem esperar o tempo acabar.
        =================================================================== -->
-  <div id="btnTelaCheia" title="Tela cheia">
+  <div id="btnProximo" class="botaoTv" title="Proximo dashboard">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+      <path d="M6 5l9 7-9 7V5z"></path>
+      <rect x="16.5" y="5" width="2.5" height="14" rx="1"></rect>
+    </svg>
+  </div>
+
+  <div id="btnPausar" class="botaoTv" title="Pausar a troca de dashboards">
+    <svg id="iconePausa" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+      <rect x="6.5" y="5" width="3.5" height="14" rx="1"></rect>
+      <rect x="14" y="5" width="3.5" height="14" rx="1"></rect>
+    </svg>
+    <svg id="iconePlay" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="display:none">
+      <path d="M7 5l12 7-12 7V5z"></path>
+    </svg>
+  </div>
+
+  <div id="btnTelaCheia" class="botaoTv" title="Tela cheia">
     <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>
     </svg>
@@ -1168,20 +1204,53 @@
     return (s > 0) ? s : SEGUNDOS_POR_SLIDE;
   }
 
+  var timerSlide = null;
+  var rotacaoPausada = false;
+
+  function avancarSlide() {
+    if (slides.length < 2) return;
+    slides[slideAtual].className = 'slide';
+    slideAtual = (slideAtual + 1) % slides.length;
+    slides[slideAtual].className = 'slide ativo';
+  }
+
   // setTimeout encadeado em vez de setInterval: o intervalo muda a cada
   // troca, entao ele e reagendado com a duracao do slide que acabou de entrar.
   function agendarTroca() {
-    setTimeout(function () {
-      if (slides.length >= 2) {
-        slides[slideAtual].className = 'slide';
-        slideAtual = (slideAtual + 1) % slides.length;
-        slides[slideAtual].className = 'slide ativo';
-      }
+    if (timerSlide) clearTimeout(timerSlide);
+    if (rotacaoPausada) return;
+    timerSlide = setTimeout(function () {
+      avancarSlide();
       agendarTroca();
     }, segundosDoSlide(slides[slideAtual]) * 1000);
   }
 
   agendarTroca();
+
+  // ---- controles de quem esta na frente da TV ----
+
+  var btnProximo = document.getElementById('btnProximo');
+  if (btnProximo) {
+    btnProximo.onclick = function () {
+      avancarSlide();
+      // reagenda: o slide que acabou de entrar merece o tempo cheio dele,
+      // em vez de herdar o que sobrava do anterior
+      agendarTroca();
+    };
+  }
+
+  var btnPausar = document.getElementById('btnPausar');
+  if (btnPausar) {
+    btnPausar.onclick = function () {
+      rotacaoPausada = !rotacaoPausada;
+      document.getElementById('iconePausa').style.display = rotacaoPausada ? 'none' : '';
+      document.getElementById('iconePlay').style.display = rotacaoPausada ? '' : 'none';
+      btnPausar.className = rotacaoPausada ? 'botaoTv ligado' : 'botaoTv';
+      btnPausar.title = rotacaoPausada ? 'Retomar a troca de dashboards'
+                                       : 'Pausar a troca de dashboards';
+      agendarTroca(); // pausado: so cancela o timer. retomado: reagenda.
+    };
+  }
 
   // =========================================================================
   // REQUISITO 3 — reload completo APENAS se os dados pararem de atualizar.
@@ -1308,7 +1377,8 @@
 
   function atualizarVisibilidadeBotao() {
     if (!btnTelaCheia) return;
-    btnTelaCheia.className = estaEmTelaCheia() ? 'oculto' : '';
+    // mantem a classe de estilo — trocar o className inteiro apagaria .botaoTv
+    btnTelaCheia.className = estaEmTelaCheia() ? 'botaoTv oculto' : 'botaoTv';
   }
 
   atualizarVisibilidadeBotao();
