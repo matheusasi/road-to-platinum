@@ -795,10 +795,6 @@
 
   // ---- ajuste automatico de tamanho (ver bloco .compacto no CSS) ----------
 
-  function temClasseNoBody(nome) {
-    return (' ' + document.body.className + ' ').indexOf(' ' + nome + ' ') >= 0;
-  }
-
   function definirNivelCompacto(nivel) {
     var c = ' ' + document.body.className + ' ';
     c = c.split(' compacto ').join(' ').split(' muitoCompacto ').join(' ');
@@ -829,6 +825,47 @@
 
   var ultimasSemanas = [];
 
+  function paddingDoPainel(painel) {
+    var estilo = painel.currentStyle ||
+                 (window.getComputedStyle ? window.getComputedStyle(painel) : null);
+    if (!estilo) return { topo: 22, baixo: 22, esq: 26, dir: 26 };
+    return {
+      topo: parseInt(estilo.paddingTop, 10) || 0,
+      baixo: parseInt(estilo.paddingBottom, 10) || 0,
+      esq: parseInt(estilo.paddingLeft, 10) || 0,
+      dir: parseInt(estilo.paddingRight, 10) || 0
+    };
+  }
+
+  // Largura util do canvas: o padding do painel muda conforme o nivel de
+  // compactacao, entao precisa ser medido. Com um valor fixo o canvas ficava
+  // mais largo que o painel em algumas resolucoes e o grafico vazava pra fora.
+  function larguraCanvasDisponivel(painel) {
+    if (!painel || !painel.clientWidth) return 880;
+    var p = paddingDoPainel(painel);
+    var espaco = painel.clientWidth - p.esq - p.dir;
+    return espaco > 100 ? Math.floor(espaco) : 100;
+  }
+
+  // Quanta altura sobra pro canvas dentro do painel. Antes a altura era fixa
+  // em degraus (430/265/190) e, no modo compacto da TV, o grafico ficava
+  // minusculo com espaco vazio embaixo. Aqui ele estica pra ocupar o que tem.
+  function alturaCanvasDisponivel(painel) {
+    if (!painel || !painel.offsetHeight) return 430;
+    var titulo = painel.getElementsByClassName('tituloSecao')[0];
+    var alturaTitulo = titulo ? titulo.offsetHeight + 14 : 40;
+    var p = paddingDoPainel(painel);
+    // folga generosa de proposito: o canvas encosta no rodape, e sem ela um
+    // arredondamento de poucos pixels ja estourava a tela e forcava o layout
+    // a compactar sem necessidade
+    var folgaRodape = 40;
+    var espaco = alturaDaTela() - painel.offsetTop - p.topo - p.baixo -
+                 alturaTitulo - folgaRodape;
+    if (espaco < 140) espaco = 140;
+    if (espaco > 560) espaco = 560;
+    return Math.round(espaco);
+  }
+
   // Tenta o tamanho cheio; se estourar a tela, vai encolhendo. Medir e mais
   // confiavel que adivinhar por resolucao — a TV reporta um viewport logico
   // que nao bate com os 1080p fisicos, e ai o conteudo saia cortado.
@@ -850,15 +887,11 @@
     // TV 1080p ou numa janela pequena a largura muda. Sem isso o grafico
     // vaza por cima do painel da tabela.
     var painel = document.getElementById('painelGrafico');
-    if (painel && painel.clientWidth > 0) {
-      var disponivel = painel.clientWidth - 44; // desconta o padding do painel
-      if (disponivel > 100 && canvas.width !== disponivel) canvas.width = disponivel;
-    }
-    // a altura vem de atributo HTML, que o CSS nao encolhe — entao acompanha
-    // aqui o nivel de compactacao que o ajuste automatico decidiu
-    var alturaAlvo = 430;
-    if (temClasseNoBody('muitoCompacto')) alturaAlvo = 190;
-    else if (temClasseNoBody('compacto')) alturaAlvo = 265;
+    var larguraAlvo = larguraCanvasDisponivel(painel);
+    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
+    // a altura vem de atributo HTML, que o CSS nao encolhe — entao e calculada
+    // aqui, pelo espaco que sobra na tela
+    var alturaAlvo = alturaCanvasDisponivel(painel);
     if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
 
     var ctx = canvas.getContext('2d');
@@ -1011,13 +1044,9 @@
     if (!canvas || !canvas.getContext) return;
 
     var painel = document.getElementById('painelGraficoArr');
-    if (painel && painel.clientWidth > 0) {
-      var disponivel = painel.clientWidth - 44;
-      if (disponivel > 100 && canvas.width !== disponivel) canvas.width = disponivel;
-    }
-    var alturaAlvo = 430;
-    if (temClasseNoBody('muitoCompacto')) alturaAlvo = 190;
-    else if (temClasseNoBody('compacto')) alturaAlvo = 265;
+    var larguraAlvo = larguraCanvasDisponivel(painel);
+    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
+    var alturaAlvo = alturaCanvasDisponivel(painel);
     if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
 
     var ctx = canvas.getContext('2d');
