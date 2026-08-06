@@ -160,12 +160,12 @@
      Mesma paleta do slide 1. Layout em float de proposito: o navegador da
      TV e de 2014 e flexbox nele e imprevisivel.
      ======================================================================= */
-  #topoVendas, #topoArr {
+  #topoVendas, #topoArr, #topoCursosMes {
     text-align: center;
     padding: 26px 20px 6px 20px;
   }
 
-  #topoVendas h1, #topoArr h1 {
+  #topoVendas h1, #topoArr h1, #topoCursosMes h1 {
     margin: 0;
     font-size: 52px;
     letter-spacing: 2px;
@@ -173,7 +173,7 @@
     text-transform: uppercase;
   }
 
-  #topoVendas .subtitulo, #topoArr .subtitulo {
+  #topoVendas .subtitulo, #topoArr .subtitulo, #topoCursosMes .subtitulo {
     margin-top: 6px;
     font-size: 24px;
     color: #7c8fb3;
@@ -244,7 +244,7 @@
 
   .metaLegenda b { color: #eaf1ff; }
 
-  #vendasBaixo, #arrBaixo {
+  #vendasBaixo, #arrBaixo, #cursosMesBaixo {
     padding: 24px 34px 20px 34px;
   }
 
@@ -260,6 +260,8 @@
 
   #painelGrafico, #painelGraficoArr { width: 56%; margin-right: 2%; }
   #painelTabela, #painelTabelaArr { width: 42%; }
+  /* o slide mensal de cursos e so o grafico, entao ocupa a largura toda */
+  #painelGraficoCursosMes { width: 100%; }
 
   .tituloSecao {
     font-size: 22px;
@@ -316,9 +318,9 @@
      desenhar e, se nao couber, marca o body com .compacto — e se ainda
      assim estourar, com .muitoCompacto.
      ======================================================================= */
-  body.compacto #topoVendas, body.compacto #topoArr { padding: 14px 20px 2px 20px; }
-  body.compacto #topoVendas h1, body.compacto #topoArr h1 { font-size: 36px; }
-  body.compacto #topoVendas .subtitulo, body.compacto #topoArr .subtitulo { font-size: 18px; }
+  body.compacto #topoVendas, body.compacto #topoArr, body.compacto #topoCursosMes { padding: 14px 20px 2px 20px; }
+  body.compacto #topoVendas h1, body.compacto #topoArr h1, body.compacto #topoCursosMes h1 { font-size: 36px; }
+  body.compacto #topoVendas .subtitulo, body.compacto #topoArr .subtitulo, body.compacto #topoCursosMes .subtitulo { font-size: 18px; }
   body.compacto #vendasResumo, body.compacto #arrResumo { padding: 8px 24px 0 24px; }
   body.compacto .blocoVendas { padding: 15px 19px; }
   body.compacto .blocoVendas .rotulo { font-size: 16px; margin-bottom: 6px; }
@@ -327,7 +329,7 @@
   body.compacto .barraFundo { margin-top: 10px; height: 15px; border-radius: 8px; }
   body.compacto .barraProgresso { border-radius: 8px; }
   body.compacto .metaLegenda { margin-top: 8px; font-size: 16px; }
-  body.compacto #vendasBaixo, body.compacto #arrBaixo { padding: 13px 24px 12px 24px; }
+  body.compacto #vendasBaixo, body.compacto #arrBaixo, body.compacto #cursosMesBaixo { padding: 13px 24px 12px 24px; }
   body.compacto .painelVendas { padding: 13px 17px; }
   body.compacto .tituloSecao { font-size: 16px; margin-bottom: 8px; }
   body.compacto #tabelaCursos { font-size: 19px; }
@@ -335,9 +337,9 @@
   body.compacto #tabelaCursos td.qtd { width: 52px; }
   body.compacto #tabelaCursos td.fat { width: 118px; }
 
-  body.muitoCompacto #topoVendas, body.muitoCompacto #topoArr { padding: 8px 16px 0 16px; }
-  body.muitoCompacto #topoVendas h1, body.muitoCompacto #topoArr h1 { font-size: 26px; }
-  body.muitoCompacto #topoVendas .subtitulo, body.muitoCompacto #topoArr .subtitulo { font-size: 14px; }
+  body.muitoCompacto #topoVendas, body.muitoCompacto #topoArr, body.muitoCompacto #topoCursosMes { padding: 8px 16px 0 16px; }
+  body.muitoCompacto #topoVendas h1, body.muitoCompacto #topoArr h1, body.muitoCompacto #topoCursosMes h1 { font-size: 26px; }
+  body.muitoCompacto #topoVendas .subtitulo, body.muitoCompacto #topoArr .subtitulo, body.muitoCompacto #topoCursosMes .subtitulo { font-size: 14px; }
   body.muitoCompacto #vendasResumo, body.muitoCompacto #arrResumo { padding: 6px 18px 0 18px; }
   body.muitoCompacto .blocoVendas { padding: 10px 14px; }
   body.muitoCompacto .blocoVendas .rotulo { font-size: 13px; margin-bottom: 4px; }
@@ -346,7 +348,7 @@
   body.muitoCompacto .barraFundo { margin-top: 7px; height: 11px; border-radius: 6px; }
   body.muitoCompacto .barraProgresso { border-radius: 6px; }
   body.muitoCompacto .metaLegenda { margin-top: 6px; font-size: 13px; }
-  body.muitoCompacto #vendasBaixo, body.muitoCompacto #arrBaixo { padding: 9px 18px 8px 18px; }
+  body.muitoCompacto #vendasBaixo, body.muitoCompacto #arrBaixo, body.muitoCompacto #cursosMesBaixo { padding: 9px 18px 8px 18px; }
   body.muitoCompacto .painelVendas { padding: 9px 13px; }
   body.muitoCompacto .tituloSecao { font-size: 13px; margin-bottom: 6px; }
   body.muitoCompacto #tabelaCursos { font-size: 15px; }
@@ -412,7 +414,7 @@
   <!-- ===================================================================
        SLIDE 1 — Road to Platinum. Comeca ".ativo" (primeiro a aparecer).
        =================================================================== -->
-  <div class="slide ativo" data-slide="road-to-platinum">
+  <div class="slide ativo" data-slide="road-to-platinum" data-segundos="5">
 
     <div id="topo">
       <h1>Road to Platinum</h1>
@@ -460,7 +462,7 @@
        SLIDE 2 — Vendas de Cursos (Eduzz + Digital Manager Guru).
        Os numeros vem prontos do n8n (VENDAS_URL): a TV nao faz conta.
        =================================================================== -->
-  <div class="slide" data-slide="vendas-cursos">
+  <div class="slide" data-slide="vendas-cursos" data-segundos="30">
 
     <div id="topoVendas">
       <h1>Vendas de Cursos</h1>
@@ -496,7 +498,7 @@
     <div id="vendasBaixo">
 
       <div class="painelVendas" id="painelGrafico">
-        <div class="tituloSecao">Faturamento mensal</div>
+        <div class="tituloSecao">Faturamento semanal</div>
         <canvas id="graficoSemanal" width="880" height="430"></canvas>
       </div>
 
@@ -511,10 +513,31 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 3 — ARR da monday.com, mes a mes. Os dados vem dos subelementos
+       SLIDE 3 — Cursos mes a mes. Separado do slide do mes atual porque sao
+       leituras diferentes: aqui e a tendencia do ano, la e o detalhe do mes.
+       =================================================================== -->
+  <div class="slide" data-slide="cursos-mensal" data-segundos="15">
+
+    <div id="topoCursosMes">
+      <h1>Vendas de Cursos</h1>
+      <div class="subtitulo">Faturamento mes a mes</div>
+    </div>
+
+    <div id="cursosMesBaixo">
+      <div class="painelVendas" id="painelGraficoCursosMes">
+        <div class="tituloSecao">Faturamento por mes</div>
+        <canvas id="graficoCursosMes" width="880" height="430"></canvas>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 4 — ARR da monday.com, mes a mes. Os dados vem dos subelementos
        do Road to Platinum (uma venda de conta/expansao por subelemento).
        =================================================================== -->
-  <div class="slide" data-slide="arr-monday">
+  <div class="slide" data-slide="arr-monday" data-segundos="15">
 
     <div id="topoArr">
       <h1>ARR monday.com</h1>
@@ -812,7 +835,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -826,6 +849,11 @@
   var MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
                       'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   var serieMensalCursos = [];
+  var serieSemanalCursos = [];
+
+  // Quantas semanas fechadas aparecem no slide de cursos. O webhook manda 12,
+  // o que na TV chegava a mostrar maio — recente demais nao, velho demais sim.
+  var SEMANAS_NA_TV = 6;
 
   function paddingDoPainel(painel) {
     var estilo = painel.currentStyle ||
@@ -875,9 +903,10 @@
     var niveis = [null, 'compacto', 'muitoCompacto'];
     for (var i = 0; i < niveis.length; i++) {
       definirNivelCompacto(niveis[i]);
-      desenharBarrasMensais('graficoSemanal', 'painelGrafico', serieMensalCursos, formatarBRL);
+      desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
+      desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       if (ultimoArr) {
-        desenharBarrasMensais('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD);
+        desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD);
       }
       if (conteudoCabe()) return;
     }
@@ -899,8 +928,14 @@
     // mesma escala de cor do gauge do slide 1, pra leitura ficar consistente
     barra.style.backgroundColor = corDoGauge(dados.percentualMeta / 100);
 
+    // O n8n manda 12 semanas fechadas, mas na TV isso puxava ate meados de
+    // maio — informacao velha demais pro painel. Aqui fica so o pedaco
+    // recente, sem precisar mexer no workflow.
+    var semanas = dados.semanal || [];
+    serieSemanalCursos = semanas.slice(Math.max(0, semanas.length - SEMANAS_NA_TV));
+
     // O n8n manda a serie mensal como {mes:'2026-03', total:n} — o rotulo
-    // curto e montado aqui pra nao precisar mexer no workflow.
+    // curto e montado aqui, tambem pra nao mexer no workflow.
     serieMensalCursos = (dados.mensal || []).map(function (m) {
       var partes = String(m.mes).split('-');
       var indice = Number(partes[1]) - 1;
@@ -953,9 +988,10 @@
 
   var ultimoArr = null;
 
-  // Grafico de barras por mes, usado pelos dois slides (ARR e cursos). O
-  // formatador entra por parametro porque um e USD e o outro BRL.
-  function desenharBarrasMensais(idCanvas, idPainel, meses, formatar) {
+  // Grafico de barras, usado pra series semanais e mensais nos tres slides.
+  // O formatador entra por parametro porque um e USD e o outro BRL; a ultima
+  // barra sai destacada (periodo corrente).
+  function desenharBarras(idCanvas, idPainel, meses, formatar) {
     var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
 
@@ -1113,14 +1149,28 @@
   var slides = document.getElementsByClassName('slide');
   var slideAtual = 0;
 
-  function trocarSlide() {
-    if (slides.length < 2) return; // com 1 so nao ha o que rotacionar
-    slides[slideAtual].className = 'slide';
-    slideAtual = (slideAtual + 1) % slides.length;
-    slides[slideAtual].className = 'slide ativo';
+  // Cada slide fica um tempo proprio na tela, definido no atributo
+  // data-segundos do HTML — uns pedem leitura mais demorada (tabela de
+  // cursos) e outros sao so um numero grande.
+  function segundosDoSlide(el) {
+    var s = el ? Number(el.getAttribute('data-segundos')) : 0;
+    return (s > 0) ? s : SEGUNDOS_POR_SLIDE;
   }
 
-  setInterval(trocarSlide, SEGUNDOS_POR_SLIDE * 1000);
+  // setTimeout encadeado em vez de setInterval: o intervalo muda a cada
+  // troca, entao ele e reagendado com a duracao do slide que acabou de entrar.
+  function agendarTroca() {
+    setTimeout(function () {
+      if (slides.length >= 2) {
+        slides[slideAtual].className = 'slide';
+        slideAtual = (slideAtual + 1) % slides.length;
+        slides[slideAtual].className = 'slide ativo';
+      }
+      agendarTroca();
+    }, segundosDoSlide(slides[slideAtual]) * 1000);
+  }
+
+  agendarTroca();
 
   // =========================================================================
   // REQUISITO 3 — reload completo APENAS se os dados pararem de atualizar.
