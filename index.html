@@ -496,7 +496,7 @@
     <div id="vendasBaixo">
 
       <div class="painelVendas" id="painelGrafico">
-        <div class="tituloSecao">Faturamento semanal</div>
+        <div class="tituloSecao">Faturamento mensal</div>
         <canvas id="graficoSemanal" width="880" height="430"></canvas>
       </div>
 
@@ -823,7 +823,9 @@
     return true;
   }
 
-  var ultimasSemanas = [];
+  var MESES_CURTOS = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
+                      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  var serieMensalCursos = [];
 
   function paddingDoPainel(painel) {
     var estilo = painel.currentStyle ||
@@ -873,108 +875,11 @@
     var niveis = [null, 'compacto', 'muitoCompacto'];
     for (var i = 0; i < niveis.length; i++) {
       definirNivelCompacto(niveis[i]);
-      desenharGraficoSemanal(ultimasSemanas);
-      if (ultimoArr) desenharGraficoArr(ultimoArr.mensal);
+      desenharBarrasMensais('graficoSemanal', 'painelGrafico', serieMensalCursos, formatarBRL);
+      if (ultimoArr) {
+        desenharBarrasMensais('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD);
+      }
       if (conteudoCabe()) return;
-    }
-  }
-
-  function desenharGraficoSemanal(semanas) {
-    var canvas = document.getElementById('graficoSemanal');
-    if (!canvas || !canvas.getContext) return;
-
-    // O canvas precisa caber no painel, que e uma porcentagem da tela — numa
-    // TV 1080p ou numa janela pequena a largura muda. Sem isso o grafico
-    // vaza por cima do painel da tabela.
-    var painel = document.getElementById('painelGrafico');
-    var larguraAlvo = larguraCanvasDisponivel(painel);
-    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
-    // a altura vem de atributo HTML, que o CSS nao encolhe — entao e calculada
-    // aqui, pelo espaco que sobra na tela
-    var alturaAlvo = alturaCanvasDisponivel(painel);
-    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
-
-    var ctx = canvas.getContext('2d');
-    var w = canvas.width;
-    var h = canvas.height;
-
-    ctx.clearRect(0, 0, w, h);
-    if (!semanas || semanas.length === 0) return;
-
-    var margemEsq = 12, margemDir = 12, margemTopo = 18, margemBaixo = 40;
-    var largura = w - margemEsq - margemDir;
-    var altura = h - margemTopo - margemBaixo;
-
-    var maior = 0;
-    var i;
-    for (i = 0; i < semanas.length; i++) {
-      if (semanas[i].total > maior) maior = semanas[i].total;
-    }
-    if (maior <= 0) maior = 1; // evita divisao por zero quando nao houve venda
-
-    function coordX(indice) {
-      if (semanas.length === 1) return margemEsq + largura / 2;
-      return margemEsq + (largura * indice) / (semanas.length - 1);
-    }
-    function coordY(valor) {
-      return margemTopo + altura - (altura * valor) / maior;
-    }
-
-    // linhas de grade horizontais
-    ctx.strokeStyle = 'rgba(46,142,255,0.10)';
-    ctx.lineWidth = 1;
-    for (i = 0; i <= 3; i++) {
-      var y = margemTopo + (altura * i) / 3;
-      ctx.beginPath();
-      ctx.moveTo(margemEsq, y);
-      ctx.lineTo(w - margemDir, y);
-      ctx.stroke();
-    }
-
-    // area sob a linha
-    ctx.beginPath();
-    ctx.moveTo(coordX(0), margemTopo + altura);
-    for (i = 0; i < semanas.length; i++) {
-      ctx.lineTo(coordX(i), coordY(semanas[i].total));
-    }
-    ctx.lineTo(coordX(semanas.length - 1), margemTopo + altura);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(46,142,255,0.14)';
-    ctx.fill();
-
-    // a linha
-    ctx.beginPath();
-    for (i = 0; i < semanas.length; i++) {
-      var x = coordX(i);
-      var yv = coordY(semanas[i].total);
-      if (i === 0) ctx.moveTo(x, yv); else ctx.lineTo(x, yv);
-    }
-    ctx.strokeStyle = '#4da8ff';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // pontos
-    for (i = 0; i < semanas.length; i++) {
-      ctx.beginPath();
-      ctx.arc(coordX(i), coordY(semanas[i].total), 4, 0, Math.PI * 2, false);
-      ctx.fillStyle = '#29e0c8';
-      ctx.fill();
-    }
-
-    // rotulos do eixo x (mostra 1 a cada 2 pra nao embolar na TV)
-    ctx.fillStyle = '#7c8fb3';
-    ctx.font = (h < 240 ? 14 : 19) + 'px Arial, Helvetica, sans-serif';
-    for (i = 0; i < semanas.length; i++) {
-      if (i % 2 !== 0 && i !== semanas.length - 1) continue;
-      // o ultimo e sempre desenhado; se o penultimo escolhido cair colado
-      // nele, pula pra os dois nao se sobreporem
-      if (i === semanas.length - 2) continue;
-      // o primeiro e o ultimo ficam nas bordas do canvas: centralizados,
-      // metade do texto vazaria pra fora (era o "27/0" cortado na TV)
-      if (i === 0) ctx.textAlign = 'left';
-      else if (i === semanas.length - 1) ctx.textAlign = 'right';
-      else ctx.textAlign = 'center';
-      ctx.fillText(semanas[i].rotulo, coordX(i), h - 12);
     }
   }
 
@@ -994,7 +899,16 @@
     // mesma escala de cor do gauge do slide 1, pra leitura ficar consistente
     barra.style.backgroundColor = corDoGauge(dados.percentualMeta / 100);
 
-    ultimasSemanas = dados.semanal || [];
+    // O n8n manda a serie mensal como {mes:'2026-03', total:n} — o rotulo
+    // curto e montado aqui pra nao precisar mexer no workflow.
+    serieMensalCursos = (dados.mensal || []).map(function (m) {
+      var partes = String(m.mes).split('-');
+      var indice = Number(partes[1]) - 1;
+      return {
+        rotulo: (MESES_CURTOS[indice] || partes[1]) + '/' + String(partes[0]).slice(-2),
+        total: m.total
+      };
+    });
 
     var corpo = document.getElementById('corpoTabelaCursos');
     var html = '';
@@ -1039,11 +953,13 @@
 
   var ultimoArr = null;
 
-  function desenharGraficoArr(meses) {
-    var canvas = document.getElementById('graficoArr');
+  // Grafico de barras por mes, usado pelos dois slides (ARR e cursos). O
+  // formatador entra por parametro porque um e USD e o outro BRL.
+  function desenharBarrasMensais(idCanvas, idPainel, meses, formatar) {
+    var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
 
-    var painel = document.getElementById('painelGraficoArr');
+    var painel = document.getElementById(idPainel);
     var larguraAlvo = larguraCanvasDisponivel(painel);
     if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
     var alturaAlvo = alturaCanvasDisponivel(painel);
@@ -1097,7 +1013,7 @@
         ctx.fillStyle = '#eaf1ff';
         ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(formatarUSD(m.total), centro, topo - 7);
+        ctx.fillText(formatar(m.total), centro, topo - 7);
       }
 
       // rotulo do mes
