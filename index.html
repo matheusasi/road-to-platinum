@@ -275,6 +275,9 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 26px;
+    /* sem isto a tabela cresce pra caber o nome inteiro e empurra a coluna
+       de valor pra fora do painel */
+    table-layout: fixed;
   }
 
   #tabelaCursos td {
@@ -301,6 +304,7 @@
   #tabelaCursos td.nome {
     overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   #tabelaCursos tr.vazio td {
@@ -364,6 +368,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 26px;
+    table-layout: fixed;
   }
 
   #tabelaArr td {
@@ -381,6 +386,7 @@
   #tabelaArr td.conta {
     overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   #tabelaArr td.arr {
