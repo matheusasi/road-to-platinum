@@ -171,7 +171,7 @@
   .clearfix { clear: both; }
 
   /* =======================================================================
-     SLIDE 2 — Vendas de Cursos (Eduzz + Digital Manager Guru)
+     SLIDES 3 e 4 — Vendas de Cursos (Eduzz + Digital Manager Guru)
      Mesma paleta do slide 1. Layout em float de proposito: o navegador da
      TV e de 2014 e flexbox nele e imprevisivel.
      ======================================================================= */
@@ -376,7 +376,7 @@
   body.muitoCompacto #tabelaCursos td.fat { width: 96px; }
 
   /* =======================================================================
-     SLIDE 3 — ARR monday.com mes a mes. Reaproveita as classes do slide 2
+     SLIDE 2 — ARR monday.com mes a mes. Reaproveita as classes do slide de cursos
      (blocoVendas, painelVendas, tituloSecao) pra manter a mesma cara.
      ======================================================================= */
   #tabelaArr {
@@ -480,7 +480,60 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 2 — Vendas de Cursos (Eduzz + Digital Manager Guru).
+       SLIDE 2 — ARR da monday.com, mes a mes. Os dados vem dos subelementos
+       do Road to Platinum (uma venda de conta/expansao por subelemento).
+       =================================================================== -->
+  <div class="slide" data-slide="arr-monday" data-segundos="15">
+
+    <div id="topoArr">
+      <h1>ARR monday.com</h1>
+      <div class="subtitulo" id="arrRotuloMes">&nbsp;</div>
+    </div>
+
+    <div id="arrResumo">
+
+      <div class="blocoVendas meta">
+        <div class="rotulo">ARR gerado no mês</div>
+        <div class="valorGrande" id="arrMesAtual">$0</div>
+        <div class="metaLegenda">
+          <b id="arrVendasMes">0</b> contas no mês
+          &nbsp;&middot;&nbsp;
+          melhor mês: <b id="arrMelhorMes">-</b>
+        </div>
+      </div>
+
+      <div class="blocoVendas metade">
+        <div class="rotulo">Total no período</div>
+        <div class="valor" id="arrTotal">$0</div>
+      </div>
+
+      <div class="blocoVendas metade">
+        <div class="rotulo">Contas registradas</div>
+        <div class="valor" id="arrRegistros">0</div>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+    <div id="arrBaixo">
+
+      <div class="painelVendas" id="painelGraficoArr">
+        <div class="tituloSecao">ARR por mês</div>
+        <canvas id="graficoArr" width="880" height="430"></canvas>
+      </div>
+
+      <div class="painelVendas" id="painelTabelaArr">
+        <div class="tituloSecao">Últimas contas</div>
+        <table id="tabelaArr"><tbody id="corpoTabelaArr"></tbody></table>
+      </div>
+
+      <div class="clearfix"></div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 3 — Vendas de Cursos (Eduzz + Digital Manager Guru).
        Os numeros vem prontos do n8n (VENDAS_URL): a TV nao faz conta.
        =================================================================== -->
   <div class="slide" data-slide="vendas-cursos" data-segundos="30">
@@ -534,7 +587,7 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 3 — Cursos mes a mes. Separado do slide do mes atual porque sao
+       SLIDE 4 — Cursos mes a mes. Separado do slide do mes atual porque sao
        leituras diferentes: aqui e a tendencia do ano, la e o detalhe do mes.
        =================================================================== -->
   <div class="slide" data-slide="cursos-mensal" data-segundos="15">
@@ -549,59 +602,6 @@
         <div class="tituloSecao">Faturamento por mês</div>
         <canvas id="graficoCursosMes" width="880" height="430"></canvas>
       </div>
-      <div class="clearfix"></div>
-    </div>
-
-  </div>
-
-  <!-- ===================================================================
-       SLIDE 4 — ARR da monday.com, mes a mes. Os dados vem dos subelementos
-       do Road to Platinum (uma venda de conta/expansao por subelemento).
-       =================================================================== -->
-  <div class="slide" data-slide="arr-monday" data-segundos="15">
-
-    <div id="topoArr">
-      <h1>ARR monday.com</h1>
-      <div class="subtitulo" id="arrRotuloMes">&nbsp;</div>
-    </div>
-
-    <div id="arrResumo">
-
-      <div class="blocoVendas meta">
-        <div class="rotulo">ARR gerado no mês</div>
-        <div class="valorGrande" id="arrMesAtual">$0</div>
-        <div class="metaLegenda">
-          <b id="arrVendasMes">0</b> contas no mês
-          &nbsp;&middot;&nbsp;
-          melhor mês: <b id="arrMelhorMes">-</b>
-        </div>
-      </div>
-
-      <div class="blocoVendas metade">
-        <div class="rotulo">Total no período</div>
-        <div class="valor" id="arrTotal">$0</div>
-      </div>
-
-      <div class="blocoVendas metade">
-        <div class="rotulo">Contas registradas</div>
-        <div class="valor" id="arrRegistros">0</div>
-      </div>
-
-      <div class="clearfix"></div>
-    </div>
-
-    <div id="arrBaixo">
-
-      <div class="painelVendas" id="painelGraficoArr">
-        <div class="tituloSecao">ARR por mês</div>
-        <canvas id="graficoArr" width="880" height="430"></canvas>
-      </div>
-
-      <div class="painelVendas" id="painelTabelaArr">
-        <div class="tituloSecao">Últimas contas</div>
-        <table id="tabelaArr"><tbody id="corpoTabelaArr"></tbody></table>
-      </div>
-
       <div class="clearfix"></div>
     </div>
 
@@ -832,7 +832,7 @@
   }
 
   // =========================================================================
-  // SLIDE 2 — VENDAS DE CURSOS
+  // SLIDES 3 e 4 — VENDAS DE CURSOS
   //
   // O n8n manda tudo mastigado (faturamento do mes, meta, ticket medio,
   // serie semanal e tabela por curso). Aqui so pinta na tela.
@@ -1022,7 +1022,7 @@
   }
 
   // =========================================================================
-  // SLIDE 3 — ARR DA MONDAY.COM, MES A MES
+  // SLIDE 2 — ARR DA MONDAY.COM, MES A MES
   //
   // Cada subelemento do Road to Platinum e uma venda de conta/expansao. O n8n
   // soma por mes e manda pronto. Valores em USD, mesma moeda do slide 1.
