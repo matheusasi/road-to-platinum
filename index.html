@@ -424,7 +424,7 @@
 
     <div id="topo">
       <h1>Road to Platinum</h1>
-      <div class="subtitulo">Progresso dos ultimos 12 meses</div>
+      <div class="subtitulo">Progresso dos últimos 12 meses</div>
     </div>
 
     <div id="areaGauge">
@@ -455,7 +455,7 @@
       </div>
 
       <div class="card">
-        <div class="rotulo">Necessario / Dia</div>
+        <div class="rotulo">Necessário / Dia</div>
         <div class="valor neutro" id="valPorDia">$0</div>
       </div>
 
@@ -478,7 +478,7 @@
     <div id="vendasResumo">
 
       <div class="blocoVendas meta">
-        <div class="rotulo">Faturamento do mes</div>
+        <div class="rotulo">Faturamento do mês</div>
         <div class="valorGrande" id="vendasFaturamento">R$ 0</div>
         <div class="barraFundo"><div class="barraProgresso" id="vendasBarra"></div></div>
         <div class="metaLegenda">
@@ -489,12 +489,12 @@
       </div>
 
       <div class="blocoVendas metade">
-        <div class="rotulo">Vendas no mes</div>
+        <div class="rotulo">Vendas no mês</div>
         <div class="valor" id="vendasQtd">0</div>
       </div>
 
       <div class="blocoVendas metade">
-        <div class="rotulo">Ticket medio</div>
+        <div class="rotulo">Ticket médio</div>
         <div class="valor" id="vendasTicket">R$ 0</div>
       </div>
 
@@ -509,7 +509,7 @@
       </div>
 
       <div class="painelVendas" id="painelTabela">
-        <div class="tituloSecao">Cursos &mdash; mes atual</div>
+        <div class="tituloSecao">Cursos &mdash; mês atual</div>
         <table id="tabelaCursos"><tbody id="corpoTabelaCursos"></tbody></table>
       </div>
 
@@ -526,12 +526,12 @@
 
     <div id="topoCursosMes">
       <h1>Vendas de Cursos</h1>
-      <div class="subtitulo">Faturamento mes a mes</div>
+      <div class="subtitulo">Faturamento mês a mês</div>
     </div>
 
     <div id="cursosMesBaixo">
       <div class="painelVendas" id="painelGraficoCursosMes">
-        <div class="tituloSecao">Faturamento por mes</div>
+        <div class="tituloSecao">Faturamento por mês</div>
         <canvas id="graficoCursosMes" width="880" height="430"></canvas>
       </div>
       <div class="clearfix"></div>
@@ -553,17 +553,17 @@
     <div id="arrResumo">
 
       <div class="blocoVendas meta">
-        <div class="rotulo">ARR gerado no mes</div>
+        <div class="rotulo">ARR gerado no mês</div>
         <div class="valorGrande" id="arrMesAtual">$0</div>
         <div class="metaLegenda">
-          <b id="arrVendasMes">0</b> contas no mes
+          <b id="arrVendasMes">0</b> contas no mês
           &nbsp;&middot;&nbsp;
-          melhor mes: <b id="arrMelhorMes">-</b>
+          melhor mês: <b id="arrMelhorMes">-</b>
         </div>
       </div>
 
       <div class="blocoVendas metade">
-        <div class="rotulo">Total no periodo</div>
+        <div class="rotulo">Total no período</div>
         <div class="valor" id="arrTotal">$0</div>
       </div>
 
@@ -578,12 +578,12 @@
     <div id="arrBaixo">
 
       <div class="painelVendas" id="painelGraficoArr">
-        <div class="tituloSecao">ARR por mes</div>
+        <div class="tituloSecao">ARR por mês</div>
         <canvas id="graficoArr" width="880" height="430"></canvas>
       </div>
 
       <div class="painelVendas" id="painelTabelaArr">
-        <div class="tituloSecao">Ultimas contas</div>
+        <div class="tituloSecao">Últimas contas</div>
         <table id="tabelaArr"><tbody id="corpoTabelaArr"></tbody></table>
       </div>
 
@@ -955,7 +955,7 @@
     var html = '';
     var cursos = dados.cursos || [];
     if (cursos.length === 0) {
-      html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mes</td></tr>';
+      html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mês</td></tr>';
     } else {
       // cabe cerca de 7 linhas no painel da TV sem cortar
       var limite = cursos.length > 7 ? 7 : cursos.length;
