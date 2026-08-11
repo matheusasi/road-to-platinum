@@ -286,6 +286,24 @@
     margin-bottom: 14px;
   }
 
+  .legendaOrigem {
+    float: right;
+    font-size: 16px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .legendaOrigem .marca {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    margin: 0 5px 0 14px;
+  }
+  .legendaOrigem .marca.out { background: #2e8eff; }
+  .legendaOrigem .marca.in  { background: #a06bff; }
+  body.compacto .legendaOrigem { font-size: 13px; }
+  body.muitoCompacto .legendaOrigem { font-size: 11px; }
+
   #tabelaCursos {
     width: 100%;
     border-collapse: collapse;
@@ -503,7 +521,7 @@
       </div>
 
       <div class="blocoVendas metade">
-        <div class="rotulo">Total no período</div>
+        <div class="rotulo">Total no ano</div>
         <div class="valor" id="arrTotal">$0</div>
       </div>
 
@@ -518,7 +536,12 @@
     <div id="arrBaixo">
 
       <div class="painelVendas" id="painelGraficoArr">
-        <div class="tituloSecao">ARR por mês</div>
+        <div class="tituloSecao">ARR por mês
+          <span class="legendaOrigem">
+            <i class="marca out"></i>Outbound
+            <i class="marca in"></i>Inbound
+          </span>
+        </div>
         <canvas id="graficoArr" width="880" height="430"></canvas>
       </div>
 
@@ -948,7 +971,7 @@
       desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       if (ultimoArr) {
-        desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD);
+        desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
       if (conteudoCabe()) return;
     }
@@ -1033,7 +1056,7 @@
   // Grafico de barras, usado pra series semanais e mensais nos tres slides.
   // O formatador entra por parametro porque um e USD e o outro BRL; a ultima
   // barra sai destacada (periodo corrente).
-  function desenharBarras(idCanvas, idPainel, meses, formatar) {
+  function desenharBarras(idCanvas, idPainel, meses, formatar, empilhado) {
     var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
 
@@ -1079,24 +1102,64 @@
     var fonteRotulo = (h < 240) ? 13 : 18;
     var fonteValor = (h < 240) ? 12 : 17;
 
+    // No modo empilhado o valor vai DENTRO de cada faixa, e nao acima da barra.
+    // So cabe se a faixa for mais alta que a fonte com uma folga; faixa curta
+    // fica sem numero em vez de derramar texto por cima da barra vizinha.
+    function valorDentro(valor, topoFaixa, alturaFaixa, centroX, cor) {
+      if (valor <= 0 || alturaFaixa < fonteValor + 7) return;
+      ctx.fillStyle = cor;
+      ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(formatar(valor), centroX, topoFaixa + alturaFaixa / 2);
+      ctx.textBaseline = 'alphabetic';
+    }
+
     for (i = 0; i < meses.length; i++) {
       var m = meses[i];
       var centro = margemEsq + fatia * i + fatia / 2;
-      var alturaBarra = (altura * m.total) / maior;
-      if (m.total > 0 && alturaBarra < 3) alturaBarra = 3;
-      var topo = margemTopo + altura - alturaBarra;
+      var esq = centro - larguraBarra / 2;
+      var piso = margemTopo + altura;
 
-      if (m.parcial) ctx.fillStyle = '#8df2e6';                       // em curso
-      else if (i === meses.length - 1) ctx.fillStyle = '#29e0c8';      // corrente
-      else ctx.fillStyle = '#2e8eff';                                  // fechado
-      ctx.fillRect(centro - larguraBarra / 2, topo, larguraBarra, alturaBarra);
+      if (empilhado) {
+        // Outbound embaixo em azul, inbound em cima em roxo. A ordem e fixa pra
+        // vista nao dancar entre um mes e outro.
+        //
+        // Se o webhook ainda for a versao antiga, o mes vem so com total e sem
+        // as duas origens. Nesse caso tudo entra como outbound: a barra sai
+        // inteira azul, como era antes, em vez de o grafico simplesmente sumir.
+        var temOrigem = (m.inbound != null) || (m.outbound != null);
+        var vOut = temOrigem ? (m.outbound || 0) : (m.total || 0);
+        var vIn = temOrigem ? (m.inbound || 0) : 0;
+        var hOut = (altura * vOut) / maior;
+        var hIn = (altura * vIn) / maior;
+        if (vOut > 0 && hOut < 3) hOut = 3;
+        if (vIn > 0 && hIn < 3) hIn = 3;
 
-      // valor em cima da barra
-      if (m.total > 0) {
-        ctx.fillStyle = '#eaf1ff';
-        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(formatar(m.total), centro, topo - 7);
+        ctx.fillStyle = '#2e8eff';
+        ctx.fillRect(esq, piso - hOut, larguraBarra, hOut);
+        ctx.fillStyle = '#a06bff';
+        ctx.fillRect(esq, piso - hOut - hIn, larguraBarra, hIn);
+
+        valorDentro(vOut, piso - hOut, hOut, centro, '#eaf1ff');
+        valorDentro(vIn, piso - hOut - hIn, hIn, centro, '#f3e9ff');
+      } else {
+        var alturaBarra = (altura * m.total) / maior;
+        if (m.total > 0 && alturaBarra < 3) alturaBarra = 3;
+        var topo = piso - alturaBarra;
+
+        if (m.parcial) ctx.fillStyle = '#8df2e6';                       // em curso
+        else if (i === meses.length - 1) ctx.fillStyle = '#29e0c8';      // corrente
+        else ctx.fillStyle = '#2e8eff';                                  // fechado
+        ctx.fillRect(esq, topo, larguraBarra, alturaBarra);
+
+        // valor em cima da barra
+        if (m.total > 0) {
+          ctx.fillStyle = '#eaf1ff';
+          ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(formatar(m.total), centro, topo - 7);
+        }
       }
 
       // rotulo do mes
@@ -1115,7 +1178,11 @@
     document.getElementById('arrVendasMes').innerHTML = dados.vendasMesAtual;
     document.getElementById('arrMelhorMes').innerHTML =
       dados.melhorMesRotulo + ' (' + formatarUSD(dados.melhorMesTotal) + ')';
-    document.getElementById('arrTotal').innerHTML = formatarUSD(dados.totalPeriodo);
+    // totalPeriodo e o nome antigo do campo, e somava o board inteiro. Fica como
+    // reserva pra tela nao mostrar NaN enquanto o workflow novo nao for
+    // importado no n8n; assim que for, totalAno manda.
+    var totalDoAno = (dados.totalAno != null) ? dados.totalAno : dados.totalPeriodo;
+    document.getElementById('arrTotal').innerHTML = formatarUSD(totalDoAno);
     document.getElementById('arrRegistros').innerHTML = dados.totalRegistros;
 
     var corpo = document.getElementById('corpoTabelaArr');
