@@ -906,7 +906,15 @@
       // os slides ficam com visibility/opacity (nunca display:none), entao
       // medem certo mesmo escondidos
       var el = document.getElementById(alvos[i]);
-      if (el && (el.offsetTop + el.offsetHeight) > tela) return false;
+      if (!el) continue;
+      if ((el.offsetTop + el.offsetHeight) > tela) return false;
+      // Com a altura dos paineis fixada, uma tabela comprida nao empurra mais o
+      // container pra fora da tela — ela transborda por dentro e o teste acima
+      // passaria com as linhas de baixo escondidas. Por isso o segundo teste.
+      var paineis = el.getElementsByClassName('painelVendas');
+      for (var j = 0; j < paineis.length; j++) {
+        if (paineis[j].scrollHeight > paineis[j].clientHeight + 2) return false;
+      }
     }
     return true;
   }
@@ -944,21 +952,51 @@
 
   // Quanta altura sobra pro canvas dentro do painel. Antes a altura era fixa
   // em degraus (430/265/190) e, no modo compacto da TV, o grafico ficava
-  // minusculo com espaco vazio embaixo. Aqui ele estica pra ocupar o que tem.
+  // minusculo com espaco vazio embaixo. Aqui ele ocupa o que o painel tem.
+  //
+  // Le a altura ja fixada pelo esticarPaineis em vez de recalcular a partir da
+  // tela: assim canvas e painel nao podem discordar por arredondamento.
   function alturaCanvasDisponivel(painel) {
     if (!painel || !painel.offsetHeight) return 430;
     var titulo = painel.getElementsByClassName('tituloSecao')[0];
     var alturaTitulo = titulo ? titulo.offsetHeight + 14 : 40;
     var p = paddingDoPainel(painel);
-    // folga generosa de proposito: o canvas encosta no rodape, e sem ela um
-    // arredondamento de poucos pixels ja estourava a tela e forcava o layout
-    // a compactar sem necessidade
-    var folgaRodape = 40;
-    var espaco = alturaDaTela() - painel.offsetTop - p.topo - p.baixo -
-                 alturaTitulo - folgaRodape;
+    var espaco = painel.clientHeight - p.topo - p.baixo - alturaTitulo;
     if (espaco < 140) espaco = 140;
     if (espaco > 560) espaco = 560;
     return Math.round(espaco);
+  }
+
+  // Os paineis da linha de baixo sao floats sem altura, entao paravam na altura
+  // do proprio conteudo. O do grafico estica sozinho (o canvas ocupa o que tem),
+  // mas o da tabela nao: com poucas linhas sobrava um buraco embaixo dele, e no
+  // slide de cursos esse buraco passava de um terco da tela.
+  //
+  // Aqui todos recebem a mesma altura, ate a folga do rodape. So estica, nunca
+  // encolhe: se a tabela for mais alta que o espaco, ela manda e o layout
+  // compacta no proximo nivel, em vez de cortar linha.
+  // A altura sai da geometria da tela, nao do conteudo: todos os paineis da
+  // linha terminam na mesma altura, e a margem final fica igual em qualquer
+  // nivel de compactacao. Antes era uma folga fixa de 40px subtraida antes do
+  // padding do container — no nivel cheio (padding 20) sobravam 2px, e qualquer
+  // arredondamento derrubava o layout pro nivel compacto sem necessidade.
+  var MARGEM_RODAPE = 12;
+
+  function esticarPaineis() {
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo'];
+    var tela = alturaDaTela();
+    for (var i = 0; i < alvos.length; i++) {
+      var cont = document.getElementById(alvos[i]);
+      if (!cont) continue;
+      var padCont = paddingDoPainel(cont);
+      var paineis = cont.getElementsByClassName('painelVendas');
+      for (var j = 0; j < paineis.length; j++) {
+        var p = paineis[j];
+        var alvo = tela - MARGEM_RODAPE - padCont.baixo - p.offsetTop;
+        if (alvo < 140) alvo = 140;
+        p.style.height = alvo + 'px';
+      }
+    }
   }
 
   // Tenta o tamanho cheio; se estourar a tela, vai encolhendo. Medir e mais
@@ -968,6 +1006,8 @@
     var niveis = [null, 'compacto', 'muitoCompacto'];
     for (var i = 0; i < niveis.length; i++) {
       definirNivelCompacto(niveis[i]);
+      // antes de desenhar: o canvas se dimensiona pela altura ja fixada aqui
+      esticarPaineis();
       desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       if (ultimoArr) {
