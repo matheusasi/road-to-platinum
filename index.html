@@ -1281,12 +1281,22 @@
     });
   }
 
+  // Intervalo entre atualizacoes. Cada disparo e uma execucao no n8n: a 1 min
+  // eram 4.320 por dia (3 webhooks x 1440), quase todas respondendo "continua
+  // igual". A 5 min caem pra 864, e ninguem olhando a TV percebe a diferenca.
+  //
+  // O watchdog logo abaixo DEPENDE deste valor. Mexer aqui sem mexer la faz a
+  // TV se recarregar sozinha em looping — e todo reload derruba o fullscreen,
+  // que ninguem restaura porque a TV nao tem quem toque na tela. Por isso o
+  // limite do watchdog e derivado daqui, e nao um numero solto.
+  var MS_ATUALIZACAO = 5 * 60 * 1000;
+
   atualizarDados();
   atualizarVendas();
   atualizarArr();
-  setInterval(atualizarDados, 1 * 60 * 1000);
-  setInterval(atualizarVendas, 1 * 60 * 1000);
-  setInterval(atualizarArr, 1 * 60 * 1000);
+  setInterval(atualizarDados, MS_ATUALIZACAO);
+  setInterval(atualizarVendas, MS_ATUALIZACAO);
+  setInterval(atualizarArr, MS_ATUALIZACAO);
 
   // =========================================================================
   // ROTACAO DE DASHBOARDS (slides)
@@ -1371,8 +1381,16 @@
   // fullscreen pra sair do estado travado.
   // =========================================================================
 
+  // O limite sai do intervalo de atualizacao, nao de um numero fixo: com 3
+  // ciclos perdidos seguidos (mais um minuto de folga pra requisicao lenta) da
+  // pra afirmar que travou. Um limite fixo de 5 minutos, como era antes,
+  // passaria a disparar a cada ciclo assim que o intervalo virasse 5 minutos —
+  // a TV se recarregaria pra sempre, perdendo o fullscreen toda vez.
+  var CICLOS_PERDIDOS_ATE_RELOAD = 3;
+  var MS_TRAVADO = MS_ATUALIZACAO * CICLOS_PERDIDOS_ATE_RELOAD + 60 * 1000;
+
   setInterval(function () {
-    if (Date.now() - ultimoSucesso > 5 * 60 * 1000) {
+    if (Date.now() - ultimoSucesso > MS_TRAVADO) {
       location.reload();
     }
   }, 1 * 60 * 1000);
