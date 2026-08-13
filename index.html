@@ -699,9 +699,11 @@
 
   // Cada dashboard e servido pela instancia de n8n onde o workflow dele vive —
   // por isso os dois hosts diferentes aqui embaixo, nao e engano.
-  var URL_ROAD_TO_PLATINUM = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/road-to-platinum';
-  var URL_VENDAS_CURSOS    = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/vendas-cursos';
-  var URL_ARR_MENSAL       = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/arr-mensal';
+  // Um webhook so, com os tres blocos (road, arr, cursos). Eram tres chamadas
+  // por ciclo: 3 execucoes no n8n e 3 consultas ao monday a cada atualizacao.
+  // Como os tres liam do MESMO lugar, uma consulta GraphQL com tres apelidos
+  // traz tudo — medido: 2.787 ms contra 3.388 ms das tres somadas.
+  var URL_TV_DADOS = 'https://n8n-xymb.srv1709744.hstgr.cloud/webhook/tv-dados';
 
   // aoResponder (opcional) dispara quando a requisicao COMPLETA, com sucesso
   // ou nao. Serve pra distinguir duas falhas que parecem iguais de fora: o
@@ -730,7 +732,7 @@
   }
 
   function buscarDados(callback) {
-    buscarJSON(URL_ROAD_TO_PLATINUM, callback);
+    buscarJSON(URL_TV_DADOS, callback);
   }
 
   // =========================================================================
@@ -1263,47 +1265,44 @@
 
   var ultimoSucesso = Date.now();
 
+  // Uma busca so alimenta os tres slides. Cada bloco vem no mesmo formato dos
+  // webhooks antigos, entao as funcoes de render nao mudaram.
+  //
+  // Cada render vai protegido: um erro ao desenhar um slide (um canvas que
+  // falha, um campo inesperado) nao pode impedir os outros dois de aparecer.
+  // Com tres buscas separadas isso era de graca — cada uma caia sozinha.
+  function aplicar(nome, fn, dados) {
+    if (!dados) return;
+    try {
+      fn(dados);
+    } catch (erro) {
+      if (window.console && console.error) console.error('Falha ao renderizar ' + nome, erro);
+    }
+  }
+
   function atualizarDados() {
-    buscarDados(function (dados) {
+    buscarJSON(URL_TV_DADOS, function (tudo) {
       ultimoSucesso = Date.now();
-      renderizarDashboard(dados);
+      aplicar('road', renderizarDashboard, tudo.road);
+      aplicar('cursos', renderizarVendas, tudo.cursos);
+      aplicar('arr', renderizarArr, tudo.arr);
     });
   }
 
-  function atualizarVendas() {
-    buscarJSON(URL_VENDAS_CURSOS, function (dados) {
-      // de proposito NAO mexe em ultimoSucesso: o watchdog de reload existe
-      // pra destravar a pagina, e o slide 1 e a fonte de verdade disso. Se so
-      // o webhook de vendas cair, nao vale recarregar (e perder o fullscreen).
-      renderizarVendas(dados);
-    });
-  }
-
-  function atualizarArr() {
-    buscarJSON(URL_ARR_MENSAL, function (dados) {
-      // mesmo motivo do atualizarVendas: nao mexe no ultimoSucesso
-      renderizarArr(dados);
-    });
-  }
-
-  // Intervalo entre atualizacoes. Cada disparo e uma execucao no n8n: a 1 min
-  // sao 4.320 por dia (3 webhooks x 1440), quase todas respondendo "continua
-  // igual". Aumentar aqui corta execucao na mesma proporcao — a 5 min seriam
-  // 864 — e na pratica ninguem olhando a TV nota a diferenca.
+  // Intervalo entre atualizacoes. Cada disparo e UMA execucao no n8n (era uma
+  // por webhook, com tres webhooks). Antes: 3 x 1440 = 4.320 por dia, quase
+  // todas respondendo "continua igual". Agora, a 5 min: 288.
+  // Dado de venda nao muda de minuto em minuto — ninguem olhando a TV nota.
   //
   // ANTES DE MEXER: o watchdog la embaixo depende deste valor, e o limite dele
   // e derivado daqui justamente por isso. Quando era um numero fixo de 5 min,
   // subir este intervalo pra 4 min ja fazia UMA requisicao falhada recarregar
   // a TV — e todo reload derruba o fullscreen, que ninguem restaura porque a
   // TV nao tem quem toque na tela. Derivado, o limite acompanha sozinho.
-  var MS_ATUALIZACAO = 1 * 60 * 1000;
+  var MS_ATUALIZACAO = 5 * 60 * 1000;
 
   atualizarDados();
-  atualizarVendas();
-  atualizarArr();
   setInterval(atualizarDados, MS_ATUALIZACAO);
-  setInterval(atualizarVendas, MS_ATUALIZACAO);
-  setInterval(atualizarArr, MS_ATUALIZACAO);
 
   // =========================================================================
   // ROTACAO DE DASHBOARDS (slides)
@@ -1425,9 +1424,11 @@
     var marcaAntes = ultimoSucesso;
     var servidorRespondeu = false;
 
-    buscarJSON(URL_ROAD_TO_PLATINUM, function (dados) {
+    buscarJSON(URL_TV_DADOS, function (tudo) {
       ultimoSucesso = Date.now();
-      renderizarDashboard(dados);
+      aplicar('road', renderizarDashboard, tudo.road);
+      aplicar('cursos', renderizarVendas, tudo.cursos);
+      aplicar('arr', renderizarArr, tudo.arr);
     }, function () {
       servidorRespondeu = true;
     });
