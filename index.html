@@ -194,7 +194,7 @@
     color: #7c8fb3;
   }
 
-  #vendasResumo, #arrResumo {
+  #arrResumo {
     padding: 14px 34px 0 34px;
   }
 
@@ -212,6 +212,14 @@
   .blocoVendas.meta   { width: 48%; margin-left: 0; }
   .blocoVendas.metade { width: 23%; text-align: center; }
   .blocoVendas.metade:last-of-type { margin-right: 0; }
+
+  /* "Faturamento do mes" saiu da linha de resumo e foi empilhar com o
+     grafico semanal na mesma coluna (colunaFaturamento) — precisa de 100%
+     da coluna, nao mais 48% de uma linha, e sem a margem horizontal que
+     fazia sentido quando tinha vizinhos dos lados. */
+  #blocoFaturamentoMes { width: 100%; margin: 0 0 18px 0; box-sizing: border-box; }
+  body.compacto #blocoFaturamentoMes { margin-bottom: 13px; }
+  body.muitoCompacto #blocoFaturamentoMes { margin-bottom: 9px; }
 
   .blocoVendas .rotulo {
     font-size: 22px;
@@ -273,18 +281,20 @@
     padding: 22px 26px;
   }
 
-  #painelGrafico, #painelGraficoArr { width: 56%; margin-right: 2%; }
+  #painelGraficoArr { width: 56%; margin-right: 2%; }
   #painelTabelaArr { width: 42%; }
   /* o slide mensal de cursos e so o grafico, entao ocupa a largura toda */
   #painelGraficoCursosMes { width: 100%; }
 
-  /* Coluna direita do slide de cursos: dois paineis empilhados (Cursos - mes
-     atual em cima, Ultimas Vendas embaixo) em vez de um painel so. A coluna
-     ocupa a mesma largura que #painelTabela ocupava sozinho antes; overflow
-     hidden contem os dois filhos flutuantes, senao a coluna colapsa pra
-     altura zero (floats nao empurram o pai sem isso). */
+  /* As duas colunas do slide de cursos: cada uma com dois paineis empilhados
+     (resumo/tabela em cima, o que estica embaixo) em vez de uma linha de
+     resumo separada da linha de graficos. Isso fecha o vazio que sobrava ao
+     lado de "Faturamento do mes" — agora e ali que "Cursos - mes atual"
+     comeca, no mesmo topo dos dois lados. overflow hidden contem os filhos
+     flutuantes, senao a coluna colapsa pra altura zero. */
+  #colunaFaturamento { width: 56%; float: left; margin-right: 2%; box-sizing: border-box; overflow: hidden; }
   #colunaCursos { width: 42%; float: left; box-sizing: border-box; overflow: hidden; }
-  #painelTabela, #painelUltimasCursos { width: 100%; box-sizing: border-box; }
+  #painelGrafico, #painelTabela, #painelUltimasCursos { width: 100%; box-sizing: border-box; }
   #painelTabela { margin-bottom: 18px; }
   body.compacto #painelTabela { margin-bottom: 13px; }
   body.muitoCompacto #painelTabela { margin-bottom: 9px; }
@@ -421,7 +431,7 @@
   body.compacto #topoVendas, body.compacto #topoArr, body.compacto #topoCursosMes { padding: 14px 20px 2px 20px; }
   body.compacto #topoVendas h1, body.compacto #topoArr h1, body.compacto #topoCursosMes h1 { font-size: 36px; }
   body.compacto #topoVendas .subtitulo, body.compacto #topoArr .subtitulo, body.compacto #topoCursosMes .subtitulo { font-size: 18px; }
-  body.compacto #vendasResumo, body.compacto #arrResumo { padding: 8px 24px 0 24px; }
+  body.compacto #arrResumo { padding: 8px 24px 0 24px; }
   body.compacto .blocoVendas { padding: 15px 19px; }
   body.compacto .blocoVendas .rotulo { font-size: 16px; margin-bottom: 6px; }
   body.compacto .blocoVendas .valor { font-size: 38px; }
@@ -440,7 +450,7 @@
   body.muitoCompacto #topoVendas, body.muitoCompacto #topoArr, body.muitoCompacto #topoCursosMes { padding: 8px 16px 0 16px; }
   body.muitoCompacto #topoVendas h1, body.muitoCompacto #topoArr h1, body.muitoCompacto #topoCursosMes h1 { font-size: 26px; }
   body.muitoCompacto #topoVendas .subtitulo, body.muitoCompacto #topoArr .subtitulo, body.muitoCompacto #topoCursosMes .subtitulo { font-size: 14px; }
-  body.muitoCompacto #vendasResumo, body.muitoCompacto #arrResumo { padding: 6px 18px 0 18px; }
+  body.muitoCompacto #arrResumo { padding: 6px 18px 0 18px; }
   body.muitoCompacto .blocoVendas { padding: 10px 14px; }
   body.muitoCompacto .blocoVendas .rotulo { font-size: 13px; margin-bottom: 4px; }
   body.muitoCompacto .blocoVendas .valor { font-size: 27px; }
@@ -629,27 +639,30 @@
       <div class="subtitulo" id="vendasRotuloMes">&nbsp;</div>
     </div>
 
-    <div id="vendasResumo">
-
-      <div class="blocoVendas meta">
-        <div class="rotulo">Faturamento do mês</div>
-        <div class="valorGrande" id="vendasFaturamento">R$ 0</div>
-        <div class="barraFundo"><div class="barraProgresso" id="vendasBarra"></div></div>
-        <div class="metaLegenda">
-          Meta: <b id="vendasMeta">R$ 0</b>
-          &nbsp;&middot;&nbsp;
-          <b id="vendasPercentual">0%</b> da meta
-        </div>
-      </div>
-
-      <div class="clearfix"></div>
-    </div>
-
+    <!-- vendasResumo sumiu: "Faturamento do mes" e "Faturamento semanal" agora
+         empilham na MESMA coluna (colunaFaturamento), do mesmo jeito que
+         "Cursos - mes atual" empilha com "Ultimas Vendas" do lado direito.
+         Isso fecha o vazio que sobrava a direita de "Faturamento do mes"
+         depois que Vendas no mes/Ticket medio saíram dali — agora e ali que
+         "Cursos - mes atual" comeca, no mesmo topo dos dois lados. -->
     <div id="vendasBaixo">
 
-      <div class="painelVendas" id="painelGrafico">
-        <div class="tituloSecao">Faturamento semanal</div>
-        <canvas id="graficoSemanal" width="880" height="430"></canvas>
+      <div id="colunaFaturamento">
+        <div class="blocoVendas meta semAutoAltura" id="blocoFaturamentoMes">
+          <div class="rotulo">Faturamento do mês</div>
+          <div class="valorGrande" id="vendasFaturamento">R$ 0</div>
+          <div class="barraFundo"><div class="barraProgresso" id="vendasBarra"></div></div>
+          <div class="metaLegenda">
+            Meta: <b id="vendasMeta">R$ 0</b>
+            &nbsp;&middot;&nbsp;
+            <b id="vendasPercentual">0%</b> da meta
+          </div>
+        </div>
+
+        <div class="painelVendas" id="painelGrafico">
+          <div class="tituloSecao">Faturamento semanal</div>
+          <canvas id="graficoSemanal" width="880" height="430"></canvas>
+        </div>
       </div>
 
       <!-- Cursos - mes atual fica do tamanho do proprio conteudo (classe
