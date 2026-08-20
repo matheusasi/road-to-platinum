@@ -274,9 +274,20 @@
   }
 
   #painelGrafico, #painelGraficoArr { width: 56%; margin-right: 2%; }
-  #painelTabela, #painelTabelaArr { width: 42%; }
+  #painelTabelaArr { width: 42%; }
   /* o slide mensal de cursos e so o grafico, entao ocupa a largura toda */
   #painelGraficoCursosMes { width: 100%; }
+
+  /* Coluna direita do slide de cursos: dois paineis empilhados (Cursos - mes
+     atual em cima, Ultimas Vendas embaixo) em vez de um painel so. A coluna
+     ocupa a mesma largura que #painelTabela ocupava sozinho antes; overflow
+     hidden contem os dois filhos flutuantes, senao a coluna colapsa pra
+     altura zero (floats nao empurram o pai sem isso). */
+  #colunaCursos { width: 42%; float: left; box-sizing: border-box; overflow: hidden; }
+  #painelTabela, #painelUltimasCursos { width: 100%; box-sizing: border-box; }
+  #painelTabela { margin-bottom: 18px; }
+  body.compacto #painelTabela { margin-bottom: 13px; }
+  body.muitoCompacto #painelTabela { margin-bottom: 9px; }
 
   .tituloSecao {
     font-size: 22px;
@@ -346,6 +357,58 @@
     border-bottom: 0;
     padding-top: 22px;
   }
+
+  /* Ultimas vendas de curso: mesma estrutura de 3 colunas do #tabelaArr
+     (data, nome, valor), mas com cifra em BRL em vez de USD. */
+  #tabelaUltimasCursos {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 26px;
+    table-layout: fixed;
+  }
+
+  #tabelaUltimasCursos td {
+    padding: 13px 6px;
+    border-bottom: 1px solid rgba(46,142,255,0.12);
+    color: #eaf1ff;
+  }
+
+  #tabelaUltimasCursos td.quando {
+    color: #8a9bc0;
+    width: 86px;
+    white-space: nowrap;
+  }
+
+  #tabelaUltimasCursos td.nome {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  #tabelaUltimasCursos td.fat {
+    text-align: right;
+    color: #29e0c8;
+    font-weight: bold;
+    white-space: nowrap;
+    width: 168px;
+  }
+
+  #tabelaUltimasCursos tr.vazio td {
+    color: #7c8fb3;
+    text-align: center;
+    border-bottom: 0;
+    padding-top: 22px;
+  }
+
+  body.compacto #tabelaUltimasCursos { font-size: 19px; }
+  body.compacto #tabelaUltimasCursos td { padding: 8px 4px; }
+  body.compacto #tabelaUltimasCursos td.quando { width: 66px; }
+  body.compacto #tabelaUltimasCursos td.fat { width: 118px; }
+
+  body.muitoCompacto #tabelaUltimasCursos { font-size: 15px; }
+  body.muitoCompacto #tabelaUltimasCursos td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaUltimasCursos td.quando { width: 54px; }
+  body.muitoCompacto #tabelaUltimasCursos td.fat { width: 96px; }
 
   /* =======================================================================
      AJUSTE AUTOMATICO DE TAMANHO
@@ -579,16 +642,6 @@
         </div>
       </div>
 
-      <div class="blocoVendas metade">
-        <div class="rotulo">Vendas no mês</div>
-        <div class="valor" id="vendasQtd">0</div>
-      </div>
-
-      <div class="blocoVendas metade">
-        <div class="rotulo">Ticket médio</div>
-        <div class="valor" id="vendasTicket">R$ 0</div>
-      </div>
-
       <div class="clearfix"></div>
     </div>
 
@@ -599,9 +652,19 @@
         <canvas id="graficoSemanal" width="880" height="430"></canvas>
       </div>
 
-      <div class="painelVendas" id="painelTabela">
-        <div class="tituloSecao">Cursos &mdash; mês atual</div>
-        <table id="tabelaCursos"><tbody id="corpoTabelaCursos"></tbody></table>
+      <!-- Cursos - mes atual fica do tamanho do proprio conteudo (classe
+           semAutoAltura), em vez de esticar ate o rodape como antes: agora
+           divide a coluna com Ultimas Vendas, que e quem estica pra baixo. -->
+      <div id="colunaCursos">
+        <div class="painelVendas semAutoAltura" id="painelTabela">
+          <div class="tituloSecao">Cursos - mês atual</div>
+          <table id="tabelaCursos"><tbody id="corpoTabelaCursos"></tbody></table>
+        </div>
+
+        <div class="painelVendas" id="painelUltimasCursos">
+          <div class="tituloSecao">Últimas vendas</div>
+          <table id="tabelaUltimasCursos"><tbody id="corpoUltimasCursos"></tbody></table>
+        </div>
       </div>
 
       <div class="clearfix"></div>
@@ -995,6 +1058,11 @@
       var paineis = cont.getElementsByClassName('painelVendas');
       for (var j = 0; j < paineis.length; j++) {
         var p = paineis[j];
+        // Painel marcado semAutoAltura (Cursos - mes atual) fica do tamanho
+        // do proprio conteudo: ele divide a coluna com outro painel embaixo
+        // (Ultimas Vendas), que e quem estica ate o rodape. Esticar os dois
+        // faria o de cima cobrir a coluna inteira e sobrar nada pro de baixo.
+        if ((' ' + p.className + ' ').indexOf(' semAutoAltura ') !== -1) continue;
         var alvo = tela - MARGEM_RODAPE - padCont.baixo - p.offsetTop;
         if (alvo < 140) alvo = 140;
         p.style.height = alvo + 'px';
@@ -1025,8 +1093,9 @@
     document.getElementById('vendasFaturamento').innerHTML = formatarBRL(dados.faturamentoMes);
     document.getElementById('vendasMeta').innerHTML = formatarBRL(dados.metaMensal);
     document.getElementById('vendasPercentual').innerHTML = dados.percentualMeta + '%';
-    document.getElementById('vendasQtd').innerHTML = dados.vendasMes;
-    document.getElementById('vendasTicket').innerHTML = formatarBRL(dados.ticketMedio);
+    // Vendas no mes e Ticket medio saem do dashboard, mas continuam vindo no
+    // payload do n8n (dados.vendasMes / dados.ticketMedio) — sem uso na tela
+    // por enquanto, sem custo remover do workflow tambem.
 
     var pct = dados.percentualMeta;
     if (pct < 0) pct = 0;
@@ -1059,8 +1128,10 @@
     if (cursos.length === 0) {
       html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mês</td></tr>';
     } else {
-      // cabe cerca de 7 linhas no painel da TV sem cortar
-      var limite = cursos.length > 7 ? 7 : cursos.length;
+      // O painel agora divide a coluna com Ultimas Vendas em vez de ocupar
+      // ela inteira, entao mostra menos linhas de propósito (era 7, depois 5).
+      // Mais compacto aqui = mais espaco sobra pro painel de baixo.
+      var limite = cursos.length > 4 ? 4 : cursos.length;
       for (var i = 0; i < limite; i++) {
         var c = cursos[i];
         html += '<tr>' +
@@ -1081,9 +1152,26 @@
     }
     corpo.innerHTML = html;
 
-    // por ultimo: a tabela ja esta preenchida, entao da pra medir a altura
-    // real do slide e decidir se precisa encolher (isso tambem desenha o
-    // grafico, no tamanho do nivel escolhido)
+    var corpoUltimas = document.getElementById('corpoUltimasCursos');
+    var htmlUltimas = '';
+    var ultimasCursos = dados.ultimas || [];
+    if (ultimasCursos.length === 0) {
+      htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
+    } else {
+      for (var k = 0; k < ultimasCursos.length; k++) {
+        var uc = ultimasCursos[k];
+        htmlUltimas += '<tr>' +
+                  '<td class="quando">' + uc.data + '</td>' +
+                  '<td class="nome">' + uc.curso + '</td>' +
+                  '<td class="fat">' + formatarBRL(uc.valor) + '</td>' +
+                '</tr>';
+      }
+    }
+    corpoUltimas.innerHTML = htmlUltimas;
+
+    // por ultimo: as tabelas ja estao preenchidas, entao da pra medir a
+    // altura real do slide e decidir se precisa encolher (isso tambem
+    // desenha o grafico, no tamanho do nivel escolhido)
     ajustarTamanhoVendas();
   }
 
