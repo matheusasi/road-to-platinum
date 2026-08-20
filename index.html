@@ -209,7 +209,7 @@
     margin: 0 1%;
   }
 
-  .blocoVendas.meta   { width: 48%; margin-left: 0; }
+  .blocoVendas.meta   { width: 43%; margin-left: 0; }
   .blocoVendas.metade { width: 23%; text-align: center; }
   .blocoVendas.metade:last-of-type { margin-right: 0; }
 
@@ -674,7 +674,7 @@
           <table id="tabelaCursos"><tbody id="corpoTabelaCursos"></tbody></table>
         </div>
 
-        <div class="painelVendas" id="painelUltimasCursos">
+        <div class="painelVendas semAutoAltura" id="painelUltimasCursos">
           <div class="tituloSecao">Últimas vendas</div>
           <table id="tabelaUltimasCursos"><tbody id="corpoUltimasCursos"></tbody></table>
         </div>
@@ -1071,16 +1071,51 @@
       var paineis = cont.getElementsByClassName('painelVendas');
       for (var j = 0; j < paineis.length; j++) {
         var p = paineis[j];
-        // Painel marcado semAutoAltura (Cursos - mes atual) fica do tamanho
-        // do proprio conteudo: ele divide a coluna com outro painel embaixo
-        // (Ultimas Vendas), que e quem estica ate o rodape. Esticar os dois
-        // faria o de cima cobrir a coluna inteira e sobrar nada pro de baixo.
+        // Painel marcado semAutoAltura NAO entra nesse esticar generico:
+        // "Faturamento do mes" fica do tamanho do proprio conteudo (o
+        // grafico embaixo dele e quem estica ate o rodape). Ja os dois da
+        // coluna de cursos (Cursos - mes atual e Ultimas Vendas) TAMBEM
+        // ficam de fora daqui — os dois sao proporcionais, calculados por
+        // dividirColunaCursos() logo depois, nao "esticar ate o rodape".
         if ((' ' + p.className + ' ').indexOf(' semAutoAltura ') !== -1) continue;
         var alvo = tela - MARGEM_RODAPE - padCont.baixo - p.offsetTop;
         if (alvo < 140) alvo = 140;
         p.style.height = alvo + 'px';
       }
     }
+  }
+
+  // Cursos - mes atual precisa pegar a maior parte da coluna, Ultimas Vendas
+  // menos — ao contrario do lado esquerdo (resumo pequeno, grafico grande),
+  // aqui NENHUM dos dois e "do tamanho do conteudo": os dois tem altura fixa,
+  // proporcional ao espaco total da coluna. Por isso nao reusa o mecanismo
+  // "auto + estica ate o rodape" do esticarPaineis — precisa de outro calculo.
+  var PROPORCAO_CURSOS_MES_ATUAL = 0.65;
+
+  function dividirColunaCursos() {
+    var coluna = document.getElementById('colunaCursos');
+    var tabela = document.getElementById('painelTabela');
+    var ultimas = document.getElementById('painelUltimasCursos');
+    var cont = document.getElementById('vendasBaixo');
+    if (!coluna || !tabela || !ultimas || !cont) return;
+
+    var tela = alturaDaTela();
+    var padCont = paddingDoPainel(cont);
+    // le o gap do proprio CSS (18/13/9 conforme o nivel de compactacao) em
+    // vez de duplicar essa escala aqui em JS
+    var estiloTabela = tabela.currentStyle ||
+                        (window.getComputedStyle ? window.getComputedStyle(tabela) : null);
+    var gap = (estiloTabela && parseInt(estiloTabela.marginBottom, 10)) || 18;
+
+    var totalDisponivel = tela - MARGEM_RODAPE - padCont.baixo - coluna.offsetTop;
+    if (totalDisponivel < 280) totalDisponivel = 280;
+
+    var alturaTabela = Math.round((totalDisponivel - gap) * PROPORCAO_CURSOS_MES_ATUAL);
+    var alturaUltimas = totalDisponivel - gap - alturaTabela;
+    if (alturaUltimas < 100) alturaUltimas = 100;
+
+    tabela.style.height = alturaTabela + 'px';
+    ultimas.style.height = alturaUltimas + 'px';
   }
 
   // Tenta o tamanho cheio; se estourar a tela, vai encolhendo. Medir e mais
@@ -1092,6 +1127,7 @@
       definirNivelCompacto(niveis[i]);
       // antes de desenhar: o canvas se dimensiona pela altura ja fixada aqui
       esticarPaineis();
+      dividirColunaCursos();
       desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       if (ultimoArr) {
@@ -1141,10 +1177,9 @@
     if (cursos.length === 0) {
       html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mês</td></tr>';
     } else {
-      // O painel agora divide a coluna com Ultimas Vendas em vez de ocupar
-      // ela inteira, entao mostra menos linhas de propósito (era 7, depois 5).
-      // Mais compacto aqui = mais espaco sobra pro painel de baixo.
-      var limite = cursos.length > 4 ? 4 : cursos.length;
+      // Cursos - mes atual pega a maior parte da coluna (65%, ver
+      // dividirColunaCursos), entao volta a mostrar mais linhas.
+      var limite = cursos.length > 6 ? 6 : cursos.length;
       for (var i = 0; i < limite; i++) {
         var c = cursos[i];
         html += '<tr>' +
@@ -1167,7 +1202,10 @@
 
     var corpoUltimas = document.getElementById('corpoUltimasCursos');
     var htmlUltimas = '';
-    var ultimasCursos = dados.ultimas || [];
+    // Ultimas Vendas e o painel menor da coluna (so 35% dela), entao mostra
+    // menos linhas de proposito — o n8n manda ate 6, aqui corta pra 3. Cortar
+    // no front evita depender de reimportar o workflow so por causa disso.
+    var ultimasCursos = (dados.ultimas || []).slice(0, 3);
     if (ultimasCursos.length === 0) {
       htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
     } else {
