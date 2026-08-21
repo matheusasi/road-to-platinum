@@ -1090,7 +1090,7 @@
   // aqui NENHUM dos dois e "do tamanho do conteudo": os dois tem altura fixa,
   // proporcional ao espaco total da coluna. Por isso nao reusa o mecanismo
   // "auto + estica ate o rodape" do esticarPaineis — precisa de outro calculo.
-  var PROPORCAO_CURSOS_MES_ATUAL = 0.65;
+  var PROPORCAO_CURSOS_MES_ATUAL = 0.58;
 
   function dividirColunaCursos() {
     var coluna = document.getElementById('colunaCursos');
@@ -1202,10 +1202,10 @@
 
     var corpoUltimas = document.getElementById('corpoUltimasCursos');
     var htmlUltimas = '';
-    // Ultimas Vendas e o painel menor da coluna (so 35% dela), entao mostra
-    // menos linhas de proposito — o n8n manda ate 6, aqui corta pra 3. Cortar
+    // Ultimas Vendas e o painel menor da coluna (42% dela), entao mostra
+    // menos linhas de proposito — o n8n manda ate 6, aqui corta pra 4. Cortar
     // no front evita depender de reimportar o workflow so por causa disso.
-    var ultimasCursos = (dados.ultimas || []).slice(0, 3);
+    var ultimasCursos = (dados.ultimas || []).slice(0, 4);
     if (ultimasCursos.length === 0) {
       htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
     } else {
