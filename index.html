@@ -1576,28 +1576,34 @@
       ctx.fillText(m.rotulo, centro, h - 12);
     }
 
-    // linha de quantidade por cima
+    // Linha de quantidade de vendas. Ela vive so na METADE DE BAIXO do grafico
+    // (banda = altura * 0.5, comecando 12px acima do eixo): os rotulos de R$
+    // ficam no topo das barras, entao prender a linha embaixo evita que o pico
+    // dela e o "Nx" batam no "R$ ..." da barra mais alta.
+    var baseLinha = piso - 12;
+    var bandaLinha = altura * 0.5;
+    function yQtd(q) { return baseLinha - (bandaLinha * q) / maiorQ; }
+
     ctx.strokeStyle = '#ffb648';
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (i = 0; i < meses.length; i++) {
       var cx = margemEsq + fatia * i + fatia / 2;
-      var cy = piso - (altura * meses[i].qtd) / maiorQ;
-      if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+      if (i === 0) ctx.moveTo(cx, yQtd(meses[i].qtd)); else ctx.lineTo(cx, yQtd(meses[i].qtd));
     }
     ctx.stroke();
     for (i = 0; i < meses.length; i++) {
       var px = margemEsq + fatia * i + fatia / 2;
-      var py = piso - (altura * meses[i].qtd) / maiorQ;
+      var py = yQtd(meses[i].qtd);
       ctx.fillStyle = '#ffb648';
       ctx.beginPath();
-      ctx.arc(px, py, 3.5, 0, Math.PI * 2, false);
+      ctx.arc(px, py, 3, 0, Math.PI * 2, false);
       ctx.fill();
       if (meses[i].qtd > 0) {
         ctx.fillStyle = '#ffd79a';
         ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(meses[i].qtd + 'x', px, py - 8);
+        ctx.fillText(meses[i].qtd + 'x', px, py - 9);
       }
     }
   }
