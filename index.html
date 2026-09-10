@@ -1507,10 +1507,10 @@
     }
   }
 
-  // Barras de faturamento por mes COM uma linha de quantidade de vendas por
-  // cima (eixo proprio a direita, escala independente do R$). Usada so nos
-  // slides de servico. Nao mexe na desenharBarras, que os outros tres slides
-  // usam. meses = [{rotulo, total, qtd}].
+  // Barras de faturamento por mes, com a QUANTIDADE de vendas dentro da barra
+  // (etiqueta laranja, numero branco) — mesma ideia do "valor dentro da faixa"
+  // do slide de ARR. Usada so nos slides de servico. Nao mexe na desenharBarras.
+  // meses = [{rotulo, total, qtd}].
   function desenharBarrasComLinha(idCanvas, idPainel, meses, formatar) {
     var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
@@ -1526,19 +1526,15 @@
     ctx.clearRect(0, 0, w, h);
     if (!meses || meses.length === 0) return;
 
-    // margemBaixo maior que a da desenharBarras: aqui a base tem DUAS linhas de
-    // texto (nome do mes + quantidade), pra a quantidade nao encostar nas barras.
-    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 56;
+    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 40;
     var largura = w - margemEsq - margemDir;
     var altura = h - margemTopo - margemBaixo;
 
-    var maiorV = 0, maiorQ = 0, i;
+    var maiorV = 0, i;
     for (i = 0; i < meses.length; i++) {
       if (meses[i].total > maiorV) maiorV = meses[i].total;
-      if (meses[i].qtd > maiorQ) maiorQ = meses[i].qtd;
     }
     if (maiorV <= 0) maiorV = 1;
-    if (maiorQ <= 0) maiorQ = 1;
 
     ctx.strokeStyle = 'rgba(46,142,255,0.10)';
     ctx.lineWidth = 1;
@@ -1556,79 +1552,62 @@
     var fonteValor = (h < 240) ? 11 : 15;
     var fonteQtd = (h < 240) ? 11 : 14;
     var piso = margemTopo + altura;
+    // barras vao ate 82% da altura — sobra espaco pro "R$ ..." em cima da mais alta
+    var alturaBarras = altura * 0.82;
 
-    // Duas faixas que NAO se cruzam, pra nada passar por cima de nada:
-    //  - as barras crescem do eixo e sao limitadas a 74% da altura (deixa
-    //    espaco pro "R$ ..." em cima da barra mais alta);
-    //  - a linha de quantidade vive so nos 42% de baixo;
-    //  - os numeros de quantidade ("4x") ficam na base, logo acima do nome do
-    //    mes — longe de tudo.
-    var alturaBarras = altura * 0.74;
-    var baseLinha = piso - 10;
-    var bandaLinha = altura * 0.34;
-    function yQtd(q) { return baseLinha - (bandaLinha * q) / maiorQ; }
-
-    // barras
+    ctx.textAlign = 'center';
     for (i = 0; i < meses.length; i++) {
       var centro = margemEsq + fatia * i + fatia / 2;
       var esq = centro - larguraBarra / 2;
       var alturaBarra = (alturaBarras * meses[i].total) / maiorV;
       if (meses[i].total > 0 && alturaBarra < 3) alturaBarra = 3;
+      var topo = piso - alturaBarra;
+
+      // barra
       ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
-      ctx.fillRect(esq, piso - alturaBarra, larguraBarra, alturaBarra);
-    }
+      ctx.fillRect(esq, topo, larguraBarra, alturaBarra);
 
-    // linha de quantidade (so tracado + pontos, sem numeros flutuantes)
-    ctx.strokeStyle = '#ffb648';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for (i = 0; i < meses.length; i++) {
-      var cx = margemEsq + fatia * i + fatia / 2;
-      if (i === 0) ctx.moveTo(cx, yQtd(meses[i].qtd)); else ctx.lineTo(cx, yQtd(meses[i].qtd));
-    }
-    ctx.stroke();
-    for (i = 0; i < meses.length; i++) {
-      var px = margemEsq + fatia * i + fatia / 2;
-      ctx.fillStyle = '#ffb648';
-      ctx.beginPath();
-      ctx.arc(px, yQtd(meses[i].qtd), 3, 0, Math.PI * 2, false);
-      ctx.fill();
-    }
+      // etiqueta de QUANTIDADE de vendas: fundo laranja, numero branco.
+      // Dentro da barra, perto do topo. Se a barra for curta demais (ou nem
+      // existir, quando o valor ainda nao foi preenchido), a etiqueta senta
+      // logo acima do eixo.
+      if (meses[i].qtd > 0) {
+        ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
+        var qt = String(meses[i].qtd);
+        var qw = ctx.measureText(qt).width;
+        var padX = 6, padY = 4;
+        var caixaW = qw + padX * 2;
+        var caixaH = fonteQtd + padY * 2;
+        var caixaY;
+        if (alturaBarra >= caixaH + 8) caixaY = topo + 5;           // dentro, no topo
+        else caixaY = piso - caixaH - 3;                             // barra curta: junto ao eixo
+        ctx.fillStyle = '#ff9d2e';
+        ctx.fillRect(centro - caixaW / 2, caixaY, caixaW, caixaH);
+        ctx.fillStyle = '#ffffff';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(qt, centro, caixaY + caixaH / 2 + 1);
+        ctx.textBaseline = 'alphabetic';
+      }
 
-    // rotulos POR CIMA de tudo: "R$ ..." acima da barra (com um fundo escuro
-    // atras, pra a linha que passar perto nunca cortar o texto), quantidade e
-    // nome do mes na base.
-    ctx.textAlign = 'center';
-    for (i = 0; i < meses.length; i++) {
-      var cxr = margemEsq + fatia * i + fatia / 2;
-
+      // "R$ ..." acima da barra, com fundo escuro atras
       if (meses[i].total > 0) {
-        var ab = (alturaBarras * meses[i].total) / maiorV;
-        if (ab < 3) ab = 3;
-        var yTxt = piso - ab - 6 - fonteValor;
+        var yTxt = topo - 6 - fonteValor;
         if (yTxt < margemTopo) yTxt = margemTopo;
         var txt = formatar(meses[i].total);
         ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
         var lw = ctx.measureText(txt).width;
         ctx.fillStyle = 'rgba(5,9,20,0.82)';
-        ctx.fillRect(cxr - lw / 2 - 4, yTxt - 2, lw + 8, fonteValor + 6);
+        ctx.fillRect(centro - lw / 2 - 4, yTxt - 2, lw + 8, fonteValor + 6);
         ctx.fillStyle = '#eaf1ff';
         ctx.textBaseline = 'top';
-        ctx.fillText(txt, cxr, yTxt);
+        ctx.fillText(txt, centro, yTxt);
         ctx.textBaseline = 'alphabetic';
       }
 
-      // nome do mes numa linha, quantidade LOGO ABAIXO — as duas fora da area
-      // das barras (a base tem 54px de margem justamente pra isso)
+      // nome do mes na base
       ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
       ctx.fillStyle = '#7c8fb3';
-      ctx.fillText(meses[i].rotulo, cxr, h - 24);
-
-      if (meses[i].qtd > 0) {
-        ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#ffb648';
-        ctx.fillText(meses[i].qtd + 'x', cxr, h - 9);
-      }
+      ctx.fillText(meses[i].rotulo, centro, h - 12);
     }
   }
 
