@@ -519,6 +519,78 @@
   body.muitoCompacto #tabelaArr td { padding: 5px 3px; }
   body.muitoCompacto #tabelaArr td.quando { width: 54px; }
   body.muitoCompacto #tabelaArr td.arr { width: 86px; }
+
+  /* =======================================================================
+     SLIDES 5 e 6 — Projetos de Consultoria / Assessoria + Treinamentos.
+     Mesma paleta e mesmo esqueleto em float dos slides de cursos. O CSS
+     proprio e por CLASSE (.slideServico), nao por id, pra os tres niveis de
+     compactacao aqui ficarem contidos e nao dependerem de listar id por id
+     como o resto do arquivo faz.
+     ======================================================================= */
+  .topoServico { text-align: center; padding: 26px 20px 6px 20px; }
+  .topoServico h1 {
+    margin: 0; font-size: 46px; letter-spacing: 2px;
+    color: #f5f8ff; text-transform: uppercase;
+  }
+  .topoServico .subtitulo { margin-top: 6px; font-size: 22px; color: #7c8fb3; }
+
+  .servBaixo { padding: 22px 34px 20px 34px; }
+  .servEsq { width: 56%; float: left; margin-right: 2%; box-sizing: border-box; overflow: hidden; }
+  .servDir { width: 42%; float: left; box-sizing: border-box; overflow: hidden; }
+  .servDir .painelVendas, .servEsq .painelVendas { width: 100%; box-sizing: border-box; }
+  .servDir .painelVendas { margin-bottom: 16px; }
+  .servDir .painelVendas:last-child { margin-bottom: 0; }
+
+  .tickerServico { font-size: 60px; font-weight: bold; color: #29e0c8; white-space: nowrap; }
+  .tickerServico .sub { display: block; font-size: 18px; font-weight: normal; color: #7c8fb3; margin-top: 6px; letter-spacing: 0; }
+
+  /* barras horizontais do pipeline: div simples com width em %, sem canvas */
+  .linhaTemp { margin-bottom: 13px; }
+  .linhaTemp:last-child { margin-bottom: 0; }
+  .linhaTemp .rot {
+    font-size: 19px; color: #b9c6e2; margin-bottom: 5px;
+    display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  }
+  .linhaTemp .rot b { color: #eaf1ff; }
+  .linhaTemp .trilha { height: 20px; border-radius: 10px; background: #111a2e; overflow: hidden; }
+  .linhaTemp .preenche { height: 100%; width: 0; border-radius: 10px; background: #4da8ff; }
+  .linhaTemp.alto  .preenche { background: #ff6b6b; }
+  .linhaTemp.medio .preenche { background: #ffb648; }
+  .linhaTemp.baixo .preenche { background: #4da8ff; }
+  .rodapeSemClasse {
+    margin-top: 12px; font-size: 16px; color: #7c8fb3;
+    border-top: 1px solid rgba(46,142,255,0.12); padding-top: 10px;
+  }
+  .rodapeSemClasse b { color: #b9c6e2; }
+  /* a legenda dos slides de servico: barra = R$ (azul), linha = nº vendas
+     (laranja). Classe propria porque a rotacao reescreve o className do .slide
+     inteiro a cada troca — um hook no proprio .slide nao sobrevive. */
+  .legendaServico .marca.out { background: #2e8eff; }
+  .legendaServico .marca.in  { background: #ffb648; }
+
+  body.compacto .topoServico { padding: 14px 20px 2px 20px; }
+  body.compacto .topoServico h1 { font-size: 34px; }
+  body.compacto .topoServico .subtitulo { font-size: 17px; }
+  body.compacto .servBaixo { padding: 13px 24px 12px 24px; }
+  body.compacto .servDir .painelVendas { margin-bottom: 11px; }
+  body.compacto .tickerServico { font-size: 42px; }
+  body.compacto .tickerServico .sub { font-size: 14px; }
+  body.compacto .linhaTemp { margin-bottom: 9px; }
+  body.compacto .linhaTemp .rot { font-size: 15px; margin-bottom: 3px; }
+  body.compacto .linhaTemp .trilha { height: 14px; }
+  body.compacto .rodapeSemClasse { font-size: 13px; margin-top: 8px; padding-top: 7px; }
+
+  body.muitoCompacto .topoServico { padding: 8px 16px 0 16px; }
+  body.muitoCompacto .topoServico h1 { font-size: 25px; }
+  body.muitoCompacto .topoServico .subtitulo { font-size: 13px; }
+  body.muitoCompacto .servBaixo { padding: 9px 18px 8px 18px; }
+  body.muitoCompacto .servDir .painelVendas { margin-bottom: 8px; }
+  body.muitoCompacto .tickerServico { font-size: 30px; }
+  body.muitoCompacto .tickerServico .sub { font-size: 12px; }
+  body.muitoCompacto .linhaTemp { margin-bottom: 6px; }
+  body.muitoCompacto .linhaTemp .rot { font-size: 12px; margin-bottom: 2px; }
+  body.muitoCompacto .linhaTemp .trilha { height: 10px; }
+  body.muitoCompacto .rodapeSemClasse { font-size: 11px; margin-top: 6px; padding-top: 5px; }
 </style>
 </head>
 <body>
@@ -704,6 +776,83 @@
       <div class="clearfix"></div>
     </div>
 
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 5 — Projetos de Consultoria.
+       SLIDE 6 — Assessoria + Treinamentos.
+       Mesmo layout: faturamento por mes (barras) com a linha de quantidade
+       por cima; ticket medio dos ultimos 3 meses; e os pipelines de proposta
+       e de contrato enviados, por temperatura (Grau Confianca do CRM).
+       Faturamento/ticket vem do board manual; os pipelines vem do Funil
+       Comercial ao vivo. Tudo mastigado pelo n8n — a TV so pinta.
+       =================================================================== -->
+  <div class="slide" data-slide="consultoria" data-segundos="18">
+    <div class="topoServico">
+      <h1>Projetos de Consultoria</h1>
+      <div class="subtitulo" id="servRotuloCons">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="servBaixoCons">
+      <div class="servEsq" id="servEsqCons">
+        <div class="painelVendas semAutoAltura" id="servGraficoCons">
+          <div class="tituloSecao">Faturamento por mês
+            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de vendas</span>
+          </div>
+          <canvas id="graficoServCons" width="740" height="420"></canvas>
+        </div>
+        <div class="painelVendas semAutoAltura" id="servTicketCons">
+          <div class="tituloSecao">Ticket médio — últimos 3 meses</div>
+          <div class="tickerServico" id="servTicketValCons">R$ 0<span class="sub" id="servTicketSubCons">&nbsp;</span></div>
+        </div>
+      </div>
+      <div class="servDir" id="servDirCons">
+        <div class="painelVendas semAutoAltura" id="servPropCons">
+          <div class="tituloSecao">Propostas enviadas — pipeline atual</div>
+          <div id="servPropLinhasCons"></div>
+          <div class="rodapeSemClasse" id="servPropSemCons">&nbsp;</div>
+        </div>
+        <div class="painelVendas semAutoAltura" id="servContrCons">
+          <div class="tituloSecao">Contratos enviados — pipeline atual</div>
+          <div id="servContrLinhasCons"></div>
+          <div class="rodapeSemClasse" id="servContrSemCons">&nbsp;</div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <div class="slide" data-slide="assessoria-treino" data-segundos="18">
+    <div class="topoServico">
+      <h1>Assessoria + Treinamentos</h1>
+      <div class="subtitulo" id="servRotuloAsse">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="servBaixoAsse">
+      <div class="servEsq" id="servEsqAsse">
+        <div class="painelVendas semAutoAltura" id="servGraficoAsse">
+          <div class="tituloSecao">Faturamento por mês
+            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de vendas</span>
+          </div>
+          <canvas id="graficoServAsse" width="740" height="420"></canvas>
+        </div>
+        <div class="painelVendas semAutoAltura" id="servTicketAsse">
+          <div class="tituloSecao">Ticket médio — últimos 3 meses</div>
+          <div class="tickerServico" id="servTicketValAsse">R$ 0<span class="sub" id="servTicketSubAsse">&nbsp;</span></div>
+        </div>
+      </div>
+      <div class="servDir" id="servDirAsse">
+        <div class="painelVendas semAutoAltura" id="servPropAsse">
+          <div class="tituloSecao">Propostas enviadas — pipeline atual</div>
+          <div id="servPropLinhasAsse"></div>
+          <div class="rodapeSemClasse" id="servPropSemAsse">&nbsp;</div>
+        </div>
+        <div class="painelVendas semAutoAltura" id="servContrAsse">
+          <div class="tituloSecao">Contratos enviados — pipeline atual</div>
+          <div id="servContrLinhasAsse"></div>
+          <div class="rodapeSemClasse" id="servContrSemAsse">&nbsp;</div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
   </div>
 
   <!-- ===================================================================
@@ -979,7 +1128,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1062,7 +1211,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -1128,8 +1277,14 @@
       // antes de desenhar: o canvas se dimensiona pela altura ja fixada aqui
       esticarPaineis();
       dividirColunaCursos();
+      dividirColunaServico('servBaixoCons', ['servGraficoCons', 'servTicketCons'], [0.7, 0.3]);
+      dividirColunaServico('servBaixoAsse', ['servGraficoAsse', 'servTicketAsse'], [0.7, 0.3]);
+      dividirColunaServico('servBaixoCons', ['servPropCons', 'servContrCons'], [0.5, 0.5]);
+      dividirColunaServico('servBaixoAsse', ['servPropAsse', 'servContrAsse'], [0.5, 0.5]);
       desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
+      desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
+      desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -1352,6 +1507,194 @@
     }
   }
 
+  // Barras de faturamento por mes COM uma linha de quantidade de vendas por
+  // cima (eixo proprio a direita, escala independente do R$). Usada so nos
+  // slides de servico. Nao mexe na desenharBarras, que os outros tres slides
+  // usam. meses = [{rotulo, total, qtd}].
+  function desenharBarrasComLinha(idCanvas, idPainel, meses, formatar) {
+    var canvas = document.getElementById(idCanvas);
+    if (!canvas || !canvas.getContext) return;
+
+    var painel = document.getElementById(idPainel);
+    var larguraAlvo = larguraCanvasDisponivel(painel);
+    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
+    var alturaAlvo = alturaCanvasDisponivel(painel);
+    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
+
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (!meses || meses.length === 0) return;
+
+    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 40;
+    var largura = w - margemEsq - margemDir;
+    var altura = h - margemTopo - margemBaixo;
+
+    var maiorV = 0, maiorQ = 0, i;
+    for (i = 0; i < meses.length; i++) {
+      if (meses[i].total > maiorV) maiorV = meses[i].total;
+      if (meses[i].qtd > maiorQ) maiorQ = meses[i].qtd;
+    }
+    if (maiorV <= 0) maiorV = 1;
+    if (maiorQ <= 0) maiorQ = 1;
+
+    ctx.strokeStyle = 'rgba(46,142,255,0.10)';
+    ctx.lineWidth = 1;
+    for (i = 0; i <= 3; i++) {
+      var y = margemTopo + (altura * i) / 3;
+      ctx.beginPath();
+      ctx.moveTo(margemEsq, y);
+      ctx.lineTo(w - margemDir, y);
+      ctx.stroke();
+    }
+
+    var fatia = largura / meses.length;
+    var larguraBarra = fatia * 0.5;
+    var fonteRotulo = (h < 240) ? 13 : 17;
+    var fonteValor = (h < 240) ? 11 : 15;
+    var piso = margemTopo + altura;
+
+    // barras de R$
+    for (i = 0; i < meses.length; i++) {
+      var m = meses[i];
+      var centro = margemEsq + fatia * i + fatia / 2;
+      var esq = centro - larguraBarra / 2;
+      var alturaBarra = (altura * m.total) / maiorV;
+      if (m.total > 0 && alturaBarra < 3) alturaBarra = 3;
+      var topo = piso - alturaBarra;
+      ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
+      ctx.fillRect(esq, topo, larguraBarra, alturaBarra);
+      if (m.total > 0) {
+        ctx.fillStyle = '#eaf1ff';
+        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(formatar(m.total), centro, topo - 6);
+      }
+      ctx.fillStyle = '#7c8fb3';
+      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.rotulo, centro, h - 12);
+    }
+
+    // linha de quantidade por cima
+    ctx.strokeStyle = '#ffb648';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (i = 0; i < meses.length; i++) {
+      var cx = margemEsq + fatia * i + fatia / 2;
+      var cy = piso - (altura * meses[i].qtd) / maiorQ;
+      if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+    for (i = 0; i < meses.length; i++) {
+      var px = margemEsq + fatia * i + fatia / 2;
+      var py = piso - (altura * meses[i].qtd) / maiorQ;
+      ctx.fillStyle = '#ffb648';
+      ctx.beginPath();
+      ctx.arc(px, py, 3.5, 0, Math.PI * 2, false);
+      ctx.fill();
+      if (meses[i].qtd > 0) {
+        ctx.fillStyle = '#ffd79a';
+        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(meses[i].qtd + 'x', px, py - 8);
+      }
+    }
+  }
+
+  // Divide uma coluna de servico em N paineis semAutoAltura por proporcao
+  // fixa — mesma ideia da dividirColunaCursos, generalizada. proporcoes soma 1.
+  function dividirColunaServico(idContainer, ids, proporcoes) {
+    var cont = document.getElementById(idContainer);
+    if (!cont) return;
+    var padCont = paddingDoPainel(cont);
+    var tela = alturaDaTela();
+    var primeiro = document.getElementById(ids[0]);
+    if (!primeiro) return;
+    var total = tela - MARGEM_RODAPE - padCont.baixo - primeiro.offsetTop;
+    if (total < 260) total = 260;
+    var estilo = primeiro.currentStyle ||
+                 (window.getComputedStyle ? window.getComputedStyle(primeiro) : null);
+    var gap = (estilo && parseInt(estilo.marginBottom, 10)) || 16;
+    var util = total - gap * (ids.length - 1);
+    for (var i = 0; i < ids.length; i++) {
+      var el = document.getElementById(ids[i]);
+      if (!el) continue;
+      var alt = Math.round(util * proporcoes[i]);
+      if (alt < 80) alt = 80;
+      el.style.height = alt + 'px';
+    }
+  }
+
+  var serieServCons = [];
+  var serieServAsse = [];
+
+  function plural(qtd, subst) {
+    if (subst === 'contrato') return qtd + (qtd === 1 ? ' contrato' : ' contratos');
+    return qtd + (qtd === 1 ? ' proposta' : ' propostas');
+  }
+
+  function linhasPipeline(pipe, subst) {
+    var faixas = pipe.porTemperatura || [];
+    var maior = 0, i;
+    for (i = 0; i < faixas.length; i++) if (faixas[i].valor > maior) maior = faixas[i].valor;
+    if (pipe.semGrau && pipe.semGrau.valor > maior) maior = pipe.semGrau.valor;
+    if (maior <= 0) maior = 1;
+    var classePorTemp = { 'Alto': 'alto', 'Médio': 'medio', 'Baixo': 'baixo' };
+    var html = '';
+    function linha(nome, cls, valor, qtd) {
+      var pct = Math.round((valor / maior) * 100);
+      html += '<div class="linhaTemp ' + cls + '">' +
+                '<span class="rot"><b>' + nome + '</b> — ' + formatarBRL(valor) + ' · ' + plural(qtd, subst) + '</span>' +
+                '<div class="trilha"><div class="preenche" style="width:' + pct + '%"></div></div>' +
+              '</div>';
+    }
+    for (i = 0; i < faixas.length; i++) {
+      linha(faixas[i].temperatura, classePorTemp[faixas[i].temperatura] || 'baixo', faixas[i].valor, faixas[i].qtd);
+    }
+    if (pipe.semGrau && pipe.semGrau.qtd > 0) {
+      linha('Sem grau', 'baixo', pipe.semGrau.valor, pipe.semGrau.qtd);
+    }
+    return html;
+  }
+
+  function textoSemClasse(pipe, subst) {
+    var s = pipe.semClassificacao || { valor: 0, qtd: 0 };
+    var nome = (subst === 'contrato') ? 'os contratos' : 'as propostas';
+    if (!s.qtd) return 'Todas ' + nome + ' com produto definido.';
+    return '<b>Sem produto definido:</b> ' + formatarBRL(s.valor) + ' · ' + plural(s.qtd, subst) +
+           ' (pode ser de qualquer painel)';
+  }
+
+  function pintarServico(sufixo, bloco) {
+    if (!bloco) return;
+    document.getElementById('servRotulo' + sufixo).innerHTML = 'Ano ' + (bloco.rotuloAno || '');
+
+    var serie = (bloco.mensal || []).map(function (m) {
+      return { rotulo: m.rotulo, total: m.total, qtd: m.qtd };
+    });
+    if (sufixo === 'Cons') serieServCons = serie; else serieServAsse = serie;
+
+    var tv = document.getElementById('servTicketVal' + sufixo);
+    var qtd3 = 0;
+    var corte = bloco.mensal ? bloco.mensal.slice(-3) : [];
+    for (var i = 0; i < corte.length; i++) qtd3 += corte[i].qtd;
+    tv.innerHTML = formatarBRL(bloco.ticketMedio3m || 0) +
+      '<span class="sub">' + qtd3 + (qtd3 === 1 ? ' venda' : ' vendas') + ' no período</span>';
+
+    document.getElementById('servPropLinhas' + sufixo).innerHTML = linhasPipeline(bloco.propostas || {}, 'proposta');
+    document.getElementById('servPropSem' + sufixo).innerHTML = textoSemClasse(bloco.propostas || {}, 'proposta');
+    document.getElementById('servContrLinhas' + sufixo).innerHTML = linhasPipeline(bloco.contratos || {}, 'contrato');
+    document.getElementById('servContrSem' + sufixo).innerHTML = textoSemClasse(bloco.contratos || {}, 'contrato');
+  }
+
+  function renderizarAssessoria(dados) {
+    if (!dados) return;
+    pintarServico('Cons', dados.consultoria);
+    pintarServico('Asse', dados.assessoriaTreino);
+    ajustarTamanhoVendas();
+  }
+
   function renderizarArr(dados) {
     ultimoArr = dados;
 
@@ -1421,6 +1764,7 @@
       aplicar('road', renderizarDashboard, tudo.road);
       aplicar('cursos', renderizarVendas, tudo.cursos);
       aplicar('arr', renderizarArr, tudo.arr);
+      aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
     });
   }
 
@@ -1564,6 +1908,7 @@
       aplicar('road', renderizarDashboard, tudo.road);
       aplicar('cursos', renderizarVendas, tudo.cursos);
       aplicar('arr', renderizarArr, tudo.arr);
+      aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
     }, function () {
       servidorRespondeu = true;
     });
