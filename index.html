@@ -541,8 +541,8 @@
   .servDir .painelVendas { margin-bottom: 16px; }
   .servDir .painelVendas:last-child { margin-bottom: 0; }
 
-  .tickerServico { font-size: 60px; font-weight: bold; color: #29e0c8; white-space: nowrap; }
-  .tickerServico .sub { display: block; font-size: 18px; font-weight: normal; color: #7c8fb3; margin-top: 6px; letter-spacing: 0; }
+  .tickerServico { font-size: 38px; font-weight: bold; color: #29e0c8; white-space: nowrap; }
+  .tickerServico .sub { display: block; font-size: 16px; font-weight: normal; color: #7c8fb3; margin-top: 4px; letter-spacing: 0; }
 
   /* barras horizontais do pipeline: div simples com width em %, sem canvas */
   .linhaTemp { margin-bottom: 13px; }
@@ -573,8 +573,8 @@
   body.compacto .topoServico .subtitulo { font-size: 17px; }
   body.compacto .servBaixo { padding: 13px 24px 12px 24px; }
   body.compacto .servDir .painelVendas { margin-bottom: 11px; }
-  body.compacto .tickerServico { font-size: 42px; }
-  body.compacto .tickerServico .sub { font-size: 14px; }
+  body.compacto .tickerServico { font-size: 30px; }
+  body.compacto .tickerServico .sub { font-size: 13px; }
   body.compacto .linhaTemp { margin-bottom: 9px; }
   body.compacto .linhaTemp .rot { font-size: 15px; margin-bottom: 3px; }
   body.compacto .linhaTemp .trilha { height: 14px; }
@@ -585,8 +585,8 @@
   body.muitoCompacto .topoServico .subtitulo { font-size: 13px; }
   body.muitoCompacto .servBaixo { padding: 9px 18px 8px 18px; }
   body.muitoCompacto .servDir .painelVendas { margin-bottom: 8px; }
-  body.muitoCompacto .tickerServico { font-size: 30px; }
-  body.muitoCompacto .tickerServico .sub { font-size: 12px; }
+  body.muitoCompacto .tickerServico { font-size: 24px; }
+  body.muitoCompacto .tickerServico .sub { font-size: 11px; }
   body.muitoCompacto .linhaTemp { margin-bottom: 6px; }
   body.muitoCompacto .linhaTemp .rot { font-size: 12px; margin-bottom: 2px; }
   body.muitoCompacto .linhaTemp .trilha { height: 10px; }
@@ -1277,8 +1277,8 @@
       // antes de desenhar: o canvas se dimensiona pela altura ja fixada aqui
       esticarPaineis();
       dividirColunaCursos();
-      dividirColunaServico('servBaixoCons', ['servGraficoCons', 'servTicketCons'], [0.7, 0.3]);
-      dividirColunaServico('servBaixoAsse', ['servGraficoAsse', 'servTicketAsse'], [0.7, 0.3]);
+      dividirColunaServico('servBaixoCons', ['servGraficoCons', 'servTicketCons'], [0.82, 0.18]);
+      dividirColunaServico('servBaixoAsse', ['servGraficoAsse', 'servTicketAsse'], [0.82, 0.18]);
       dividirColunaServico('servBaixoCons', ['servPropCons', 'servContrCons'], [0.5, 0.5]);
       dividirColunaServico('servBaixoAsse', ['servPropAsse', 'servContrAsse'], [0.5, 0.5]);
       desenharBarras('graficoSemanal', 'painelGrafico', serieSemanalCursos, formatarBRL);
@@ -1526,7 +1526,9 @@
     ctx.clearRect(0, 0, w, h);
     if (!meses || meses.length === 0) return;
 
-    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 40;
+    // margemBaixo maior que a da desenharBarras: aqui a base tem DUAS linhas de
+    // texto (nome do mes + quantidade), pra a quantidade nao encostar nas barras.
+    var margemEsq = 12, margemDir = 12, margemTopo = 26, margemBaixo = 56;
     var largura = w - margemEsq - margemDir;
     var altura = h - margemTopo - margemBaixo;
 
@@ -1563,7 +1565,7 @@
     //    mes — longe de tudo.
     var alturaBarras = altura * 0.74;
     var baseLinha = piso - 10;
-    var bandaLinha = altura * 0.42;
+    var bandaLinha = altura * 0.34;
     function yQtd(q) { return baseLinha - (bandaLinha * q) / maiorQ; }
 
     // barras
@@ -1616,15 +1618,17 @@
         ctx.textBaseline = 'alphabetic';
       }
 
+      // nome do mes numa linha, quantidade LOGO ABAIXO — as duas fora da area
+      // das barras (a base tem 54px de margem justamente pra isso)
+      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      ctx.fillStyle = '#7c8fb3';
+      ctx.fillText(meses[i].rotulo, cxr, h - 24);
+
       if (meses[i].qtd > 0) {
         ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
         ctx.fillStyle = '#ffb648';
-        ctx.fillText(meses[i].qtd + 'x', cxr, h - 12 - fonteRotulo - 4);
+        ctx.fillText(meses[i].qtd + 'x', cxr, h - 9);
       }
-
-      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
-      ctx.fillStyle = '#7c8fb3';
-      ctx.fillText(meses[i].rotulo, cxr, h - 12);
     }
   }
 
