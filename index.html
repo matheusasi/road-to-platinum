@@ -566,7 +566,7 @@
      = nº de vendas (roxo, igual ao ARR). Classe propria porque a rotacao
      reescreve o className do .slide inteiro a cada troca. */
   .legendaServico .marca.out { background: #2e8eff; }
-  .legendaServico .marca.in  { background: #a06bff; }
+  .legendaServico .marca.in  { background: #1f5c8f; }
 
   body.compacto .topoServico { padding: 14px 20px 2px 20px; }
   body.compacto .topoServico h1 { font-size: 34px; }
@@ -1530,11 +1530,13 @@
     var largura = w - margemEsq - margemDir;
     var altura = h - margemTopo - margemBaixo;
 
-    var maiorV = 0, i;
+    var maiorV = 0, maiorQ = 0, i;
     for (i = 0; i < meses.length; i++) {
       if (meses[i].total > maiorV) maiorV = meses[i].total;
+      if (meses[i].qtd > maiorQ) maiorQ = meses[i].qtd;
     }
     if (maiorV <= 0) maiorV = 1;
+    if (maiorQ <= 0) maiorQ = 1;
 
     ctx.strokeStyle = 'rgba(46,142,255,0.10)';
     ctx.lineWidth = 1;
@@ -1550,64 +1552,84 @@
     var larguraBarra = fatia * 0.5;
     var fonteRotulo = (h < 240) ? 13 : 17;
     var fonteValor = (h < 240) ? 11 : 15;
-    var fonteQtd = (h < 240) ? 11 : 14;
+    var fonteQtd = (h < 240) ? 15 : 20;
     var piso = margemTopo + altura;
-    // barras vao ate 82% da altura — sobra espaco pro "R$ ..." em cima da mais alta
-    var alturaBarras = altura * 0.82;
+    // As barras ocupam so a METADE DE BAIXO; a linha de quantidade (azul
+    // escura), com os pontos em quadradinhos e o numero em branco, fica toda
+    // na faixa de cima — as duas nunca se cruzam, entao nada passa por cima
+    // das barras nem dos valores em R$.
+    var ladoQ = fonteQtd + 12;
+    var alturaBarras = altura * 0.46;
+    var qtTopo = margemTopo + ladoQ / 2 + 2;
+    var qtBase = piso - alturaBarras - ladoQ / 2 - 8;   // ponto mais baixo ainda fica ACIMA da barra mais alta
+    if (qtBase < qtTopo + 12) qtBase = qtTopo + 12;
+    function yQtd(q) { return qtBase - (qtBase - qtTopo) * (q / maiorQ); }
 
-    // faixa roxa no topo da barra que carrega o numero de vendas — mesma cor
-    // roxa do slide de ARR (#a06bff), preenchida do lado a lado da barra
-    var corRoxo = '#a06bff';
-    var capH = fonteQtd + 14;
-
+    // ---- barras + valor em R$ branco dentro da barra ----
     ctx.textAlign = 'center';
     for (i = 0; i < meses.length; i++) {
       var centro = margemEsq + fatia * i + fatia / 2;
       var esq = centro - larguraBarra / 2;
       var alturaBarra = (alturaBarras * meses[i].total) / maiorV;
       if (meses[i].total > 0 && alturaBarra < 3) alturaBarra = 3;
-      var temQtd = meses[i].qtd > 0;
-
-      // Se o mes tem venda mas ainda nao tem valor lancado, garante ao menos a
-      // faixa roxa (altura capH) junto ao eixo, pra o numero ter onde aparecer.
-      if (temQtd && alturaBarra < capH) alturaBarra = capH;
       var topo = piso - alturaBarra;
 
-      // corpo da barra (azul; ciano no mes corrente)
       ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
       ctx.fillRect(esq, topo, larguraBarra, alturaBarra);
 
-      // faixa roxa no topo + numero de vendas em branco, centralizado nela
-      if (temQtd) {
-        var hCap = (alturaBarra < capH) ? alturaBarra : capH;
-        ctx.fillStyle = corRoxo;
-        ctx.fillRect(esq, topo, larguraBarra, hCap);
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(String(meses[i].qtd), centro, topo + hCap / 2 + 1);
-        ctx.textBaseline = 'alphabetic';
-      }
-
-      // "R$ ..." acima da barra, com fundo escuro atras
       if (meses[i].total > 0) {
-        var yTxt = topo - 6 - fonteValor;
-        if (yTxt < margemTopo) yTxt = margemTopo;
         var txt = formatar(meses[i].total);
         ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-        var lw = ctx.measureText(txt).width;
-        ctx.fillStyle = 'rgba(5,9,20,0.82)';
-        ctx.fillRect(centro - lw / 2 - 4, yTxt - 2, lw + 8, fonteValor + 6);
-        ctx.fillStyle = '#eaf1ff';
-        ctx.textBaseline = 'top';
-        ctx.fillText(txt, centro, yTxt);
-        ctx.textBaseline = 'alphabetic';
+        if (alturaBarra >= fonteValor + 12) {
+          // dentro da barra, perto do topo
+          ctx.fillStyle = '#ffffff';
+          ctx.textBaseline = 'top';
+          ctx.fillText(txt, centro, topo + 5);
+          ctx.textBaseline = 'alphabetic';
+        } else {
+          // barra curta: em cima, com fundo escuro
+          var yTxt = topo - 6 - fonteValor;
+          if (yTxt < margemTopo) yTxt = margemTopo;
+          var lw = ctx.measureText(txt).width;
+          ctx.fillStyle = 'rgba(5,9,20,0.82)';
+          ctx.fillRect(centro - lw / 2 - 4, yTxt - 2, lw + 8, fonteValor + 6);
+          ctx.fillStyle = '#eaf1ff';
+          ctx.textBaseline = 'top';
+          ctx.fillText(txt, centro, yTxt);
+          ctx.textBaseline = 'alphabetic';
+        }
       }
 
-      // nome do mes na base
       ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
       ctx.fillStyle = '#7c8fb3';
       ctx.fillText(meses[i].rotulo, centro, h - 12);
+    }
+
+    // ---- linha de quantidade (azul escura) POR CIMA ----
+    ctx.strokeStyle = '#1f5c8f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    for (i = 0; i < meses.length; i++) {
+      var cx = margemEsq + fatia * i + fatia / 2;
+      if (i === 0) ctx.moveTo(cx, yQtd(meses[i].qtd)); else ctx.lineTo(cx, yQtd(meses[i].qtd));
+    }
+    ctx.stroke();
+
+    // ---- quadradinhos azul escuro com o numero de vendas em branco ----
+    ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
+    for (i = 0; i < meses.length; i++) {
+      if (meses[i].qtd <= 0) continue;
+      var mx = margemEsq + fatia * i + fatia / 2;
+      var my = yQtd(meses[i].qtd);
+      ctx.fillStyle = '#0e3f63';
+      ctx.fillRect(mx - ladoQ / 2, my - ladoQ / 2, ladoQ, ladoQ);
+      ctx.strokeStyle = '#2f7fb8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(mx - ladoQ / 2, my - ladoQ / 2, ladoQ, ladoQ);
+      ctx.fillStyle = '#ffffff';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(meses[i].qtd), mx, my + 1);
+      ctx.textBaseline = 'alphabetic';
     }
   }
 
