@@ -562,11 +562,11 @@
     border-top: 1px solid rgba(46,142,255,0.12); padding-top: 10px;
   }
   .rodapeSemClasse b { color: #b9c6e2; }
-  /* a legenda dos slides de servico: barra = R$ (azul), linha = nº vendas
-     (laranja). Classe propria porque a rotacao reescreve o className do .slide
-     inteiro a cada troca — um hook no proprio .slide nao sobrevive. */
+  /* a legenda dos slides de servico: corpo da barra = R$ (azul), faixa do topo
+     = nº de vendas (roxo, igual ao ARR). Classe propria porque a rotacao
+     reescreve o className do .slide inteiro a cada troca. */
   .legendaServico .marca.out { background: #2e8eff; }
-  .legendaServico .marca.in  { background: #ffb648; }
+  .legendaServico .marca.in  { background: #a06bff; }
 
   body.compacto .topoServico { padding: 14px 20px 2px 20px; }
   body.compacto .topoServico h1 { font-size: 34px; }
@@ -1555,37 +1555,37 @@
     // barras vao ate 82% da altura — sobra espaco pro "R$ ..." em cima da mais alta
     var alturaBarras = altura * 0.82;
 
+    // faixa roxa no topo da barra que carrega o numero de vendas — mesma cor
+    // roxa do slide de ARR (#a06bff), preenchida do lado a lado da barra
+    var corRoxo = '#a06bff';
+    var capH = fonteQtd + 14;
+
     ctx.textAlign = 'center';
     for (i = 0; i < meses.length; i++) {
       var centro = margemEsq + fatia * i + fatia / 2;
       var esq = centro - larguraBarra / 2;
       var alturaBarra = (alturaBarras * meses[i].total) / maiorV;
       if (meses[i].total > 0 && alturaBarra < 3) alturaBarra = 3;
+      var temQtd = meses[i].qtd > 0;
+
+      // Se o mes tem venda mas ainda nao tem valor lancado, garante ao menos a
+      // faixa roxa (altura capH) junto ao eixo, pra o numero ter onde aparecer.
+      if (temQtd && alturaBarra < capH) alturaBarra = capH;
       var topo = piso - alturaBarra;
 
-      // barra
+      // corpo da barra (azul; ciano no mes corrente)
       ctx.fillStyle = (i === meses.length - 1) ? '#29e0c8' : '#2e8eff';
       ctx.fillRect(esq, topo, larguraBarra, alturaBarra);
 
-      // etiqueta de QUANTIDADE de vendas: fundo laranja, numero branco.
-      // Dentro da barra, perto do topo. Se a barra for curta demais (ou nem
-      // existir, quando o valor ainda nao foi preenchido), a etiqueta senta
-      // logo acima do eixo.
-      if (meses[i].qtd > 0) {
-        ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
-        var qt = String(meses[i].qtd);
-        var qw = ctx.measureText(qt).width;
-        var padX = 6, padY = 4;
-        var caixaW = qw + padX * 2;
-        var caixaH = fonteQtd + padY * 2;
-        var caixaY;
-        if (alturaBarra >= caixaH + 8) caixaY = topo + 5;           // dentro, no topo
-        else caixaY = piso - caixaH - 3;                             // barra curta: junto ao eixo
-        ctx.fillStyle = '#ff9d2e';
-        ctx.fillRect(centro - caixaW / 2, caixaY, caixaW, caixaH);
+      // faixa roxa no topo + numero de vendas em branco, centralizado nela
+      if (temQtd) {
+        var hCap = (alturaBarra < capH) ? alturaBarra : capH;
+        ctx.fillStyle = corRoxo;
+        ctx.fillRect(esq, topo, larguraBarra, hCap);
         ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold ' + fonteQtd + 'px Arial, Helvetica, sans-serif';
         ctx.textBaseline = 'middle';
-        ctx.fillText(qt, centro, caixaY + caixaH / 2 + 1);
+        ctx.fillText(String(meses[i].qtd), centro, topo + hCap / 2 + 1);
         ctx.textBaseline = 'alphabetic';
       }
 
