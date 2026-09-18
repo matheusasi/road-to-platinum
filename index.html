@@ -383,9 +383,10 @@
     color: #eaf1ff;
   }
 
-  #tabelaUltimasCursos td.quando {
+  #tabelaUltimasCursos td.qtd {
+    text-align: center;
     color: #8a9bc0;
-    width: 86px;
+    width: 72px;
     white-space: nowrap;
   }
 
@@ -412,12 +413,12 @@
 
   body.compacto #tabelaUltimasCursos { font-size: 19px; }
   body.compacto #tabelaUltimasCursos td { padding: 8px 4px; }
-  body.compacto #tabelaUltimasCursos td.quando { width: 66px; }
+  body.compacto #tabelaUltimasCursos td.qtd { width: 52px; }
   body.compacto #tabelaUltimasCursos td.fat { width: 118px; }
 
   body.muitoCompacto #tabelaUltimasCursos { font-size: 15px; }
   body.muitoCompacto #tabelaUltimasCursos td { padding: 5px 3px; }
-  body.muitoCompacto #tabelaUltimasCursos td.quando { width: 54px; }
+  body.muitoCompacto #tabelaUltimasCursos td.qtd { width: 42px; }
   body.muitoCompacto #tabelaUltimasCursos td.fat { width: 96px; }
 
   /* =======================================================================
@@ -1357,9 +1358,11 @@
 
     var corpoUltimas = document.getElementById('corpoUltimasCursos');
     var htmlUltimas = '';
-    // Ultimas Vendas e o painel menor da coluna (42% dela), entao mostra
-    // menos linhas de proposito — o n8n manda ate 6, aqui corta pra 4. Cortar
-    // no front evita depender de reimportar o workflow so por causa disso.
+    // Ultimas Vendas agora agrupa igual a tabela de Cursos - mes atual (soma
+    // a quantidade quando repete o mesmo curso, em vez de uma linha por
+    // venda) — so que ordenado por quem vendeu mais recentemente, nao por
+    // faturamento. O n8n ja manda nessa ordem; aqui so corta pra 4 linhas,
+    // que e o espaco do painel menor da coluna (42% dela).
     var ultimasCursos = (dados.ultimas || []).slice(0, 4);
     if (ultimasCursos.length === 0) {
       htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
@@ -1367,9 +1370,9 @@
       for (var k = 0; k < ultimasCursos.length; k++) {
         var uc = ultimasCursos[k];
         htmlUltimas += '<tr>' +
-                  '<td class="quando">' + uc.data + '</td>' +
+                  '<td class="qtd">' + uc.vendas + 'x</td>' +
                   '<td class="nome">' + uc.curso + '</td>' +
-                  '<td class="fat">' + formatarBRL(uc.valor) + '</td>' +
+                  '<td class="fat">' + formatarBRL(uc.faturamento) + '</td>' +
                 '</tr>';
       }
     }
