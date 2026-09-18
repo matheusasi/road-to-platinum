@@ -383,10 +383,16 @@
     color: #eaf1ff;
   }
 
+  #tabelaUltimasCursos td.quando {
+    color: #8a9bc0;
+    width: 62px;
+    white-space: nowrap;
+  }
+
   #tabelaUltimasCursos td.qtd {
     text-align: center;
     color: #8a9bc0;
-    width: 72px;
+    width: 56px;
     white-space: nowrap;
   }
 
@@ -413,12 +419,14 @@
 
   body.compacto #tabelaUltimasCursos { font-size: 19px; }
   body.compacto #tabelaUltimasCursos td { padding: 8px 4px; }
-  body.compacto #tabelaUltimasCursos td.qtd { width: 52px; }
+  body.compacto #tabelaUltimasCursos td.quando { width: 48px; }
+  body.compacto #tabelaUltimasCursos td.qtd { width: 40px; }
   body.compacto #tabelaUltimasCursos td.fat { width: 118px; }
 
   body.muitoCompacto #tabelaUltimasCursos { font-size: 15px; }
   body.muitoCompacto #tabelaUltimasCursos td { padding: 5px 3px; }
-  body.muitoCompacto #tabelaUltimasCursos td.qtd { width: 42px; }
+  body.muitoCompacto #tabelaUltimasCursos td.quando { width: 40px; }
+  body.muitoCompacto #tabelaUltimasCursos td.qtd { width: 34px; }
   body.muitoCompacto #tabelaUltimasCursos td.fat { width: 96px; }
 
   /* =======================================================================
@@ -1358,18 +1366,18 @@
 
     var corpoUltimas = document.getElementById('corpoUltimasCursos');
     var htmlUltimas = '';
-    // Ultimas Vendas agora agrupa igual a tabela de Cursos - mes atual (soma
-    // a quantidade quando repete o mesmo curso, em vez de uma linha por
-    // venda) — so que ordenado por quem vendeu mais recentemente, nao por
-    // faturamento. O n8n ja manda nessa ordem; aqui so corta pra 4 linhas,
-    // que e o espaco do painel menor da coluna (42% dela).
+    // Ultimas Vendas agrupa por CURSO + DIA (soma a quantidade quando repete
+    // o mesmo curso no mesmo dia, em vez de uma linha por venda) — ordenado
+    // pelo dia mais recente primeiro. O n8n ja manda nessa ordem; aqui so
+    // corta pra 4 linhas, que e o espaco do painel menor da coluna (42% dela).
     var ultimasCursos = (dados.ultimas || []).slice(0, 4);
     if (ultimasCursos.length === 0) {
-      htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
+      htmlUltimas = '<tr class="vazio"><td colspan="4">Nenhuma venda registrada ainda</td></tr>';
     } else {
       for (var k = 0; k < ultimasCursos.length; k++) {
         var uc = ultimasCursos[k];
         htmlUltimas += '<tr>' +
+                  '<td class="quando">' + uc.data + '</td>' +
                   '<td class="qtd">' + uc.vendas + 'x</td>' +
                   '<td class="nome">' + uc.curso + '</td>' +
                   '<td class="fat">' + formatarBRL(uc.faturamento) + '</td>' +
