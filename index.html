@@ -613,7 +613,7 @@
   /* Slide 7 — Lucratividade diaria. Reusa .topoServico / .servBaixo (com os
      niveis de compactacao ja prontos); so a legenda do gasto e nova. */
   .legendaLucro .marca.prompts { background: #2e8eff; }
-  .legendaLucro .marca.nova    { background: #a06bff; }
+  .legendaLucro .marca.nova    { background: #3ddc84; }
   .legendaLucro .marca.ads     { background: #ff6b6b; }
   #lucroAviso { color: #ff6b6b; }
   #painelGraficoLucro { width: 100%; box-sizing: border-box; }
@@ -1872,7 +1872,7 @@
       if (d.novaGestao > 0 && hN < 2) hN = 2;
       ctx.fillStyle = '#2e8eff';
       ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
-      ctx.fillStyle = '#a06bff';
+      ctx.fillStyle = '#3ddc84';
       ctx.fillRect(xVenda, piso - hP - hN, larguraBarra, hN);
       var totalVenda = d.prompts + d.novaGestao;
       if (totalVenda > 0) {
@@ -1905,9 +1905,18 @@
     ultimoLucro = dados;
     var sub = document.getElementById('lucroSub');
     if (dados.adsDisponivel) {
+      // ROAS = retorno sobre o gasto em anuncios = vendas / gasto em ADs.
+      // Acima de 1,0x as vendas cobrem o gasto; abaixo, nao cobrem.
+      var roasTxt = '—', roasCor = '#7c8fb3';
+      if (dados.totalAds > 0) {
+        var roas = dados.totalVendas / dados.totalAds;
+        roasTxt = (Math.round(roas * 100) / 100).toFixed(2).replace('.', ',') + 'x';
+        roasCor = roas >= 1 ? '#3ddc84' : '#ff6b6b';
+      }
       sub.className = 'subtitulo';
       sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
-                      ' · gasto em ADs ' + formatarBRL(dados.totalAds);
+                      ' · gasto em ADs ' + formatarBRL(dados.totalAds) +
+                      ' · ROAS <b style="color:' + roasCor + '">' + roasTxt + '</b>';
     } else {
       sub.className = 'subtitulo';
       sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
