@@ -610,6 +610,13 @@
   body.muitoCompacto .linhaTemp .rot { font-size: 12px; margin-bottom: 2px; }
   body.muitoCompacto .linhaTemp .trilha { height: 10px; }
   body.muitoCompacto .rodapeSemClasse { font-size: 11px; margin-top: 6px; padding-top: 5px; }
+  /* Slide 7 — Lucratividade diaria. Reusa .topoServico / .servBaixo (com os
+     niveis de compactacao ja prontos); so a legenda do gasto e nova. */
+  .legendaLucro .marca.prompts { background: #2e8eff; }
+  .legendaLucro .marca.nova    { background: #a06bff; }
+  .legendaLucro .marca.ads     { background: #ff6b6b; }
+  #lucroAviso { color: #ff6b6b; }
+  #painelGraficoLucro { width: 100%; box-sizing: border-box; }
 </style>
 </head>
 <body>
@@ -869,6 +876,31 @@
           <div id="servContrLinhasAsse"></div>
           <div class="rodapeSemClasse" id="servContrSemAsse">&nbsp;</div>
         </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 7 — Lucratividade diaria. Por dia (ultimos 14): uma barra
+       empilhada com as vendas de Prompts + A Nova Gestao, e ao lado uma barra
+       so com o gasto em ADs (Meta) daqueles dois produtos.
+       =================================================================== -->
+  <div class="slide" data-slide="lucro-diario" data-segundos="20">
+    <div class="topoServico">
+      <h1>Lucratividade diária</h1>
+      <div class="subtitulo" id="lucroSub">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="lucroBaixo">
+      <div class="painelVendas" id="painelGraficoLucro">
+        <div class="tituloSecao">Vendas x gasto em ADs por dia
+          <span class="legendaOrigem legendaLucro">
+            <i class="marca prompts"></i>Prompts
+            <i class="marca nova"></i>Nova Gestão
+            <i class="marca ads"></i>Gasto em ADs
+          </span>
+        </div>
+        <canvas id="graficoLucro" width="880" height="430"></canvas>
       </div>
       <div class="clearfix"></div>
     </div>
@@ -1147,7 +1179,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1230,7 +1262,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -1304,6 +1336,7 @@
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
       desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
+      desenharLucro('graficoLucro', 'painelGraficoLucro', ultimoLucro);
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -1758,6 +1791,131 @@
     ajustarTamanhoVendas();
   }
 
+  // =========================================================================
+  // SLIDE 7 — LUCRATIVIDADE DIARIA
+  //
+  // Por dia: barra 1 EMPILHADA (vendas de Prompts embaixo, A Nova Gestao em
+  // cima) e barra 2 so com o gasto em ADs. Eixo Y em reais, eixo X por dia.
+  // O n8n manda pronto em dados.dias = [{rotulo, prompts, novaGestao, ads}].
+  // ads = null quando o Meta Ads falhou: nesse caso NAO desenha a barra de
+  // gasto (zero apareceria como se fosse gasto real) e avisa no subtitulo.
+  // =========================================================================
+  var ultimoLucro = null;
+
+  function abreviarBRL(v) {
+    if (v >= 1000) return (Math.round(v / 100) / 10).toString().replace('.', ',') + 'k';
+    return String(Math.round(v));
+  }
+
+  function desenharLucro(idCanvas, idPainel, dados) {
+    var canvas = document.getElementById(idCanvas);
+    if (!canvas || !canvas.getContext) return;
+    var painel = document.getElementById(idPainel);
+    var larguraAlvo = larguraCanvasDisponivel(painel);
+    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
+    var alturaAlvo = alturaCanvasDisponivel(painel);
+    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
+
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    var dias = dados && dados.dias;
+    if (!dias || dias.length === 0) return;
+
+    var fonteRotulo = (h < 240) ? 12 : 15;
+    var fonteValor = (h < 240) ? 11 : 14;
+    var margemEsq = (h < 240) ? 58 : 74, margemDir = 10, margemTopo = 24, margemBaixo = 34;
+    var largura = w - margemEsq - margemDir;
+    var altura = h - margemTopo - margemBaixo;
+    var piso = margemTopo + altura;
+
+    var maior = 0, i;
+    for (i = 0; i < dias.length; i++) {
+      var venda = dias[i].prompts + dias[i].novaGestao;
+      if (venda > maior) maior = venda;
+      if (dias[i].ads != null && dias[i].ads > maior) maior = dias[i].ads;
+    }
+    if (maior <= 0) maior = 1;
+    // teto redondo pro eixo: 4 divisoes de valor cheio
+    var passo = Math.pow(10, Math.floor(Math.log(maior / 4) / Math.LN10));
+    var mult = [1, 2, 2.5, 5, 10];
+    for (i = 0; i < mult.length; i++) { if (passo * mult[i] * 4 >= maior) { passo = passo * mult[i]; break; } }
+    var teto = passo * 4;
+
+    // eixo Y em reais + grade
+    ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.lineWidth = 1;
+    for (i = 0; i <= 4; i++) {
+      var yy = piso - (altura * i) / 4;
+      ctx.strokeStyle = 'rgba(46,142,255,0.10)';
+      ctx.beginPath(); ctx.moveTo(margemEsq, yy); ctx.lineTo(w - margemDir, yy); ctx.stroke();
+      ctx.fillStyle = '#7c8fb3';
+      ctx.fillText(formatarBRL(passo * i), margemEsq - 8, yy + 5);
+    }
+
+    var fatia = largura / dias.length;
+    var larguraBarra = Math.min(fatia * 0.36, 60);
+    var vao = 3;
+    ctx.textAlign = 'center';
+
+    for (i = 0; i < dias.length; i++) {
+      var d = dias[i];
+      var centro = margemEsq + fatia * i + fatia / 2;
+      var xVenda = centro - vao / 2 - larguraBarra;   // barra empilhada (esq.)
+      var xAds = centro + vao / 2;                     // barra de gasto (dir.)
+
+      // barra empilhada: Prompts embaixo, Nova Gestao em cima
+      var hP = (altura * d.prompts) / teto;
+      var hN = (altura * d.novaGestao) / teto;
+      if (d.prompts > 0 && hP < 2) hP = 2;
+      if (d.novaGestao > 0 && hN < 2) hN = 2;
+      ctx.fillStyle = '#2e8eff';
+      ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
+      ctx.fillStyle = '#a06bff';
+      ctx.fillRect(xVenda, piso - hP - hN, larguraBarra, hN);
+      var totalVenda = d.prompts + d.novaGestao;
+      if (totalVenda > 0) {
+        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#eaf1ff';
+        ctx.fillText(abreviarBRL(totalVenda), xVenda + larguraBarra / 2, piso - hP - hN - 5);
+      }
+
+      // barra de gasto em ADs (nao empilhada)
+      if (d.ads != null) {
+        var hA = (altura * d.ads) / teto;
+        if (d.ads > 0 && hA < 2) hA = 2;
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fillRect(xAds, piso - hA, larguraBarra, hA);
+        if (d.ads > 0) {
+          ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+          ctx.fillStyle = '#ffb3b3';
+          ctx.fillText(abreviarBRL(d.ads), xAds + larguraBarra / 2, piso - hA - 5);
+        }
+      }
+
+      // eixo X: um rotulo por dia
+      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      ctx.fillStyle = (i === dias.length - 1) ? '#29e0c8' : '#7c8fb3';
+      ctx.fillText(d.rotulo, centro, h - 10);
+    }
+  }
+
+  function renderizarLucro(dados) {
+    ultimoLucro = dados;
+    var sub = document.getElementById('lucroSub');
+    if (dados.adsDisponivel) {
+      sub.className = 'subtitulo';
+      sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
+                      ' · gasto em ADs ' + formatarBRL(dados.totalAds);
+    } else {
+      sub.className = 'subtitulo';
+      sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
+                      ' · <span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span>';
+    }
+    ajustarTamanhoVendas();
+  }
+
   function renderizarArr(dados) {
     ultimoArr = dados;
 
@@ -1828,6 +1986,7 @@
       aplicar('cursos', renderizarVendas, tudo.cursos);
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
+      aplicar('lucro', renderizarLucro, tudo.lucro);
     });
   }
 
@@ -1972,6 +2131,7 @@
       aplicar('cursos', renderizarVendas, tudo.cursos);
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
+      aplicar('lucro', renderizarLucro, tudo.lucro);
     }, function () {
       servidorRespondeu = true;
     });
