@@ -383,16 +383,26 @@
     color: #eaf1ff;
   }
 
-  #tabelaUltimasCursos td.quando {
-    color: #8a9bc0;
-    width: 62px;
-    white-space: nowrap;
+  #tabelaUltimasCursos col.cQtd { width: 72px; }
+  #tabelaUltimasCursos col.cFat { width: 168px; }
+  body.compacto #tabelaUltimasCursos col.cQtd { width: 52px; }
+  body.compacto #tabelaUltimasCursos col.cFat { width: 118px; }
+  body.muitoCompacto #tabelaUltimasCursos col.cQtd { width: 42px; }
+  body.muitoCompacto #tabelaUltimasCursos col.cFat { width: 96px; }
+
+  /* faixa que separa um dia do outro */
+  #tabelaUltimasCursos tr.diaSep td {
+    padding: 6px 6px 3px 6px;
+    font-size: 16px;
+    letter-spacing: 1px;
+    color: #7c8fb3;
+    border-bottom: 1px solid rgba(46,142,255,0.28);
   }
 
   #tabelaUltimasCursos td.qtd {
     text-align: center;
     color: #8a9bc0;
-    width: 56px;
+    width: 72px;
     white-space: nowrap;
   }
 
@@ -419,13 +429,13 @@
 
   body.compacto #tabelaUltimasCursos { font-size: 19px; }
   body.compacto #tabelaUltimasCursos td { padding: 8px 4px; }
-  body.compacto #tabelaUltimasCursos td.quando { width: 48px; }
+  body.compacto #tabelaUltimasCursos tr.diaSep td { font-size: 13px; padding: 4px 4px 2px 4px; }
   body.compacto #tabelaUltimasCursos td.qtd { width: 40px; }
   body.compacto #tabelaUltimasCursos td.fat { width: 118px; }
 
   body.muitoCompacto #tabelaUltimasCursos { font-size: 15px; }
   body.muitoCompacto #tabelaUltimasCursos td { padding: 5px 3px; }
-  body.muitoCompacto #tabelaUltimasCursos td.quando { width: 40px; }
+  body.muitoCompacto #tabelaUltimasCursos tr.diaSep td { font-size: 11px; padding: 3px 3px 1px 3px; }
   body.muitoCompacto #tabelaUltimasCursos td.qtd { width: 34px; }
   body.muitoCompacto #tabelaUltimasCursos td.fat { width: 96px; }
 
@@ -757,7 +767,7 @@
 
         <div class="painelVendas semAutoAltura" id="painelUltimasCursos">
           <div class="tituloSecao">Últimas vendas</div>
-          <table id="tabelaUltimasCursos"><tbody id="corpoUltimasCursos"></tbody></table>
+          <table id="tabelaUltimasCursos"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoUltimasCursos"></tbody></table>
         </div>
       </div>
 
@@ -1366,18 +1376,29 @@
 
     var corpoUltimas = document.getElementById('corpoUltimasCursos');
     var htmlUltimas = '';
-    // Ultimas Vendas agrupa por CURSO + DIA (soma a quantidade quando repete
-    // o mesmo curso no mesmo dia, em vez de uma linha por venda) — ordenado
-    // pelo dia mais recente primeiro. O n8n ja manda nessa ordem; aqui so
-    // corta pra 4 linhas, que e o espaco do painel menor da coluna (42% dela).
-    var ultimasCursos = (dados.ultimas || []).slice(0, 4);
+    // Ultimas Vendas separada por DIA: uma faixa com a data e, embaixo dela,
+    // uma linha por curso vendido naquele dia com a QUANTIDADE do dia (soma
+    // quando repete o curso). O n8n manda agrupado por curso+dia, do dia mais
+    // recente pro mais antigo; aqui so monta as faixas. Limite: 2 linhas por
+    // dia e 4 no total — assim sempre cabem pelo menos 2 dias no painel menor
+    // da coluna (42% dela), em vez de um dia so ocupar tudo.
+    var LINHAS_POR_DIA = 2, LINHAS_TOTAL = 4;
+    var ultimasCursos = dados.ultimas || [];
     if (ultimasCursos.length === 0) {
-      htmlUltimas = '<tr class="vazio"><td colspan="4">Nenhuma venda registrada ainda</td></tr>';
+      htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
     } else {
-      for (var k = 0; k < ultimasCursos.length; k++) {
+      var diaAtual = null, noDia = 0, mostradas = 0;
+      for (var k = 0; k < ultimasCursos.length && mostradas < LINHAS_TOTAL; k++) {
         var uc = ultimasCursos[k];
+        if (uc.data !== diaAtual) {
+          diaAtual = uc.data;
+          noDia = 0;
+          htmlUltimas += '<tr class="diaSep"><td colspan="3">' + uc.data + '</td></tr>';
+        }
+        if (noDia >= LINHAS_POR_DIA) continue;
+        noDia++;
+        mostradas++;
         htmlUltimas += '<tr>' +
-                  '<td class="quando">' + uc.data + '</td>' +
                   '<td class="qtd">' + uc.vendas + 'x</td>' +
                   '<td class="nome">' + uc.curso + '</td>' +
                   '<td class="fat">' + formatarBRL(uc.faturamento) + '</td>' +
