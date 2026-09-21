@@ -1906,11 +1906,11 @@
     var sub = document.getElementById('lucroSub');
     if (dados.adsDisponivel) {
       // ROAS = retorno sobre o gasto em anuncios = vendas / gasto em ADs.
-      // Em %: 100% ou mais = as vendas cobrem o gasto; abaixo, nao cobrem.
+      // Acima de 1,0x as vendas cobrem o gasto; abaixo, nao cobrem.
       var roasTxt = '—', roasCor = '#7c8fb3';
       if (dados.totalAds > 0) {
         var roas = dados.totalVendas / dados.totalAds;
-        roasTxt = Math.round(roas * 100) + '%';
+        roasTxt = (Math.round(roas * 100) / 100).toFixed(2).replace('.', ',') + 'x';
         roasCor = roas >= 1 ? '#3ddc84' : '#ff6b6b';
       }
       sub.className = 'subtitulo';
