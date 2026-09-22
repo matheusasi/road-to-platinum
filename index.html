@@ -613,6 +613,7 @@
   /* Slide 7 — Lucratividade diaria. Reusa .topoServico / .servBaixo (com os
      niveis de compactacao ja prontos); so a legenda do gasto e nova. */
   .legendaLucro .marca.prompts { background: #2e8eff; }
+  .legendaLucro .marca.mini    { background: #ff9d2e; }
   .legendaLucro .marca.nova    { background: #3ddc84; }
   .legendaLucro .marca.ads     { background: #ff6b6b; }
   #lucroAviso { color: #ff6b6b; }
@@ -896,6 +897,7 @@
         <div class="tituloSecao">Vendas x gasto em ADs por dia
           <span class="legendaOrigem legendaLucro">
             <i class="marca prompts"></i>Prompts
+            <i class="marca mini"></i>Minicursos
             <i class="marca nova"></i>Nova Gestão
             <i class="marca ads"></i>Gasto em ADs
           </span>
@@ -1202,6 +1204,11 @@
                       'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   var serieMensalCursos = [];
   var serieSemanalCursos = [];
+  // Dados crus dos dois painéis da coluna direita — o numero de linhas que
+  // cada um mostra e decidido em preencherCursosMes()/preencherUltimasVendas(),
+  // medindo o espaco real (ver dividirColunaCursos), nao um limite fixo.
+  var todosCursosMes = [];
+  var todasUltimasCursos = [];
 
   // Quantas semanas fechadas aparecem no slide de cursos. O webhook manda 12,
   // o que na TV chegava a mostrar maio — recente demais nao, velho demais sim.
@@ -1318,6 +1325,93 @@
     ultimas.style.height = alturaUltimas + 'px';
   }
 
+  // Espaco disponivel (em px) pra linhas de tabela dentro de um painel, depois
+  // de descontar o titulo e o padding — usado pelos dois preencher* abaixo pra
+  // decidir QUANTAS linhas mostrar, em vez de um numero fixo.
+  function espacoParaLinhas(painel) {
+    var titulo = painel.getElementsByClassName('tituloSecao')[0];
+    var p = paddingDoPainel(painel);
+    var alturaTitulo = titulo ? titulo.offsetHeight + 8 : 0;
+    var espaco = painel.clientHeight - p.topo - p.baixo - alturaTitulo;
+    return espaco > 0 ? espaco : 0;
+  }
+
+  // "Cursos - mes atual": mostra o MAXIMO de linhas que couber no espaco que
+  // dividirColunaCursos ja reservou pro painel (58% da coluna), resumindo o
+  // resto em "+N outros cursos" so quando realmente nao cabe tudo. Antes era
+  // um limite fixo de 6, que deixava espaco vazio sobrando na TV mesmo
+  // cabendo mais curso — o computador (tela maior) cabia os 6 folgado, a TV
+  // sobrava embaixo.
+  function preencherCursosMes() {
+    var painel = document.getElementById('painelTabela');
+    var corpo = document.getElementById('corpoTabelaCursos');
+    if (!painel || !corpo) return;
+    var cursos = todosCursosMes;
+    if (cursos.length === 0) {
+      corpo.innerHTML = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mês</td></tr>';
+      return;
+    }
+    function linha(c) {
+      return '<tr><td class="qtd">' + c.vendas + 'x</td><td class="nome">' + c.curso + '</td><td class="fat">' + formatarBRL(c.faturamento) + '</td></tr>';
+    }
+    // renderiza tudo primeiro so pra MEDIR a altura real de uma linha (muda
+    // com o nivel de compactacao — fonte e padding diferentes)
+    corpo.innerHTML = cursos.map(linha).join('');
+    var trs = corpo.getElementsByTagName('tr');
+    var alturaLinha = trs[0].getBoundingClientRect().height || 30;
+    var maxLinhas = Math.max(1, Math.floor(espacoParaLinhas(painel) / alturaLinha));
+    if (cursos.length <= maxLinhas) return; // tudo cabe, fica como esta
+
+    var limite = Math.max(1, maxLinhas - 1); // reserva 1 linha pro resumo
+    var resto = 0;
+    for (var j = limite; j < cursos.length; j++) resto += cursos[j].faturamento;
+    corpo.innerHTML = cursos.slice(0, limite).map(linha).join('') +
+      '<tr><td class="qtd">&nbsp;</td><td class="nome">+ ' + (cursos.length - limite) + ' outros cursos</td><td class="fat">' + formatarBRL(resto) + '</td></tr>';
+  }
+
+  // "Ultimas Vendas": uma faixa por dia (mais recente primeiro, e o n8n ja
+  // manda nessa ordem) com uma linha por curso vendido naquele dia. Preenche
+  // ate o espaco acabar — sem limite fixo de dias nem de linhas por dia, entao
+  // o dia de hoje aparece inteiro primeiro, e um dia anterior so entra se
+  // sobrar espaco depois dele (nunca corta hoje pra caber ontem).
+  function preencherUltimasVendas() {
+    var painel = document.getElementById('painelUltimasCursos');
+    var corpo = document.getElementById('corpoUltimasCursos');
+    if (!painel || !corpo) return;
+    var ultimas = todasUltimasCursos;
+    if (ultimas.length === 0) {
+      corpo.innerHTML = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
+      return;
+    }
+    var linhas = [];
+    var diaAtual = null;
+    for (var i = 0; i < ultimas.length; i++) {
+      var uc = ultimas[i];
+      if (uc.data !== diaAtual) {
+        diaAtual = uc.data;
+        linhas.push({ separador: true, html: '<tr class="diaSep"><td colspan="3">' + uc.data + '</td></tr>' });
+      }
+      linhas.push({
+        separador: false,
+        html: '<tr><td class="qtd">' + uc.vendas + 'x</td><td class="nome">' + uc.curso + '</td><td class="fat">' + formatarBRL(uc.faturamento) + '</td></tr>'
+      });
+    }
+
+    corpo.innerHTML = linhas.map(function (l) { return l.html; }).join('');
+    var trs = corpo.getElementsByTagName('tr');
+    var espaco = espacoParaLinhas(painel);
+    var acumulado = 0, corte = trs.length;
+    for (var k = 0; k < trs.length; k++) {
+      var h = trs[k].getBoundingClientRect().height;
+      if (k > 0 && acumulado + h > espaco) { corte = k; break; }
+      acumulado += h;
+    }
+    // nunca deixa uma faixa de dia sozinha, sem nenhuma venda embaixo dela
+    while (corte > 0 && linhas[corte - 1].separador) corte--;
+    if (corte === 0) corte = Math.min(trs.length, 2); // rede de seguranca: nunca zera o painel
+    for (var m = trs.length - 1; m >= corte; m--) corpo.removeChild(trs[m]);
+  }
+
   // Tenta o tamanho cheio; se estourar a tela, vai encolhendo. Medir e mais
   // confiavel que adivinhar por resolucao — a TV reporta um viewport logico
   // que nao bate com os 1080p fisicos, e ai o conteudo saia cortado.
@@ -1328,6 +1422,10 @@
       // antes de desenhar: o canvas se dimensiona pela altura ja fixada aqui
       esticarPaineis();
       dividirColunaCursos();
+      // as duas tabelas da coluna direita so podem decidir quantas linhas
+      // mostrar DEPOIS de dividirColunaCursos fixar a altura de cada painel
+      preencherCursosMes();
+      preencherUltimasVendas();
       dividirColunaServico('servBaixoCons', ['servGraficoCons', 'servTicketCons'], [0.82, 0.18]);
       dividirColunaServico('servBaixoAsse', ['servGraficoAsse', 'servTicketAsse'], [0.82, 0.18]);
       dividirColunaServico('servBaixoCons', ['servPropCons', 'servContrCons'], [0.5, 0.5]);
@@ -1378,71 +1476,16 @@
       };
     });
 
-    var corpo = document.getElementById('corpoTabelaCursos');
-    var html = '';
-    var cursos = dados.cursos || [];
-    if (cursos.length === 0) {
-      html = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada neste mês</td></tr>';
-    } else {
-      // Cursos - mes atual pega a maior parte da coluna (65%, ver
-      // dividirColunaCursos), entao volta a mostrar mais linhas.
-      var limite = cursos.length > 6 ? 6 : cursos.length;
-      for (var i = 0; i < limite; i++) {
-        var c = cursos[i];
-        html += '<tr>' +
-                  '<td class="qtd">' + c.vendas + 'x</td>' +
-                  '<td class="nome">' + c.curso + '</td>' +
-                  '<td class="fat">' + formatarBRL(c.faturamento) + '</td>' +
-                '</tr>';
-      }
-      if (cursos.length > limite) {
-        var resto = 0;
-        for (var j = limite; j < cursos.length; j++) resto += cursos[j].faturamento;
-        html += '<tr>' +
-                  '<td class="qtd">&nbsp;</td>' +
-                  '<td class="nome">+ ' + (cursos.length - limite) + ' outros cursos</td>' +
-                  '<td class="fat">' + formatarBRL(resto) + '</td>' +
-                '</tr>';
-      }
-    }
-    corpo.innerHTML = html;
+    // As duas tabelas da coluna direita nao sao mais montadas aqui: so
+    // guarda o dado cru. Quantas linhas cada uma mostra e decidido dentro de
+    // ajustarTamanhoVendas (preencherCursosMes/preencherUltimasVendas), que
+    // mede o espaco real do painel em vez de usar um limite fixo.
+    todosCursosMes = dados.cursos || [];
+    todasUltimasCursos = dados.ultimas || [];
 
-    var corpoUltimas = document.getElementById('corpoUltimasCursos');
-    var htmlUltimas = '';
-    // Ultimas Vendas separada por DIA: uma faixa com a data e, embaixo dela,
-    // uma linha por curso vendido naquele dia com a QUANTIDADE do dia (soma
-    // quando repete o curso). O n8n manda agrupado por curso+dia, do dia mais
-    // recente pro mais antigo; aqui so monta as faixas. Limite: 2 linhas por
-    // dia e 4 no total — assim sempre cabem pelo menos 2 dias no painel menor
-    // da coluna (42% dela), em vez de um dia so ocupar tudo.
-    var LINHAS_POR_DIA = 2, LINHAS_TOTAL = 4;
-    var ultimasCursos = dados.ultimas || [];
-    if (ultimasCursos.length === 0) {
-      htmlUltimas = '<tr class="vazio"><td colspan="3">Nenhuma venda registrada ainda</td></tr>';
-    } else {
-      var diaAtual = null, noDia = 0, mostradas = 0;
-      for (var k = 0; k < ultimasCursos.length && mostradas < LINHAS_TOTAL; k++) {
-        var uc = ultimasCursos[k];
-        if (uc.data !== diaAtual) {
-          diaAtual = uc.data;
-          noDia = 0;
-          htmlUltimas += '<tr class="diaSep"><td colspan="3">' + uc.data + '</td></tr>';
-        }
-        if (noDia >= LINHAS_POR_DIA) continue;
-        noDia++;
-        mostradas++;
-        htmlUltimas += '<tr>' +
-                  '<td class="qtd">' + uc.vendas + 'x</td>' +
-                  '<td class="nome">' + uc.curso + '</td>' +
-                  '<td class="fat">' + formatarBRL(uc.faturamento) + '</td>' +
-                '</tr>';
-      }
-    }
-    corpoUltimas.innerHTML = htmlUltimas;
-
-    // por ultimo: as tabelas ja estao preenchidas, entao da pra medir a
-    // altura real do slide e decidir se precisa encolher (isso tambem
-    // desenha o grafico, no tamanho do nivel escolhido)
+    // por ultimo: monta as tabelas e mede a altura real do slide pra decidir
+    // se precisa encolher (isso tambem desenha o grafico, no tamanho do
+    // nivel escolhido)
     ajustarTamanhoVendas();
   }
 
@@ -1865,20 +1908,24 @@
       var xVenda = centro - vao / 2 - larguraBarra;   // barra empilhada (esq.)
       var xAds = centro + vao / 2;                     // barra de gasto (dir.)
 
-      // barra empilhada: Prompts embaixo, Nova Gestao em cima
+      // barra empilhada: Prompts embaixo, Minicursos no meio, Nova Gestao no topo
       var hP = (altura * d.prompts) / teto;
+      var hM = (altura * (d.minicursos || 0)) / teto;
       var hN = (altura * d.novaGestao) / teto;
       if (d.prompts > 0 && hP < 2) hP = 2;
+      if (d.minicursos > 0 && hM < 2) hM = 2;
       if (d.novaGestao > 0 && hN < 2) hN = 2;
       ctx.fillStyle = '#2e8eff';
       ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
+      ctx.fillStyle = '#ff9d2e';
+      ctx.fillRect(xVenda, piso - hP - hM, larguraBarra, hM);
       ctx.fillStyle = '#3ddc84';
-      ctx.fillRect(xVenda, piso - hP - hN, larguraBarra, hN);
-      var totalVenda = d.prompts + d.novaGestao;
+      ctx.fillRect(xVenda, piso - hP - hM - hN, larguraBarra, hN);
+      var totalVenda = d.prompts + (d.minicursos || 0) + d.novaGestao;
       if (totalVenda > 0) {
         ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
         ctx.fillStyle = '#eaf1ff';
-        ctx.fillText(abreviarBRL(totalVenda), xVenda + larguraBarra / 2, piso - hP - hN - 5);
+        ctx.fillText(abreviarBRL(totalVenda), xVenda + larguraBarra / 2, piso - hP - hM - hN - 5);
       }
 
       // barra de gasto em ADs (nao empilhada)
