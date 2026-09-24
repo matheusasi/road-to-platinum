@@ -1105,6 +1105,7 @@
     var pct = dados.receitaAtual / META_RECEITA;
     var pctExibicao = Math.round(pct * 1000) / 10; // 1 casa decimal
 
+    ultimoPctGauge = pct;
     desenharGauge(pct);
     document.getElementById('textoGaugeCentro').innerHTML = pctExibicao + '%';
     document.getElementById('valGaugeAtual').innerHTML = formatarUSD(dados.receitaAtual);
@@ -1133,6 +1134,41 @@
       elPorDia.innerHTML = formatarUSD(dados.necessarioPorDia);
       elPorDia.className = 'valor neutro';
     }
+
+    ajustarRoad();
+  }
+
+  // O slide 1 nao passa por ajustarTamanhoVendas: o gauge tinha tamanho fixo
+  // (900x480) e, numa tela 1080p, sobrava uma faixa de ~20% embaixo dos cards.
+  // Aqui o gauge cresce (e o texto do centro junto) ate os cards encostarem
+  // perto do rodape. Mede de verdade: tenta o maior tamanho e vai diminuindo
+  // ate caber, limitado tambem pela largura da janela.
+  var ultimoPctGauge = 0;
+  function ajustarRoad() {
+    var canvas = document.getElementById('gauge');
+    var grade = document.getElementById('grade');
+    var centro = document.getElementById('textoGaugeCentro');
+    var valores = document.getElementById('textoGaugeValores');
+    if (!canvas || !grade || !centro || !valores) return;
+    var tela = alturaDaTela();
+    var larguraJanela = window.innerWidth || document.documentElement.clientWidth || 1280;
+    var maximo = Math.min(1.9, (larguraJanela - 80) / 900);
+    function aplicar(k) {
+      var f = 1 + (k - 1) * 0.7;   // o texto cresce menos que o desenho
+      canvas.width = Math.round(900 * k);
+      canvas.height = Math.round(480 * k);
+      centro.style.fontSize = Math.round(64 * f) + 'px';
+      centro.style.marginTop = Math.round(-70 * k) + 'px';
+      valores.style.fontSize = Math.round(26 * f) + 'px';
+    }
+    var k = maximo;
+    while (k > 1) {
+      aplicar(k);
+      if (grade.offsetTop + grade.offsetHeight <= tela - 28) break;
+      k -= 0.05;
+    }
+    if (k <= 1) aplicar(1);
+    desenharGauge(ultimoPctGauge);
   }
 
   // =========================================================================
@@ -1249,7 +1285,8 @@
     var p = paddingDoPainel(painel);
     var espaco = painel.clientHeight - p.topo - p.baixo - alturaTitulo;
     if (espaco < 140) espaco = 140;
-    if (espaco > 560) espaco = 560;
+    // sem teto: o painel ja tem altura definida pela geometria da tela; um teto
+    // fixo (era 560px) deixava o grafico no alto e o resto do painel vazio na TV
     return Math.round(espaco);
   }
 
@@ -1941,9 +1978,18 @@
         }
       }
 
-      // eixo X: um rotulo por dia
-      ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
-      ctx.fillStyle = (i === dias.length - 1) ? '#29e0c8' : '#7c8fb3';
+      // eixo X: um rotulo por dia. Data em VERDE FORTE (e negrito) quando o gasto
+      // em ADs do dia ficou abaixo da receita do dia (Prompts + Minicursos + Nova
+      // Gestao) — dia que se pagou. Sem dado do Meta (ads null) nao marca nada.
+      var receitaDia = d.prompts + (d.minicursos || 0) + d.novaGestao;
+      var diaLucrativo = (d.ads != null) && (d.ads < receitaDia);
+      if (diaLucrativo) {
+        ctx.font = 'bold ' + fonteRotulo + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#00e676';
+      } else {
+        ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = (i === dias.length - 1) ? '#29e0c8' : '#7c8fb3';
+      }
       ctx.fillText(d.rotulo, centro, h - 10);
     }
   }
@@ -2233,7 +2279,7 @@
   function aoRedimensionar() {
     if (timerRedimensionar) clearTimeout(timerRedimensionar);
     timerRedimensionar = setTimeout(function () {
-      try { ajustarTamanhoVendas(); } catch (erro) {
+      try { ajustarTamanhoVendas(); ajustarRoad(); } catch (erro) {
         if (window.console && console.error) console.error('Falha ao refazer o layout', erro);
       }
     }, 250);
