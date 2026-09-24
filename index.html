@@ -806,8 +806,34 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 5 — Projetos de Consultoria.
-       SLIDE 6 — Assessoria + Treinamentos.
+       SLIDE 5 — Lucratividade diaria (logo depois de Vendas de Cursos mes a mes). Por dia (ultimos 14): uma barra
+       empilhada com as vendas de Prompts + A Nova Gestao, e ao lado uma barra
+       so com o gasto em ADs (Meta) daqueles dois produtos.
+       =================================================================== -->
+  <div class="slide" data-slide="lucro-diario" data-segundos="20">
+    <div class="topoServico">
+      <h1>Lucratividade diária</h1>
+      <div class="subtitulo" id="lucroSub">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="lucroBaixo">
+      <div class="painelVendas" id="painelGraficoLucro">
+        <div class="tituloSecao">Vendas x gasto em ADs por dia
+          <span class="legendaOrigem legendaLucro">
+            <i class="marca prompts"></i>Prompts
+            <i class="marca mini"></i>Minicursos
+            <i class="marca nova"></i>Nova Gestão
+            <i class="marca ads"></i>Gasto em ADs
+          </span>
+        </div>
+        <canvas id="graficoLucro" width="880" height="430"></canvas>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 6 — Projetos de Consultoria.
+       SLIDE 7 — Assessoria + Treinamentos.
        Mesmo layout: faturamento por mes (barras) com a linha de quantidade
        por cima; ticket medio dos ultimos 3 meses; e os pipelines de proposta
        e de contrato enviados, por temperatura (Grau Confianca do CRM).
@@ -877,32 +903,6 @@
           <div id="servContrLinhasAsse"></div>
           <div class="rodapeSemClasse" id="servContrSemAsse">&nbsp;</div>
         </div>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-  </div>
-
-  <!-- ===================================================================
-       SLIDE 7 — Lucratividade diaria. Por dia (ultimos 14): uma barra
-       empilhada com as vendas de Prompts + A Nova Gestao, e ao lado uma barra
-       so com o gasto em ADs (Meta) daqueles dois produtos.
-       =================================================================== -->
-  <div class="slide" data-slide="lucro-diario" data-segundos="20">
-    <div class="topoServico">
-      <h1>Lucratividade diária</h1>
-      <div class="subtitulo" id="lucroSub">&nbsp;</div>
-    </div>
-    <div class="servBaixo" id="lucroBaixo">
-      <div class="painelVendas" id="painelGraficoLucro">
-        <div class="tituloSecao">Vendas x gasto em ADs por dia
-          <span class="legendaOrigem legendaLucro">
-            <i class="marca prompts"></i>Prompts
-            <i class="marca mini"></i>Minicursos
-            <i class="marca nova"></i>Nova Gestão
-            <i class="marca ads"></i>Gasto em ADs
-          </span>
-        </div>
-        <canvas id="graficoLucro" width="880" height="430"></canvas>
       </div>
       <div class="clearfix"></div>
     </div>
@@ -2217,6 +2217,30 @@
   }
 
   manterTelaAtiva();
+
+  // =========================================================================
+  // REDIMENSIONAR — refaz o layout quando o tamanho da janela muda.
+  //
+  // Todo o encaixe (altura dos paineis, quantas linhas cabem, tamanho dos
+  // graficos) e calculado por ajustarTamanhoVendas, que so rodava quando
+  // chegava dado novo (a cada 5 min). Se a janela mudava depois — entrar em
+  // tela cheia, abrir/fechar barra do navegador — o layout ficava preso no
+  // tamanho ANTIGO e sobrava uma faixa vazia no rodape (~20% da tela) ate o
+  // proximo ciclo. Agora refaz na hora. O atraso agrupa a rajada de eventos
+  // que a troca pra tela cheia dispara.
+  // =========================================================================
+  var timerRedimensionar = null;
+  function aoRedimensionar() {
+    if (timerRedimensionar) clearTimeout(timerRedimensionar);
+    timerRedimensionar = setTimeout(function () {
+      try { ajustarTamanhoVendas(); } catch (erro) {
+        if (window.console && console.error) console.error('Falha ao refazer o layout', erro);
+      }
+    }, 250);
+  }
+  window.addEventListener('resize', aoRedimensionar, false);
+  document.addEventListener('fullscreenchange', aoRedimensionar, false);
+  document.addEventListener('webkitfullscreenchange', aoRedimensionar, false);
 
   // =========================================================================
   // REQUISITO 5 — auto-recuperacao de erro (recarrega sozinho se travar)
