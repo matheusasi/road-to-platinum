@@ -1916,18 +1916,20 @@
       if (dias[i].ads != null && dias[i].ads > maior) maior = dias[i].ads;
     }
     if (maior <= 0) maior = 1;
-    // teto redondo pro eixo: 4 divisoes de valor cheio
-    var passo = Math.pow(10, Math.floor(Math.log(maior / 4) / Math.LN10));
-    var mult = [1, 2, 2.5, 5, 10];
-    for (i = 0; i < mult.length; i++) { if (passo * mult[i] * 4 >= maior) { passo = passo * mult[i]; break; } }
-    var teto = passo * 4;
+    // Teto do eixo Y: R$ 1.500 no minimo. Se algum valor passar disso, sobe de
+    // 500 em 500 (2.000, 2.500, 3.000...) sozinho. A grade acompanha: uma linha
+    // a cada R$ 500 (a cada R$ 1.000 depois de R$ 3.000, pra nao lotar).
+    var passo = 500;
+    var teto = Math.max(1500, Math.ceil(maior / 500) * 500);
+    if (teto > 3000) { passo = 1000; teto = Math.ceil(teto / 1000) * 1000; }
+    var divisoes = Math.round(teto / passo);
 
     // eixo Y em reais + grade
     ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
     ctx.textAlign = 'right';
     ctx.lineWidth = 1;
-    for (i = 0; i <= 4; i++) {
-      var yy = piso - (altura * i) / 4;
+    for (i = 0; i <= divisoes; i++) {
+      var yy = piso - (altura * i) / divisoes;
       ctx.strokeStyle = 'rgba(46,142,255,0.10)';
       ctx.beginPath(); ctx.moveTo(margemEsq, yy); ctx.lineTo(w - margemDir, yy); ctx.stroke();
       ctx.fillStyle = '#7c8fb3';
