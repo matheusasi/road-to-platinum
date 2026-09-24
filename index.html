@@ -1983,12 +1983,17 @@
       // Gestao) — dia que se pagou. Sem dado do Meta (ads null) nao marca nada.
       var receitaDia = d.prompts + (d.minicursos || 0) + d.novaGestao;
       var diaLucrativo = (d.ads != null) && (d.ads < receitaDia);
-      if (diaLucrativo) {
+      if (i === dias.length - 1) {
+        // o dia de hoje fica em BRANCO puro e negrito, sempre — o dia ainda esta
+        // rolando, entao nao ganha a cor de "se pagou"
+        ctx.font = 'bold ' + fonteRotulo + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#ffffff';
+      } else if (diaLucrativo) {
         ctx.font = 'bold ' + fonteRotulo + 'px Arial, Helvetica, sans-serif';
         ctx.fillStyle = '#00e676';
       } else {
         ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = (i === dias.length - 1) ? '#29e0c8' : '#7c8fb3';
+        ctx.fillStyle = '#7c8fb3';
       }
       ctx.fillText(d.rotulo, centro, h - 10);
     }
