@@ -1737,15 +1737,8 @@
       ctx.fillText(meses[i].rotulo, centro, h - 12);
     }
 
-    // ---- linha azul ligando os pontos (topo de cada coluna) ----
-    ctx.strokeStyle = '#1f5c8f';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    for (i = 0; i < meses.length; i++) {
-      var cx = margemEsq + fatia * i + fatia / 2;
-      if (i === 0) ctx.moveTo(cx, centroQuadrado(i)); else ctx.lineTo(cx, centroQuadrado(i));
-    }
-    ctx.stroke();
+    // (a linha azul que ligava os quadradinhos foi removida a pedido — ficam
+    // so os quadradinhos com o numero de vendas e o valor em R$)
 
     // ---- quadradinho + numero de vendas, e o R$ logo acima dele ----
     for (i = 0; i < meses.length; i++) {
