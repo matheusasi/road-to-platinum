@@ -89,6 +89,7 @@
   #btnTelaCheia { right: 22px; }
   #btnPausar    { right: 76px; }
   #btnProximo   { right: 130px; }
+  #btnAnterior  { right: 184px; }
 
   #topo {
     text-align: center;
@@ -926,6 +927,13 @@
        Proximo / Pausar: pra quem estiver na frente da TV segurar um slide
        que interessa ou pular pro proximo sem esperar o tempo acabar.
        =================================================================== -->
+  <div id="btnAnterior" class="botaoTv" title="Dashboard anterior">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+      <path d="M18 5l-9 7 9 7V5z"></path>
+      <rect x="5" y="5" width="2.5" height="14" rx="1"></rect>
+    </svg>
+  </div>
+
   <div id="btnProximo" class="botaoTv" title="Proximo dashboard">
     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
       <path d="M6 5l9 7-9 7V5z"></path>
@@ -2140,6 +2148,14 @@
     slides[slideAtual].className = 'slide ativo';
   }
 
+  // Volta um slide (da volta: do primeiro vai pro ultimo).
+  function voltarSlide() {
+    if (slides.length < 2) return;
+    slides[slideAtual].className = 'slide';
+    slideAtual = (slideAtual - 1 + slides.length) % slides.length;
+    slides[slideAtual].className = 'slide ativo';
+  }
+
   // setTimeout encadeado em vez de setInterval: o intervalo muda a cada
   // troca, entao ele e reagendado com a duracao do slide que acabou de entrar.
   function agendarTroca() {
@@ -2154,6 +2170,15 @@
   agendarTroca();
 
   // ---- controles de quem esta na frente da TV ----
+
+  var btnAnterior = document.getElementById('btnAnterior');
+  if (btnAnterior) {
+    btnAnterior.onclick = function () {
+      voltarSlide();
+      // mesmo motivo do Proximo: o slide que entrou merece o tempo cheio
+      agendarTroca();
+    };
+  }
 
   var btnProximo = document.getElementById('btnProximo');
   if (btnProximo) {
