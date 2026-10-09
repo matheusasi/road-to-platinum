@@ -850,12 +850,12 @@
       <div class="servEsq" id="servEsqCons">
         <div class="painelVendas semAutoAltura" id="servGraficoCons">
           <div class="tituloSecao">Faturamento por mês
-            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de vendas</span>
+            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de lançamentos</span>
           </div>
           <canvas id="graficoServCons" width="740" height="420"></canvas>
         </div>
         <div class="painelVendas semAutoAltura" id="servTicketCons">
-          <div class="tituloSecao">Ticket médio — últimos 3 meses</div>
+          <div class="tituloSecao">Ticket médio por lançamento — últimos 3 meses</div>
           <div class="tickerServico" id="servTicketValCons">R$ 0<span class="sub" id="servTicketSubCons">&nbsp;</span></div>
         </div>
       </div>
@@ -884,12 +884,12 @@
       <div class="servEsq" id="servEsqAsse">
         <div class="painelVendas semAutoAltura" id="servGraficoAsse">
           <div class="tituloSecao">Faturamento por mês
-            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de vendas</span>
+            <span class="legendaOrigem legendaServico"><i class="marca out"></i>R$&nbsp;&nbsp;<i class="marca in"></i>nº de lançamentos</span>
           </div>
           <canvas id="graficoServAsse" width="740" height="420"></canvas>
         </div>
         <div class="painelVendas semAutoAltura" id="servTicketAsse">
-          <div class="tituloSecao">Ticket médio — últimos 3 meses</div>
+          <div class="tituloSecao">Ticket médio por lançamento — últimos 3 meses</div>
           <div class="tickerServico" id="servTicketValAsse">R$ 0<span class="sub" id="servTicketSubAsse">&nbsp;</span></div>
         </div>
       </div>
@@ -1847,7 +1847,13 @@
     if (!bloco) return;
     document.getElementById('servRotulo' + sufixo).innerHTML = 'Ano ' + (bloco.rotuloAno || '');
 
-    var serie = (bloco.mensal || []).map(function (m) {
+    // Corta os meses VAZIOS do comeco do ano (ex: jan/26 sem nenhum lancamento):
+    // so empurravam as barras pra direita. Do primeiro mes com dado em diante
+    // fica tudo, inclusive meses vazios no meio. Sem nenhum dado, mantem tudo.
+    var mensalTodos = bloco.mensal || [];
+    var primeiro = 0;
+    while (primeiro < mensalTodos.length - 1 && !(mensalTodos[primeiro].total > 0) && !(mensalTodos[primeiro].qtd > 0)) primeiro++;
+    var serie = mensalTodos.slice(primeiro).map(function (m) {
       return { rotulo: m.rotulo, total: m.total, qtd: m.qtd };
     });
     if (sufixo === 'Cons') serieServCons = serie; else serieServAsse = serie;
@@ -1857,7 +1863,7 @@
     var corte = bloco.mensal ? bloco.mensal.slice(-3) : [];
     for (var i = 0; i < corte.length; i++) qtd3 += corte[i].qtd;
     tv.innerHTML = formatarBRL(bloco.ticketMedio3m || 0) +
-      '<span class="sub">' + qtd3 + (qtd3 === 1 ? ' venda' : ' vendas') + ' no período</span>';
+      '<span class="sub">' + qtd3 + (qtd3 === 1 ? ' lançamento' : ' lançamentos') + ' no período</span>';
 
     document.getElementById('servPropLinhas' + sufixo).innerHTML = linhasPipeline(bloco.propostas || {}, 'proposta');
     document.getElementById('servPropSem' + sufixo).innerHTML = textoSemClasse(bloco.propostas || {}, 'proposta');
