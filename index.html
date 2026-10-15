@@ -939,7 +939,7 @@
       <div class="servDir" style="width:100%">
         <div class="painelVendas" id="painelUltimasEvento">
           <div class="tituloSecao">Inscrições</div>
-          <table id="tabelaEvento"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
+          <table id="tabelaEvento"><colgroup><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -2080,11 +2080,11 @@
     var corpo = document.getElementById('corpoEvento');
     var ultimas = dados.ultimas || [];
     if (ultimas.length === 0) {
-      corpo.innerHTML = '<tr class="vazio"><td colspan="3">Nenhuma inscrição registrada ainda</td></tr>';
+      corpo.innerHTML = '<tr class="vazio"><td colspan="2">Nenhuma inscrição registrada ainda</td></tr>';
     } else {
       var html = '';
       for (var i = 0; i < ultimas.length; i++) {
-        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="nome">Almoço OX Stakehouse</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
+        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
       }
       corpo.innerHTML = html;
     }
