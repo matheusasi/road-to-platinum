@@ -619,6 +619,23 @@
   .legendaLucro .marca.ads     { background: #ff6b6b; }
   #lucroAviso { color: #ff6b6b; }
   #painelGraficoLucro { width: 100%; box-sizing: border-box; }
+
+  /* Slide do evento: tabela das ultimas inscricoes (quando | valor) */
+  #tabelaEvento { width: 100%; border-collapse: collapse; font-size: 26px; table-layout: fixed; }
+  #tabelaEvento col.cQtd { width: 190px; }
+  #tabelaEvento col.cFat { width: 168px; }
+  #tabelaEvento td { padding: 13px 6px; border-bottom: 1px solid rgba(46,142,255,0.12); color: #eaf1ff; }
+  #tabelaEvento td.qtd { color: #8a9bc0; white-space: nowrap; }
+  #tabelaEvento td.fat { text-align: right; color: #29e0c8; font-weight: bold; white-space: nowrap; }
+  #tabelaEvento tr.vazio td { color: #7c8fb3; text-align: center; border-bottom: 0; padding-top: 22px; }
+  body.compacto #tabelaEvento { font-size: 19px; }
+  body.compacto #tabelaEvento td { padding: 8px 4px; }
+  body.compacto #tabelaEvento col.cQtd { width: 140px; }
+  body.compacto #tabelaEvento col.cFat { width: 118px; }
+  body.muitoCompacto #tabelaEvento { font-size: 15px; }
+  body.muitoCompacto #tabelaEvento td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaEvento col.cQtd { width: 110px; }
+  body.muitoCompacto #tabelaEvento col.cFat { width: 96px; }
 </style>
 </head>
 <body>
@@ -903,6 +920,32 @@
           <div class="tituloSecao">Contratos enviados — pipeline atual</div>
           <div id="servContrLinhasAsse"></div>
           <div class="rodapeSemClasse" id="servContrSemAsse">&nbsp;</div>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SLIDE 8 — Evento SquadHub with OX Stakehouse (almoco). NAO e curso: vem
+       de board proprio, so aparece aqui. Vendas por dia + ultimos lancamentos.
+       =================================================================== -->
+  <div class="slide" data-slide="evento-ox" data-segundos="15">
+    <div class="topoServico">
+      <h1>Evento SquadHub with OX Stakehouse</h1>
+      <div class="subtitulo" id="eventoSub">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="eventoBaixo">
+      <div class="servEsq">
+        <div class="painelVendas" id="painelGraficoEvento">
+          <div class="tituloSecao">Vendas por dia</div>
+          <canvas id="graficoEvento" width="700" height="420"></canvas>
+        </div>
+      </div>
+      <div class="servDir">
+        <div class="painelVendas" id="painelUltimasEvento">
+          <div class="tituloSecao">Últimas inscrições</div>
+          <table id="tabelaEvento"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -1225,7 +1268,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1314,7 +1357,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -1480,6 +1523,7 @@
       desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
       desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
       desenharLucro('graficoLucro', 'painelGraficoLucro', ultimoLucro);
+      desenharBarras('graficoEvento', 'painelGraficoEvento', serieEvento, formatarBRL);
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -2032,6 +2076,30 @@
     ajustarTamanhoVendas();
   }
 
+  // SLIDE 8 — EVENTO SQUADHUB x OX STAKEHOUSE. O n8n manda
+  // {titulo, total, qtd, ticketMedio, dias:[{rotulo,total,qtd}], ultimas:[{quando,valor}]}.
+  var serieEvento = [];
+  function renderizarEvento(dados) {
+    if (!dados) return;
+    serieEvento = (dados.dias || []).map(function (d) { return { rotulo: d.rotulo, total: d.total }; });
+    var sub = document.getElementById('eventoSub');
+    sub.innerHTML = dados.qtd + (dados.qtd === 1 ? ' inscrição' : ' inscrições') +
+                    ' · ' + formatarBRL(dados.total) +
+                    (dados.qtd > 0 ? ' · média ' + formatarBRL(dados.ticketMedio) : '');
+    var corpo = document.getElementById('corpoEvento');
+    var ultimas = dados.ultimas || [];
+    if (ultimas.length === 0) {
+      corpo.innerHTML = '<tr class="vazio"><td colspan="3">Nenhuma inscrição registrada ainda</td></tr>';
+    } else {
+      var html = '';
+      for (var i = 0; i < ultimas.length; i++) {
+        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="nome">Almoço OX Stakehouse</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
+      }
+      corpo.innerHTML = html;
+    }
+    ajustarTamanhoVendas();
+  }
+
   function renderizarArr(dados) {
     ultimoArr = dados;
 
@@ -2103,6 +2171,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('evento', renderizarEvento, tudo.evento);
     });
   }
 
@@ -2265,6 +2334,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('evento', renderizarEvento, tudo.evento);
     }, function () {
       servidorRespondeu = true;
     });
