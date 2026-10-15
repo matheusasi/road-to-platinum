@@ -632,6 +632,9 @@
   #tabelaEventoDia td.qtd { color: #8a9bc0; text-align: center; white-space: nowrap; }
   #tabelaEventoDia td.fat { text-align: right; color: #29e0c8; font-weight: bold; white-space: nowrap; }
   #tabelaEventoDia tr.vazio td { color: #7c8fb3; text-align: center; border-bottom: 0; padding-top: 22px; }
+  /* linha de fechamento: inscricoes fora da janela de dias / sem data valida */
+  #tabelaEventoDia tr.outras td { color: #7c8fb3; font-style: italic; border-bottom: 0; }
+  #tabelaEventoDia tr.outras td.fat { color: #7c8fb3; font-weight: normal; }
   body.compacto #tabelaEventoDia { font-size: 19px; }
   body.compacto #tabelaEventoDia td { padding: 8px 4px; }
   body.compacto #tabelaEventoDia col.cQ { width: 64px; }
@@ -2119,7 +2122,12 @@
     } else {
       var html = '';
       for (var i = 0; i < ultimas.length; i++) {
-        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="pedido">' + (ultimas[i].pedido || '') + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
+        // O n8n manda o id inteiro da transacao (um UUID de 36 caracteres) —
+        // na TV virava um texto minusculo cortado. Aqui vira um codigo curto
+        // (ultimos 6 caracteres), suficiente pra conferir no board.
+        var pedidoCurto = String(ultimas[i].pedido || '').replace(/[^0-9A-Za-z]/g, '');
+        pedidoCurto = pedidoCurto ? '#' + pedidoCurto.slice(-6).toUpperCase() : '';
+        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="pedido">' + pedidoCurto + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
       }
       corpo.innerHTML = html;
     }
@@ -2127,16 +2135,43 @@
     document.getElementById('evTotal').innerHTML = formatarBRL(dados.total);
     document.getElementById('evMedio').innerHTML = dados.qtd > 0 ? formatarBRL(dados.ticketMedio) : '—';
     var dias = dados.dias || [];
+    // "Hoje" e sempre o ultimo dia da serie (o n8n termina a serie em hoje).
+    // Lido ANTES de aparar a serie, senao um dia sem venda sumiria daqui.
     var hoje = dias.length ? dias[dias.length - 1] : null;
     document.getElementById('evHoje').innerHTML = hoje ? hoje.qtd : 0;
 
+    // O n8n monta a serie desde a venda mais antiga (limitada a 30 dias). Se
+    // existe uma venda com data fora da janela (ou data errada no board, como
+    // 1970-01-01), a serie vira 30 linhas de "0x R$ 0" e a tabela fica
+    // ilegivel. Aqui a serie comeca no primeiro dia COM venda; dias sem venda
+    // depois disso continuam aparecendo (mostram o ritmo ate hoje).
+    var primeiro = -1;
+    for (var p = 0; p < dias.length; p++) {
+      if (dias[p].qtd > 0) { primeiro = p; break; }
+    }
+    var diasVisiveis = primeiro >= 0 ? dias.slice(primeiro) : [];
+
+    // Fecha a conta com o total do evento: o que nao esta em nenhum dia
+    // visivel (venda fora da janela de 30 dias ou com data invalida) entra
+    // numa linha propria, em vez de o "Por dia" somar menos que o total.
+    var somaQtd = 0, somaTotal = 0;
+    for (var s = 0; s < diasVisiveis.length; s++) {
+      somaQtd += diasVisiveis[s].qtd;
+      somaTotal += diasVisiveis[s].total;
+    }
+    var sobraQtd = (dados.qtd || 0) - somaQtd;
+    var sobraTotal = Math.round(((dados.total || 0) - somaTotal) * 100) / 100;
+
     var corpoDia = document.getElementById('corpoEventoDia');
-    if (dias.length === 0) {
+    if (diasVisiveis.length === 0 && sobraQtd <= 0) {
       corpoDia.innerHTML = '<tr class="vazio"><td colspan="3">Sem inscrições ainda</td></tr>';
     } else {
       var h = '';
-      for (var k = dias.length - 1; k >= 0; k--) {
-        h += '<tr><td>' + dias[k].rotulo + '</td><td class="qtd">' + dias[k].qtd + 'x</td><td class="fat">' + formatarBRL(dias[k].total) + '</td></tr>';
+      for (var k = diasVisiveis.length - 1; k >= 0; k--) {
+        h += '<tr><td>' + diasVisiveis[k].rotulo + '</td><td class="qtd">' + diasVisiveis[k].qtd + 'x</td><td class="fat">' + formatarBRL(diasVisiveis[k].total) + '</td></tr>';
+      }
+      if (sobraQtd > 0) {
+        h += '<tr class="outras"><td>Outras datas</td><td class="qtd">' + sobraQtd + 'x</td><td class="fat">' + formatarBRL(sobraTotal) + '</td></tr>';
       }
       corpoDia.innerHTML = h;
     }

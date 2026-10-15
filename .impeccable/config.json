@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "arial",
+        "createdAt": "2026-09-10T17:37:43.343Z",
+        "reason": "device constraint: target is a Samsung Tizen 2014 Smart TV browser; system Arial/Helvetica stack is deliberate (no web fonts, ES5-only) and pre-dates this change"
+      }
+    ]
+  }
+}
