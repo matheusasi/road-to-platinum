@@ -620,6 +620,27 @@
   #lucroAviso { color: #ff6b6b; }
   #painelGraficoLucro { width: 100%; box-sizing: border-box; }
 
+  #eventoResumo { padding: 14px 34px 0 34px; }
+  body.compacto #eventoResumo { padding: 8px 24px 0 24px; }
+  body.muitoCompacto #eventoResumo { padding: 6px 18px 0 18px; }
+  #eventoResumo .blocoVendas.metade { width: 23.5%; margin: 0 0.75%; }
+  /* tabela 'por dia' do evento (dia | inscricoes | valor) */
+  #tabelaEventoDia { width: 100%; border-collapse: collapse; font-size: 26px; table-layout: fixed; }
+  #tabelaEventoDia col.cQ { width: 90px; }
+  #tabelaEventoDia col.cFat { width: 168px; }
+  #tabelaEventoDia td { padding: 13px 6px; border-bottom: 1px solid rgba(46,142,255,0.12); color: #eaf1ff; }
+  #tabelaEventoDia td.qtd { color: #8a9bc0; text-align: center; white-space: nowrap; }
+  #tabelaEventoDia td.fat { text-align: right; color: #29e0c8; font-weight: bold; white-space: nowrap; }
+  #tabelaEventoDia tr.vazio td { color: #7c8fb3; text-align: center; border-bottom: 0; padding-top: 22px; }
+  body.compacto #tabelaEventoDia { font-size: 19px; }
+  body.compacto #tabelaEventoDia td { padding: 8px 4px; }
+  body.compacto #tabelaEventoDia col.cQ { width: 64px; }
+  body.compacto #tabelaEventoDia col.cFat { width: 118px; }
+  body.muitoCompacto #tabelaEventoDia { font-size: 15px; }
+  body.muitoCompacto #tabelaEventoDia td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaEventoDia col.cQ { width: 50px; }
+  body.muitoCompacto #tabelaEventoDia col.cFat { width: 96px; }
+
   /* Slide do evento: tabela das ultimas inscricoes (quando | valor) */
   #tabelaEvento { width: 100%; border-collapse: collapse; font-size: 26px; table-layout: fixed; }
   #tabelaEvento col.cQtd { width: 230px; }
@@ -936,11 +957,24 @@
       <h1>Evento SquadHub with OX Stakehouse</h1>
       <div class="subtitulo" id="eventoSub">&nbsp;</div>
     </div>
+    <div id="eventoResumo">
+      <div class="blocoVendas metade"><div class="rotulo">Inscrições</div><div class="valor" id="evQtd">0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Total arrecadado</div><div class="valor" id="evTotal">R$ 0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Valor médio</div><div class="valor" id="evMedio">R$ 0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Hoje</div><div class="valor" id="evHoje">0</div></div>
+      <div class="clearfix"></div>
+    </div>
     <div class="servBaixo" id="eventoBaixo">
-      <div class="servDir" style="width:100%">
+      <div class="servEsq">
         <div class="painelVendas" id="painelUltimasEvento">
-          <div class="tituloSecao">Inscrições</div>
+          <div class="tituloSecao">Últimas inscrições</div>
           <table id="tabelaEvento"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
+        </div>
+      </div>
+      <div class="servDir">
+        <div class="painelVendas" id="painelDiasEvento">
+          <div class="tituloSecao">Por dia</div>
+          <table id="tabelaEventoDia"><colgroup><col><col class="cQ"><col class="cFat"></colgroup><tbody id="corpoEventoDia"></tbody></table>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -2088,6 +2122,23 @@
         html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="pedido">' + (ultimas[i].pedido || '') + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
       }
       corpo.innerHTML = html;
+    }
+    document.getElementById('evQtd').innerHTML = dados.qtd;
+    document.getElementById('evTotal').innerHTML = formatarBRL(dados.total);
+    document.getElementById('evMedio').innerHTML = dados.qtd > 0 ? formatarBRL(dados.ticketMedio) : '—';
+    var dias = dados.dias || [];
+    var hoje = dias.length ? dias[dias.length - 1] : null;
+    document.getElementById('evHoje').innerHTML = hoje ? hoje.qtd : 0;
+
+    var corpoDia = document.getElementById('corpoEventoDia');
+    if (dias.length === 0) {
+      corpoDia.innerHTML = '<tr class="vazio"><td colspan="3">Sem inscrições ainda</td></tr>';
+    } else {
+      var h = '';
+      for (var k = dias.length - 1; k >= 0; k--) {
+        h += '<tr><td>' + dias[k].rotulo + '</td><td class="qtd">' + dias[k].qtd + 'x</td><td class="fat">' + formatarBRL(dias[k].total) + '</td></tr>';
+      }
+      corpoDia.innerHTML = h;
     }
     ajustarTamanhoVendas();
   }
