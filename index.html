@@ -622,7 +622,7 @@
 
   /* Slide do evento: tabela das ultimas inscricoes (quando | valor) */
   #tabelaEvento { width: 100%; border-collapse: collapse; font-size: 26px; table-layout: fixed; }
-  #tabelaEvento col.cQtd { width: 190px; }
+  #tabelaEvento col.cQtd { width: 230px; }
   #tabelaEvento col.cFat { width: 168px; }
   #tabelaEvento td { padding: 13px 6px; border-bottom: 1px solid rgba(46,142,255,0.12); color: #eaf1ff; }
   #tabelaEvento td.qtd { color: #8a9bc0; white-space: nowrap; }
@@ -936,15 +936,9 @@
       <div class="subtitulo" id="eventoSub">&nbsp;</div>
     </div>
     <div class="servBaixo" id="eventoBaixo">
-      <div class="servEsq">
-        <div class="painelVendas" id="painelGraficoEvento">
-          <div class="tituloSecao">Vendas por dia</div>
-          <canvas id="graficoEvento" width="700" height="420"></canvas>
-        </div>
-      </div>
-      <div class="servDir">
+      <div class="servDir" style="width:100%">
         <div class="painelVendas" id="painelUltimasEvento">
-          <div class="tituloSecao">Últimas inscrições</div>
+          <div class="tituloSecao">Inscrições</div>
           <table id="tabelaEvento"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
         </div>
       </div>
@@ -1523,7 +1517,6 @@
       desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
       desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
       desenharLucro('graficoLucro', 'painelGraficoLucro', ultimoLucro);
-      desenharBarras('graficoEvento', 'painelGraficoEvento', serieEvento, formatarBRL);
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -2078,10 +2071,8 @@
 
   // SLIDE 8 — EVENTO SQUADHUB x OX STAKEHOUSE. O n8n manda
   // {titulo, total, qtd, ticketMedio, dias:[{rotulo,total,qtd}], ultimas:[{quando,valor}]}.
-  var serieEvento = [];
   function renderizarEvento(dados) {
     if (!dados) return;
-    serieEvento = (dados.dias || []).map(function (d) { return { rotulo: d.rotulo, total: d.total }; });
     var sub = document.getElementById('eventoSub');
     sub.innerHTML = dados.qtd + (dados.qtd === 1 ? ' inscrição' : ' inscrições') +
                     ' · ' + formatarBRL(dados.total) +
