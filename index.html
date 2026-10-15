@@ -626,6 +626,7 @@
   #tabelaEvento col.cFat { width: 168px; }
   #tabelaEvento td { padding: 13px 6px; border-bottom: 1px solid rgba(46,142,255,0.12); color: #eaf1ff; }
   #tabelaEvento td.qtd { color: #8a9bc0; white-space: nowrap; }
+  #tabelaEvento td.pedido { color: #8a9bc0; font-size: 0.72em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #tabelaEvento td.fat { text-align: right; color: #29e0c8; font-weight: bold; white-space: nowrap; }
   #tabelaEvento tr.vazio td { color: #7c8fb3; text-align: center; border-bottom: 0; padding-top: 22px; }
   body.compacto #tabelaEvento { font-size: 19px; }
@@ -939,7 +940,7 @@
       <div class="servDir" style="width:100%">
         <div class="painelVendas" id="painelUltimasEvento">
           <div class="tituloSecao">Inscrições</div>
-          <table id="tabelaEvento"><colgroup><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
+          <table id="tabelaEvento"><colgroup><col class="cQtd"><col><col class="cFat"></colgroup><tbody id="corpoEvento"></tbody></table>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -2080,11 +2081,11 @@
     var corpo = document.getElementById('corpoEvento');
     var ultimas = dados.ultimas || [];
     if (ultimas.length === 0) {
-      corpo.innerHTML = '<tr class="vazio"><td colspan="2">Nenhuma inscrição registrada ainda</td></tr>';
+      corpo.innerHTML = '<tr class="vazio"><td colspan="3">Nenhuma inscrição registrada ainda</td></tr>';
     } else {
       var html = '';
       for (var i = 0; i < ultimas.length; i++) {
-        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
+        html += '<tr><td class="qtd">' + ultimas[i].quando + '</td><td class="pedido">' + (ultimas[i].pedido || '') + '</td><td class="fat">' + formatarBRL(ultimas[i].valor) + '</td></tr>';
       }
       corpo.innerHTML = html;
     }
