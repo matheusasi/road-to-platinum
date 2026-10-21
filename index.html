@@ -2197,8 +2197,22 @@
     }
 
     var fatia = largura / dias.length;
-    var larguraBarra = Math.min(fatia * 0.4, 40);
-    var vao = 2;
+    var larguraBarra = Math.min(fatia * 0.43, 42);
+    var vao = 3;
+    // Numero sobre a barra: a fonte encolhe ate o texto caber na largura da barra
+    // (+ o vao), assim o numero de uma barra nunca invade o da vizinha, e fica
+    // 7px acima do topo pra nao encostar na barra.
+    var limiteTexto = larguraBarra + vao + 2;
+    function numeroNaBarra(texto, xCentro, yTopo, cor) {
+      var f = fonteValor;
+      ctx.font = 'bold ' + f + 'px Arial, Helvetica, sans-serif';
+      while (f > 8 && ctx.measureText(texto).width > limiteTexto) {
+        f -= 1;
+        ctx.font = 'bold ' + f + 'px Arial, Helvetica, sans-serif';
+      }
+      ctx.fillStyle = cor;
+      ctx.fillText(texto, xCentro, yTopo - 7);
+    }
     ctx.textAlign = 'center';
     for (i = 0; i < dias.length; i++) {
       var d = dias[i];
@@ -2210,22 +2224,14 @@
       if (v > 0 && hV < 2) hV = 2;
       ctx.fillStyle = corVenda;
       ctx.fillRect(xV, piso - hV, larguraBarra, hV);
-      if (v > 0 && fatia >= 30) {
-        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#eaf1ff';
-        ctx.fillText(abreviarBRL(v), xV + larguraBarra / 2, piso - hV - 4);
-      }
+      if (v > 0 && fatia >= 24) numeroNaBarra(abreviarBRL(v), xV + larguraBarra / 2, piso - hV, '#eaf1ff');
       var gasto = d[chaveAds];
       if (gasto != null) {
         var hA = (altura * gasto) / teto;
         if (gasto > 0 && hA < 2) hA = 2;
         ctx.fillStyle = '#ff6b6b';
         ctx.fillRect(xA, piso - hA, larguraBarra, hA);
-        if (gasto > 0 && fatia >= 30) {
-          ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-          ctx.fillStyle = '#ffb3b3';
-          ctx.fillText(abreviarBRL(gasto), xA + larguraBarra / 2, piso - hA - 4);
-        }
+        if (gasto > 0 && fatia >= 24) numeroNaBarra(abreviarBRL(gasto), xA + larguraBarra / 2, piso - hA, '#ffb3b3');
       }
       var hoje = (i === dias.length - 1);
       // um rotulo por dia, SEMPRE (rotulo dia sim dia nao parecia desalinhado das
