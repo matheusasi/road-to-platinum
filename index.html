@@ -629,6 +629,13 @@
   .legendaPlat .marca.engaged { background: #29e0c8; }
   .legendaPlat .marca.ads { background: #ff6b6b; }
   #platAviso { color: #ff6b6b; }
+  .platResumo { margin-top: 6px; white-space: normal; }
+  .platBloco { display: inline-block; margin: 2px 26px; white-space: nowrap; }
+  .platNome { font-size: 1.15em; letter-spacing: 1px; margin-right: 14px; }
+  .platNome.hot { color: #2e8eff; }
+  .platNome.eng { color: #29e0c8; }
+  .platItem { margin-right: 14px; color: #8a9bc0; }
+  .platItem b { color: #eaf1ff; }
   #eventoResumo { padding: 14px 34px 0 34px; }
   body.compacto #eventoResumo { padding: 8px 24px 0 24px; }
   body.muitoCompacto #eventoResumo { padding: 6px 18px 0 18px; }
@@ -2253,16 +2260,21 @@
     function roasTxt(v, g) {
       if (!g) return '';
       var r = v / g, cor = r >= 1 ? '#3ddc84' : '#ff6b6b';
-      return ' · ROAS <b style="color:' + cor + '">' + (Math.round(r * 100) / 100).toFixed(2).replace('.', ',') + 'x</b>';
+      return '<span class="platItem">ROAS <b style="color:' + cor + '">' + (Math.round(r * 100) / 100).toFixed(2).replace('.', ',') + 'x</b></span>';
     }
-    var txt = 'Últimos ' + dados.dias.length + ' dias';
-    if (dados.adsDisponivel) {
-      txt += ' · Hotmart ' + formatarBRL(dados.totalHotmart) + ' (ADs ' + formatarBRL(dados.totalAdsHotmart) + ')' + roasTxt(dados.totalHotmart, dados.totalAdsHotmart) +
-             ' · Engaged ' + formatarBRL(dados.totalEngaged) + ' (ADs ' + formatarBRL(dados.totalAdsEngaged) + ')' + roasTxt(dados.totalEngaged, dados.totalAdsEngaged);
-    } else {
-      txt += ' · Hotmart ' + formatarBRL(dados.totalHotmart) + ' · Engaged ' + formatarBRL(dados.totalEngaged) +
-             ' · <span id="platAviso">gasto em ADs indisponível (Meta Ads)</span>';
+    // Duas linhas: o periodo em cima e, embaixo, um bloco por plataforma
+    // (nome colorido + vendas, gasto em ADs e ROAS), bem separados.
+    function bloco(nome, cls, vendas, gasto) {
+      var h = '<span class="platBloco"><b class="platNome ' + cls + '">' + nome + '</b>' +
+              '<span class="platItem">vendas <b>' + formatarBRL(vendas) + '</b></span>';
+      if (gasto != null) h += '<span class="platItem">ADs <b>' + formatarBRL(gasto) + '</b></span>' + roasTxt(vendas, gasto);
+      return h + '</span>';
     }
+    var gH = dados.adsDisponivel ? dados.totalAdsHotmart : null;
+    var gE = dados.adsDisponivel ? dados.totalAdsEngaged : null;
+    var txt = '<div>Últimos ' + dados.dias.length + ' dias</div><div class="platResumo">' +
+              bloco('Hotmart', 'hot', dados.totalHotmart, gH) + bloco('Engaged', 'eng', dados.totalEngaged, gE) + '</div>';
+    if (!dados.adsDisponivel) txt += '<div><span id="platAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
     sub.className = 'subtitulo';
     sub.innerHTML = txt;
     ajustarTamanhoVendas();
