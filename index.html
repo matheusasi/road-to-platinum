@@ -2228,10 +2228,12 @@
         }
       }
       var hoje = (i === dias.length - 1);
-      ctx.font = (hoje ? 'bold ' : '') + fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      // um rotulo por dia, SEMPRE (rotulo dia sim dia nao parecia desalinhado das
+      // barras); se a coluna for estreita, so diminui a fonte
+      var fonteDia = fatia >= 50 ? fonteRotulo : Math.max(9, Math.min(fonteRotulo, Math.floor(fatia / 4)));
+      ctx.font = (hoje ? 'bold ' : '') + fonteDia + 'px Arial, Helvetica, sans-serif';
       ctx.fillStyle = hoje ? '#ffffff' : '#7c8fb3';
-      // com muitos dias num grafico estreito, rotulo dia sim dia nao
-      if (fatia >= 50 || i % 2 === (dias.length - 1) % 2) ctx.fillText(d.rotulo, centro, h - 9);
+      ctx.fillText(d.rotulo, centro, h - 9);
     }
   }
 
