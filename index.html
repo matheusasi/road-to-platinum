@@ -618,13 +618,12 @@
   .legendaLucro .marca.nova    { background: #3ddc84; }
   .legendaLucro .marca.ads     { background: #ff6b6b; }
   #lucroAviso { color: #ff6b6b; }
-  #painelGraficoLucro { width: 100%; box-sizing: border-box; }
+  #painelLucroHotmart, #painelLucroEngaged { width: 100%; box-sizing: border-box; }
 
   /* Slide 'Vendas por plataforma': dois graficos lado a lado (Hotmart | Engaged),
      mesma escala de R$ nos dois, e a barra vermelha e o gasto TOTAL em ADs. */
   .platCol { width: 49%; float: left; box-sizing: border-box; overflow: hidden; }
   .platCol.esq { margin-right: 2%; }
-  #painelPlatHotmart, #painelPlatEngaged { width: 100%; }
   .legendaPlat .marca.hotmart { background: #2e8eff; }
   .legendaPlat .marca.engaged { background: #29e0c8; }
   .legendaPlat .marca.ads { background: #ff6b6b; }
@@ -865,9 +864,9 @@
   </div>
 
   <!-- ===================================================================
-       SLIDE 5 — Lucratividade diaria (logo depois de Vendas de Cursos mes a mes). Por dia (ultimos 14): uma barra
-       empilhada com as vendas de Prompts + A Nova Gestao, e ao lado uma barra
-       so com o gasto em ADs (Meta) daqueles dois produtos.
+       SLIDE 5 — Lucratividade diaria, dividida por plataforma (Hotmart | Engaged). Em cada
+       grafico, por dia (ultimos 14): barra empilhada com as vendas de Prompts + Minicursos +
+       A Nova Gestao daquela plataforma, e ao lado a barra do gasto em ADs dela.
        =================================================================== -->
   <div class="slide" data-slide="lucro-diario" data-segundos="20">
     <div class="topoServico">
@@ -875,47 +874,30 @@
       <div class="subtitulo" id="lucroSub">&nbsp;</div>
     </div>
     <div class="servBaixo" id="lucroBaixo">
-      <div class="painelVendas" id="painelGraficoLucro">
-        <div class="tituloSecao">Vendas x gasto em ADs por dia
-          <span class="legendaOrigem legendaLucro">
-            <i class="marca prompts"></i>Prompts
-            <i class="marca mini"></i>Minicursos
-            <i class="marca nova"></i>Nova Gestão
-            <i class="marca ads"></i>Gasto em ADs
-          </span>
-        </div>
-        <canvas id="graficoLucro" width="880" height="430"></canvas>
-      </div>
-      <div class="clearfix"></div>
-    </div>
-  </div>
-
-  <!-- ===================================================================
-       SLIDE — Vendas por plataforma. Dois graficos lado a lado: vendas por dia
-       da Hotmart e da Engaged (campo Plataforma do board de cursos), cada um
-       com a barra do gasto TOTAL em ADs do dia. Todos os anuncios levam a
-       mesma pagina, que decide o checkout, entao o gasto e compartilhado.
-       =================================================================== -->
-  <div class="slide" data-slide="plataformas" data-segundos="20">
-    <div class="topoServico">
-      <h1>Vendas por plataforma</h1>
-      <div class="subtitulo" id="platSub">&nbsp;</div>
-    </div>
-    <div class="servBaixo" id="plataformasBaixo">
       <div class="platCol esq">
-        <div class="painelVendas" id="painelPlatHotmart">
+        <div class="painelVendas" id="painelLucroHotmart">
           <div class="tituloSecao">Hotmart
-            <span class="legendaOrigem legendaPlat"><i class="marca hotmart"></i>Vendas<i class="marca ads"></i>Gasto em ADs</span>
+            <span class="legendaOrigem legendaLucro">
+              <i class="marca prompts"></i>Prompts
+              <i class="marca mini"></i>Minicursos
+              <i class="marca nova"></i>Nova Gestão
+              <i class="marca ads"></i>Gasto em ADs
+            </span>
           </div>
-          <canvas id="graficoPlatHotmart" width="440" height="430"></canvas>
+          <canvas id="graficoLucroHotmart" width="440" height="430"></canvas>
         </div>
       </div>
       <div class="platCol">
-        <div class="painelVendas" id="painelPlatEngaged">
+        <div class="painelVendas" id="painelLucroEngaged">
           <div class="tituloSecao">Engaged
-            <span class="legendaOrigem legendaPlat"><i class="marca engaged"></i>Vendas<i class="marca ads"></i>Gasto em ADs</span>
+            <span class="legendaOrigem legendaLucro">
+              <i class="marca prompts"></i>Prompts
+              <i class="marca mini"></i>Minicursos
+              <i class="marca nova"></i>Nova Gestão
+              <i class="marca ads"></i>Gasto em ADs
+            </span>
           </div>
-          <canvas id="graficoPlatEngaged" width="440" height="430"></canvas>
+          <canvas id="graficoLucroEngaged" width="440" height="430"></canvas>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -1348,7 +1330,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'plataformasBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1437,7 +1419,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'plataformasBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -1602,8 +1584,7 @@
       desenharBarras('graficoCursosMes', 'painelGraficoCursosMes', serieMensalCursos, formatarBRL);
       desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
       desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
-      desenharLucro('graficoLucro', 'painelGraficoLucro', ultimoLucro);
-      desenharPlataformas();
+      desenharLucro();
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -2018,153 +1999,12 @@
     return String(Math.round(v));
   }
 
-  function desenharLucro(idCanvas, idPainel, dados) {
-    var canvas = document.getElementById(idCanvas);
-    if (!canvas || !canvas.getContext) return;
-    var painel = document.getElementById(idPainel);
-    var larguraAlvo = larguraCanvasDisponivel(painel);
-    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
-    var alturaAlvo = alturaCanvasDisponivel(painel);
-    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
-
-    var ctx = canvas.getContext('2d');
-    var w = canvas.width, h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-    var dias = dados && dados.dias;
-    if (!dias || dias.length === 0) return;
-
-    var fonteRotulo = (h < 240) ? 12 : 15;
-    var fonteValor = (h < 240) ? 11 : 14;
-    var margemEsq = (h < 240) ? 58 : 74, margemDir = 10, margemTopo = 24, margemBaixo = 34;
-    var largura = w - margemEsq - margemDir;
-    var altura = h - margemTopo - margemBaixo;
-    var piso = margemTopo + altura;
-
-    var maior = 0, i;
-    for (i = 0; i < dias.length; i++) {
-      var venda = dias[i].prompts + dias[i].novaGestao;
-      if (venda > maior) maior = venda;
-      if (dias[i].ads != null && dias[i].ads > maior) maior = dias[i].ads;
-    }
-    if (maior <= 0) maior = 1;
-    // Teto do eixo Y: R$ 1.500 no minimo. Se algum valor passar disso, sobe de
-    // 500 em 500 (2.000, 2.500, 3.000...) sozinho. A grade acompanha: uma linha
-    // a cada R$ 500 (a cada R$ 1.000 depois de R$ 3.000, pra nao lotar).
-    var passo = 500;
-    var teto = Math.max(1500, Math.ceil(maior / 500) * 500);
-    if (teto > 3000) { passo = 1000; teto = Math.ceil(teto / 1000) * 1000; }
-    var divisoes = Math.round(teto / passo);
-
-    // eixo Y em reais + grade
-    ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.lineWidth = 1;
-    for (i = 0; i <= divisoes; i++) {
-      var yy = piso - (altura * i) / divisoes;
-      ctx.strokeStyle = 'rgba(46,142,255,0.10)';
-      ctx.beginPath(); ctx.moveTo(margemEsq, yy); ctx.lineTo(w - margemDir, yy); ctx.stroke();
-      ctx.fillStyle = '#7c8fb3';
-      ctx.fillText(formatarBRL(passo * i), margemEsq - 8, yy + 5);
-    }
-
-    var fatia = largura / dias.length;
-    var larguraBarra = Math.min(fatia * 0.36, 60);
-    var vao = 3;
-    ctx.textAlign = 'center';
-
-    for (i = 0; i < dias.length; i++) {
-      var d = dias[i];
-      var centro = margemEsq + fatia * i + fatia / 2;
-      var xVenda = centro - vao / 2 - larguraBarra;   // barra empilhada (esq.)
-      var xAds = centro + vao / 2;                     // barra de gasto (dir.)
-
-      // barra empilhada: Prompts embaixo, Minicursos no meio, Nova Gestao no topo
-      var hP = (altura * d.prompts) / teto;
-      var hM = (altura * (d.minicursos || 0)) / teto;
-      var hN = (altura * d.novaGestao) / teto;
-      if (d.prompts > 0 && hP < 2) hP = 2;
-      if (d.minicursos > 0 && hM < 2) hM = 2;
-      if (d.novaGestao > 0 && hN < 2) hN = 2;
-      ctx.fillStyle = '#2e8eff';
-      ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
-      ctx.fillStyle = '#ff9d2e';
-      ctx.fillRect(xVenda, piso - hP - hM, larguraBarra, hM);
-      ctx.fillStyle = '#3ddc84';
-      ctx.fillRect(xVenda, piso - hP - hM - hN, larguraBarra, hN);
-      var totalVenda = d.prompts + (d.minicursos || 0) + d.novaGestao;
-      if (totalVenda > 0) {
-        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#eaf1ff';
-        ctx.fillText(abreviarBRL(totalVenda), xVenda + larguraBarra / 2, piso - hP - hM - hN - 5);
-      }
-
-      // barra de gasto em ADs (nao empilhada)
-      if (d.ads != null) {
-        var hA = (altura * d.ads) / teto;
-        if (d.ads > 0 && hA < 2) hA = 2;
-        ctx.fillStyle = '#ff6b6b';
-        ctx.fillRect(xAds, piso - hA, larguraBarra, hA);
-        if (d.ads > 0) {
-          ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
-          ctx.fillStyle = '#ffb3b3';
-          ctx.fillText(abreviarBRL(d.ads), xAds + larguraBarra / 2, piso - hA - 5);
-        }
-      }
-
-      // eixo X: um rotulo por dia. Data em VERDE FORTE (e negrito) quando o gasto
-      // em ADs do dia ficou abaixo da receita do dia (Prompts + Minicursos + Nova
-      // Gestao) — dia que se pagou. Sem dado do Meta (ads null) nao marca nada.
-      var receitaDia = d.prompts + (d.minicursos || 0) + d.novaGestao;
-      var diaLucrativo = (d.ads != null) && (d.ads < receitaDia);
-      if (i === dias.length - 1) {
-        // o dia de hoje fica em BRANCO puro e negrito, sempre — o dia ainda esta
-        // rolando, entao nao ganha a cor de "se pagou"
-        ctx.font = 'bold ' + fonteRotulo + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#ffffff';
-      } else if (diaLucrativo) {
-        ctx.font = 'bold ' + fonteRotulo + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#00e676';
-      } else {
-        ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
-        ctx.fillStyle = '#7c8fb3';
-      }
-      ctx.fillText(d.rotulo, centro, h - 10);
-    }
-  }
-
-  function renderizarLucro(dados) {
-    ultimoLucro = dados;
-    var sub = document.getElementById('lucroSub');
-    if (dados.adsDisponivel) {
-      // ROAS = retorno sobre o gasto em anuncios = vendas / gasto em ADs.
-      // Acima de 1,0x as vendas cobrem o gasto; abaixo, nao cobrem.
-      var roasTxt = '—', roasCor = '#7c8fb3';
-      if (dados.totalAds > 0) {
-        var roas = dados.totalVendas / dados.totalAds;
-        roasTxt = (Math.round(roas * 100) / 100).toFixed(2).replace('.', ',') + 'x';
-        roasCor = roas >= 1 ? '#3ddc84' : '#ff6b6b';
-      }
-      sub.className = 'subtitulo';
-      sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
-                      ' · gasto em ADs ' + formatarBRL(dados.totalAds) +
-                      ' · ROAS <b style="color:' + roasCor + '">' + roasTxt + '</b>';
-    } else {
-      sub.className = 'subtitulo';
-      sub.innerHTML = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas) +
-                      ' · <span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span>';
-    }
-    ajustarTamanhoVendas();
-  }
-
-  // SLIDE — VENDAS POR PLATAFORMA. O n8n manda
-  // {dias:[{rotulo, hotmart, engaged, ads}], totalHotmart, totalEngaged, totalAds,
-  // adsDisponivel, erroAds}. Os dois graficos usam a MESMA escala de R$ (o teto
-  // e calculado olhando os dois), senao a comparacao entre eles enganaria.
-  // A barra vermelha e o gasto TOTAL do dia (todos os anuncios levam a mesma
-  // pagina, que escolhe o checkout) — por isso ela aparece igual nos dois.
-  var ultimoPlat = null;
-
-  function desenharVendasAds(idCanvas, idPainel, dias, chaveVenda, chaveAds, corVenda, teto, passo) {
+  // Um grafico (Hotmart OU Engaged): por dia, barra empilhada (Prompts embaixo,
+  // Minicursos no meio, Nova Gestao no topo) e, ao lado, a barra do gasto em ADs
+  // da plataforma. 'chave' diz de qual plataforma ler as vendas (hotmart|engaged).
+  // A data fica VERDE quando o gasto do dia foi menor que a receita do dia; hoje
+  // fica em branco. Sem dado do Meta (ads null) nao desenha a barra nem marca.
+  function desenharLucroPlat(idCanvas, idPainel, dias, chave, chaveAds, teto, passo) {
     var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
     var painel = document.getElementById(idPainel);
@@ -2177,9 +2017,10 @@
     ctx.clearRect(0, 0, w, h);
     if (!dias || dias.length === 0) return;
 
-    var fonteRotulo = (h < 240 || w < 520) ? 11 : 14;
-    var fonteValor = (h < 240 || w < 520) ? 10 : 13;
-    var margemEsq = (h < 240 || w < 520) ? 52 : 66, margemDir = 6, margemTopo = 22, margemBaixo = 30;
+    var estreito = (h < 240 || w < 520);
+    var fonteRotulo = estreito ? 11 : 14;
+    var fonteValor = estreito ? 10 : 13;
+    var margemEsq = estreito ? 52 : 66, margemDir = 6, margemTopo = 24, margemBaixo = 30;
     var largura = w - margemEsq - margemDir;
     var altura = h - margemTopo - margemBaixo;
     var piso = margemTopo + altura;
@@ -2199,9 +2040,7 @@
     var fatia = largura / dias.length;
     var larguraBarra = Math.min(fatia * 0.43, 42);
     var vao = 3;
-    // Numero sobre a barra: a fonte encolhe ate o texto caber na largura da barra
-    // (+ o vao), assim o numero de uma barra nunca invade o da vizinha, e fica
-    // 7px acima do topo pra nao encostar na barra.
+    // numero sobre a barra: a fonte encolhe ate caber na largura da barra (nao invade a vizinha)
     var limiteTexto = larguraBarra + vao + 2;
     function numeroNaBarra(texto, xCentro, yTopo, cor) {
       var f = fonteValor;
@@ -2214,77 +2053,107 @@
       ctx.fillText(texto, xCentro, yTopo - 7);
     }
     ctx.textAlign = 'center';
+
     for (i = 0; i < dias.length; i++) {
       var d = dias[i];
+      var v = d[chave] || { prompts: 0, minicursos: 0, novaGestao: 0 };
       var centro = margemEsq + fatia * i + fatia / 2;
-      var xV = centro - vao / 2 - larguraBarra;
-      var xA = centro + vao / 2;
-      var v = d[chaveVenda] || 0;
-      var hV = (altura * v) / teto;
-      if (v > 0 && hV < 2) hV = 2;
-      ctx.fillStyle = corVenda;
-      ctx.fillRect(xV, piso - hV, larguraBarra, hV);
-      if (v > 0 && fatia >= 24) numeroNaBarra(abreviarBRL(v), xV + larguraBarra / 2, piso - hV, '#eaf1ff');
+      var xVenda = centro - vao / 2 - larguraBarra;
+      var xAds = centro + vao / 2;
+
+      var hP = (altura * v.prompts) / teto;
+      var hM = (altura * (v.minicursos || 0)) / teto;
+      var hN = (altura * v.novaGestao) / teto;
+      if (v.prompts > 0 && hP < 2) hP = 2;
+      if (v.minicursos > 0 && hM < 2) hM = 2;
+      if (v.novaGestao > 0 && hN < 2) hN = 2;
+      ctx.fillStyle = '#2e8eff';
+      ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
+      ctx.fillStyle = '#ff9d2e';
+      ctx.fillRect(xVenda, piso - hP - hM, larguraBarra, hM);
+      ctx.fillStyle = '#3ddc84';
+      ctx.fillRect(xVenda, piso - hP - hM - hN, larguraBarra, hN);
+      var receita = v.prompts + (v.minicursos || 0) + v.novaGestao;
+      if (receita > 0) numeroNaBarra(abreviarBRL(receita), xVenda + larguraBarra / 2, piso - hP - hM - hN, '#eaf1ff');
+
       var gasto = d[chaveAds];
       if (gasto != null) {
         var hA = (altura * gasto) / teto;
         if (gasto > 0 && hA < 2) hA = 2;
         ctx.fillStyle = '#ff6b6b';
-        ctx.fillRect(xA, piso - hA, larguraBarra, hA);
-        if (gasto > 0 && fatia >= 24) numeroNaBarra(abreviarBRL(gasto), xA + larguraBarra / 2, piso - hA, '#ffb3b3');
+        ctx.fillRect(xAds, piso - hA, larguraBarra, hA);
+        if (gasto > 0) numeroNaBarra(abreviarBRL(gasto), xAds + larguraBarra / 2, piso - hA, '#ffb3b3');
       }
-      var hoje = (i === dias.length - 1);
-      // um rotulo por dia, SEMPRE (rotulo dia sim dia nao parecia desalinhado das
-      // barras); se a coluna for estreita, so diminui a fonte
+
+      var diaLucrativo = (gasto != null) && (gasto < receita);
       var fonteDia = fatia >= 50 ? fonteRotulo : Math.max(9, Math.min(fonteRotulo, Math.floor(fatia / 4)));
-      ctx.font = (hoje ? 'bold ' : '') + fonteDia + 'px Arial, Helvetica, sans-serif';
-      ctx.fillStyle = hoje ? '#ffffff' : '#7c8fb3';
-      ctx.fillText(d.rotulo, centro, h - 9);
+      if (i === dias.length - 1) {
+        ctx.font = 'bold ' + fonteDia + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#ffffff';
+      } else if (diaLucrativo) {
+        ctx.font = 'bold ' + fonteDia + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#00e676';
+      } else {
+        ctx.font = fonteDia + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#7c8fb3';
+      }
+      ctx.fillText(d.rotulo, centro, h - 10);
     }
   }
 
-  function desenharPlataformas() {
-    if (!ultimoPlat || !ultimoPlat.dias) return;
-    var dias = ultimoPlat.dias, maior = 0, i;
+  // Os dois graficos usam a MESMA escala de R$ (teto calculado olhando os dois),
+  // senao a comparacao entre Hotmart e Engaged enganaria.
+  function desenharLucro() {
+    if (!ultimoLucro || !ultimoLucro.dias) return;
+    var dias = ultimoLucro.dias, maior = 0, i;
+    function soma(b) { return b.prompts + (b.minicursos || 0) + b.novaGestao; }
     for (i = 0; i < dias.length; i++) {
-      if (dias[i].hotmart > maior) maior = dias[i].hotmart;
-      if (dias[i].engaged > maior) maior = dias[i].engaged;
-      if (dias[i].adsHotmart != null && dias[i].adsHotmart > maior) maior = dias[i].adsHotmart;
-      if (dias[i].adsEngaged != null && dias[i].adsEngaged > maior) maior = dias[i].adsEngaged;
+      maior = Math.max(maior, soma(dias[i].hotmart), soma(dias[i].engaged));
+      if (dias[i].adsHotmart != null) maior = Math.max(maior, dias[i].adsHotmart);
+      if (dias[i].adsEngaged != null) maior = Math.max(maior, dias[i].adsEngaged);
     }
-    // mesma regra de escala do slide de lucratividade (minimo R$ 1.500, sobe de R$ 500 em R$ 500)
+    // Teto do eixo Y: R$ 1.500 no minimo; se algum valor passar, sobe de 500 em 500
+    // (de 1.000 em 1.000 depois de R$ 3.000, pra nao lotar a grade).
     var passo = 500;
     var teto = Math.max(1500, Math.ceil(maior / 500) * 500);
     if (teto > 3000) { passo = 1000; teto = Math.ceil(teto / 1000) * 1000; }
-    desenharVendasAds('graficoPlatHotmart', 'painelPlatHotmart', dias, 'hotmart', 'adsHotmart', '#2e8eff', teto, passo);
-    desenharVendasAds('graficoPlatEngaged', 'painelPlatEngaged', dias, 'engaged', 'adsEngaged', '#29e0c8', teto, passo);
+    desenharLucroPlat('graficoLucroHotmart', 'painelLucroHotmart', dias, 'hotmart', 'adsHotmart', teto, passo);
+    desenharLucroPlat('graficoLucroEngaged', 'painelLucroEngaged', dias, 'engaged', 'adsEngaged', teto, passo);
   }
 
-  function renderizarPlataformas(dados) {
-    if (!dados) return;
-    ultimoPlat = dados;
-    var sub = document.getElementById('platSub');
-    // ROAS por plataforma = vendas / gasto em ADs da plataforma
-    function roasTxt(v, g) {
-      if (!g) return '';
-      var r = v / g, cor = r >= 1 ? '#3ddc84' : '#ff6b6b';
-      return '<span class="platItem">ROAS <b style="color:' + cor + '">' + (Math.round(r * 100) / 100).toFixed(2).replace('.', ',') + 'x</b></span>';
-    }
-    // Duas linhas: o periodo em cima e, embaixo, um bloco por plataforma
+  function roasHtml(vendas, gasto) {
+    if (!gasto) return '';
+    var r = vendas / gasto, cor = r >= 1 ? '#3ddc84' : '#ff6b6b';
+    return '<span class="platItem">ROAS <b style="color:' + cor + '">' + (Math.round(r * 100) / 100).toFixed(2).replace('.', ',') + 'x</b></span>';
+  }
+
+  function renderizarLucro(dados) {
+    if (!dados || !dados.dias) return;
+    ultimoLucro = dados;
+    var sub = document.getElementById('lucroSub');
+    // Duas linhas: o periodo (com o total) em cima e, embaixo, um bloco por plataforma
     // (nome colorido + vendas, gasto em ADs e ROAS), bem separados.
     function bloco(nome, cls, vendas, gasto) {
       var h = '<span class="platBloco"><b class="platNome ' + cls + '">' + nome + '</b>' +
               '<span class="platItem">vendas <b>' + formatarBRL(vendas) + '</b></span>';
-      if (gasto != null) h += '<span class="platItem">ADs <b>' + formatarBRL(gasto) + '</b></span>' + roasTxt(vendas, gasto);
+      if (gasto != null) h += '<span class="platItem">ADs <b>' + formatarBRL(gasto) + '</b></span>' + roasHtml(vendas, gasto);
       return h + '</span>';
     }
     var gH = dados.adsDisponivel ? dados.totalAdsHotmart : null;
     var gE = dados.adsDisponivel ? dados.totalAdsEngaged : null;
-    var txt = '<div>Últimos ' + dados.dias.length + ' dias</div><div class="platResumo">' +
-              bloco('Hotmart', 'hot', dados.totalHotmart, gH) + bloco('Engaged', 'eng', dados.totalEngaged, gE) + '</div>';
-    if (!dados.adsDisponivel) txt += '<div><span id="platAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
+    var linha1 = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas);
+    if (dados.adsDisponivel) {
+      linha1 += ' · gasto em ADs ' + formatarBRL(dados.totalAds);
+      if (dados.totalAds > 0) {
+        var roas = dados.totalVendas / dados.totalAds;
+        linha1 += ' · ROAS <b style="color:' + (roas >= 1 ? '#3ddc84' : '#ff6b6b') + '">' + (Math.round(roas * 100) / 100).toFixed(2).replace('.', ',') + 'x</b>';
+      }
+    }
+    var html = '<div>' + linha1 + '</div><div class="platResumo">' +
+               bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE) + '</div>';
+    if (!dados.adsDisponivel) html += '<div><span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
     sub.className = 'subtitulo';
-    sub.innerHTML = txt;
+    sub.innerHTML = html;
     ajustarTamanhoVendas();
   }
 
@@ -2430,7 +2299,6 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
-      aplicar('plataformas', renderizarPlataformas, tudo.plataformas);
       aplicar('evento', renderizarEvento, tudo.evento);
     });
   }
@@ -2594,7 +2462,6 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
-      aplicar('plataformas', renderizarPlataformas, tudo.plataformas);
       aplicar('evento', renderizarEvento, tudo.evento);
     }, function () {
       servidorRespondeu = true;
