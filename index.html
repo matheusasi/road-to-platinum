@@ -616,6 +616,7 @@
   .legendaLucro .marca.prompts { background: #2e8eff; }
   .legendaLucro .marca.mini    { background: #ff9d2e; }
   .legendaLucro .marca.nova    { background: #3ddc84; }
+  .legendaLucro .marca.miniazul { background: #2e8eff; }
   .legendaLucro .marca.ads     { background: #ff6b6b; }
   #lucroAviso { color: #ff6b6b; }
   #painelLucroHotmart, #painelLucroEngaged { width: 100%; box-sizing: border-box; }
@@ -891,8 +892,7 @@
         <div class="painelVendas" id="painelLucroEngaged">
           <div class="tituloSecao">Engaged
             <span class="legendaOrigem legendaLucro">
-              <i class="marca prompts"></i>Prompts
-              <i class="marca mini"></i>Minicursos
+              <i class="marca miniazul"></i>Minicursos
               <i class="marca nova"></i>Nova Gestão
               <i class="marca ads"></i>Gasto em ADs
             </span>
@@ -2004,7 +2004,7 @@
   // da plataforma. 'chave' diz de qual plataforma ler as vendas (hotmart|engaged).
   // A data fica VERDE quando o gasto do dia foi menor que a receita do dia; hoje
   // fica em branco. Sem dado do Meta (ads null) nao desenha a barra nem marca.
-  function desenharLucroPlat(idCanvas, idPainel, dias, chave, chaveAds, teto, passo) {
+  function desenharLucroPlat(idCanvas, idPainel, dias, chave, chaveAds, teto, passo, ehEngaged) {
     var canvas = document.getElementById(idCanvas);
     if (!canvas || !canvas.getContext) return;
     var painel = document.getElementById(idPainel);
@@ -2057,6 +2057,8 @@
     for (i = 0; i < dias.length; i++) {
       var d = dias[i];
       var v = d[chave] || { prompts: 0, minicursos: 0, novaGestao: 0 };
+      // Engaged nao vende Prompts: some do grafico, e o Minicurso fica azul
+      if (ehEngaged) v = { prompts: 0, minicursos: v.minicursos || 0, novaGestao: v.novaGestao || 0 };
       var centro = margemEsq + fatia * i + fatia / 2;
       var xVenda = centro - vao / 2 - larguraBarra;
       var xAds = centro + vao / 2;
@@ -2069,8 +2071,8 @@
       if (v.novaGestao > 0 && hN < 2) hN = 2;
       ctx.fillStyle = '#2e8eff';
       ctx.fillRect(xVenda, piso - hP, larguraBarra, hP);
-      ctx.fillStyle = '#ff9d2e';
-      ctx.fillRect(xVenda, piso - hP - hM, larguraBarra, hM);
+      ctx.fillStyle = ehEngaged ? '#2e8eff' : '#ff9d2e';
+      ctx.fillRect(xVenda, piso - hP, larguraBarra, hM);
       ctx.fillStyle = '#3ddc84';
       ctx.fillRect(xVenda, piso - hP - hM - hN, larguraBarra, hN);
       var receita = v.prompts + (v.minicursos || 0) + v.novaGestao;
@@ -2118,7 +2120,7 @@
     var teto = Math.max(1500, Math.ceil(maior / 500) * 500);
     if (teto > 3000) { passo = 1000; teto = Math.ceil(teto / 1000) * 1000; }
     desenharLucroPlat('graficoLucroHotmart', 'painelLucroHotmart', dias, 'hotmart', 'adsHotmart', teto, passo);
-    desenharLucroPlat('graficoLucroEngaged', 'painelLucroEngaged', dias, 'engaged', 'adsEngaged', teto, passo);
+    desenharLucroPlat('graficoLucroEngaged', 'painelLucroEngaged', dias, 'engaged', 'adsEngaged', teto, passo, true);
   }
 
   function roasHtml(vendas, gasto) {
