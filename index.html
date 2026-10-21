@@ -620,6 +620,15 @@
   #lucroAviso { color: #ff6b6b; }
   #painelGraficoLucro { width: 100%; box-sizing: border-box; }
 
+  /* Slide 'Vendas por plataforma': dois graficos lado a lado (Hotmart | Engaged),
+     mesma escala de R$ nos dois, e a barra vermelha e o gasto TOTAL em ADs. */
+  .platCol { width: 49%; float: left; box-sizing: border-box; overflow: hidden; }
+  .platCol.esq { margin-right: 2%; }
+  #painelPlatHotmart, #painelPlatEngaged { width: 100%; }
+  .legendaPlat .marca.hotmart { background: #2e8eff; }
+  .legendaPlat .marca.engaged { background: #29e0c8; }
+  .legendaPlat .marca.ads { background: #ff6b6b; }
+  #platAviso { color: #ff6b6b; }
   #eventoResumo { padding: 14px 34px 0 34px; }
   body.compacto #eventoResumo { padding: 8px 24px 0 24px; }
   body.muitoCompacto #eventoResumo { padding: 6px 18px 0 18px; }
@@ -869,6 +878,38 @@
           </span>
         </div>
         <canvas id="graficoLucro" width="880" height="430"></canvas>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SLIDE — Vendas por plataforma. Dois graficos lado a lado: vendas por dia
+       da Hotmart e da Engaged (campo Plataforma do board de cursos), cada um
+       com a barra do gasto TOTAL em ADs do dia. Todos os anuncios levam a
+       mesma pagina, que decide o checkout, entao o gasto e compartilhado.
+       =================================================================== -->
+  <div class="slide" data-slide="plataformas" data-segundos="20">
+    <div class="topoServico">
+      <h1>Vendas por plataforma</h1>
+      <div class="subtitulo" id="platSub">&nbsp;</div>
+    </div>
+    <div class="servBaixo" id="plataformasBaixo">
+      <div class="platCol esq">
+        <div class="painelVendas" id="painelPlatHotmart">
+          <div class="tituloSecao">Hotmart
+            <span class="legendaOrigem legendaPlat"><i class="marca hotmart"></i>Vendas<i class="marca ads"></i>Gasto em ADs</span>
+          </div>
+          <canvas id="graficoPlatHotmart" width="440" height="430"></canvas>
+        </div>
+      </div>
+      <div class="platCol">
+        <div class="painelVendas" id="painelPlatEngaged">
+          <div class="tituloSecao">Engaged
+            <span class="legendaOrigem legendaPlat"><i class="marca engaged"></i>Vendas<i class="marca ads"></i>Gasto em ADs</span>
+          </div>
+          <canvas id="graficoPlatEngaged" width="440" height="430"></canvas>
+        </div>
       </div>
       <div class="clearfix"></div>
     </div>
@@ -1300,7 +1341,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'plataformasBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1389,7 +1430,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'plataformasBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -1555,6 +1596,7 @@
       desenharBarrasComLinha('graficoServCons', 'servGraficoCons', serieServCons, formatarBRL);
       desenharBarrasComLinha('graficoServAsse', 'servGraficoAsse', serieServAsse, formatarBRL);
       desenharLucro('graficoLucro', 'painelGraficoLucro', ultimoLucro);
+      desenharPlataformas();
       if (ultimoArr) {
         desenharBarras('graficoArr', 'painelGraficoArr', ultimoArr.mensal, formatarUSD, true);
       }
@@ -2107,6 +2149,125 @@
     ajustarTamanhoVendas();
   }
 
+  // SLIDE — VENDAS POR PLATAFORMA. O n8n manda
+  // {dias:[{rotulo, hotmart, engaged, ads}], totalHotmart, totalEngaged, totalAds,
+  // adsDisponivel, erroAds}. Os dois graficos usam a MESMA escala de R$ (o teto
+  // e calculado olhando os dois), senao a comparacao entre eles enganaria.
+  // A barra vermelha e o gasto TOTAL do dia (todos os anuncios levam a mesma
+  // pagina, que escolhe o checkout) — por isso ela aparece igual nos dois.
+  var ultimoPlat = null;
+
+  function desenharVendasAds(idCanvas, idPainel, dias, chaveVenda, chaveAds, corVenda, teto, passo) {
+    var canvas = document.getElementById(idCanvas);
+    if (!canvas || !canvas.getContext) return;
+    var painel = document.getElementById(idPainel);
+    var larguraAlvo = larguraCanvasDisponivel(painel);
+    if (canvas.width !== larguraAlvo) canvas.width = larguraAlvo;
+    var alturaAlvo = alturaCanvasDisponivel(painel);
+    if (canvas.height !== alturaAlvo) canvas.height = alturaAlvo;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+    if (!dias || dias.length === 0) return;
+
+    var fonteRotulo = (h < 240 || w < 520) ? 11 : 14;
+    var fonteValor = (h < 240 || w < 520) ? 10 : 13;
+    var margemEsq = (h < 240 || w < 520) ? 52 : 66, margemDir = 6, margemTopo = 22, margemBaixo = 30;
+    var largura = w - margemEsq - margemDir;
+    var altura = h - margemTopo - margemBaixo;
+    var piso = margemTopo + altura;
+    var divisoes = Math.round(teto / passo), i;
+
+    ctx.font = fonteRotulo + 'px Arial, Helvetica, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.lineWidth = 1;
+    for (i = 0; i <= divisoes; i++) {
+      var yy = piso - (altura * i) / divisoes;
+      ctx.strokeStyle = 'rgba(46,142,255,0.10)';
+      ctx.beginPath(); ctx.moveTo(margemEsq, yy); ctx.lineTo(w - margemDir, yy); ctx.stroke();
+      ctx.fillStyle = '#7c8fb3';
+      ctx.fillText(formatarBRL(passo * i), margemEsq - 6, yy + 5);
+    }
+
+    var fatia = largura / dias.length;
+    var larguraBarra = Math.min(fatia * 0.4, 40);
+    var vao = 2;
+    ctx.textAlign = 'center';
+    for (i = 0; i < dias.length; i++) {
+      var d = dias[i];
+      var centro = margemEsq + fatia * i + fatia / 2;
+      var xV = centro - vao / 2 - larguraBarra;
+      var xA = centro + vao / 2;
+      var v = d[chaveVenda] || 0;
+      var hV = (altura * v) / teto;
+      if (v > 0 && hV < 2) hV = 2;
+      ctx.fillStyle = corVenda;
+      ctx.fillRect(xV, piso - hV, larguraBarra, hV);
+      if (v > 0 && fatia >= 30) {
+        ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+        ctx.fillStyle = '#eaf1ff';
+        ctx.fillText(abreviarBRL(v), xV + larguraBarra / 2, piso - hV - 4);
+      }
+      var gasto = d[chaveAds];
+      if (gasto != null) {
+        var hA = (altura * gasto) / teto;
+        if (gasto > 0 && hA < 2) hA = 2;
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fillRect(xA, piso - hA, larguraBarra, hA);
+        if (gasto > 0 && fatia >= 30) {
+          ctx.font = 'bold ' + fonteValor + 'px Arial, Helvetica, sans-serif';
+          ctx.fillStyle = '#ffb3b3';
+          ctx.fillText(abreviarBRL(gasto), xA + larguraBarra / 2, piso - hA - 4);
+        }
+      }
+      var hoje = (i === dias.length - 1);
+      ctx.font = (hoje ? 'bold ' : '') + fonteRotulo + 'px Arial, Helvetica, sans-serif';
+      ctx.fillStyle = hoje ? '#ffffff' : '#7c8fb3';
+      // com muitos dias num grafico estreito, rotulo dia sim dia nao
+      if (fatia >= 50 || i % 2 === (dias.length - 1) % 2) ctx.fillText(d.rotulo, centro, h - 9);
+    }
+  }
+
+  function desenharPlataformas() {
+    if (!ultimoPlat || !ultimoPlat.dias) return;
+    var dias = ultimoPlat.dias, maior = 0, i;
+    for (i = 0; i < dias.length; i++) {
+      if (dias[i].hotmart > maior) maior = dias[i].hotmart;
+      if (dias[i].engaged > maior) maior = dias[i].engaged;
+      if (dias[i].adsHotmart != null && dias[i].adsHotmart > maior) maior = dias[i].adsHotmart;
+      if (dias[i].adsEngaged != null && dias[i].adsEngaged > maior) maior = dias[i].adsEngaged;
+    }
+    // mesma regra de escala do slide de lucratividade (minimo R$ 1.500, sobe de R$ 500 em R$ 500)
+    var passo = 500;
+    var teto = Math.max(1500, Math.ceil(maior / 500) * 500);
+    if (teto > 3000) { passo = 1000; teto = Math.ceil(teto / 1000) * 1000; }
+    desenharVendasAds('graficoPlatHotmart', 'painelPlatHotmart', dias, 'hotmart', 'adsHotmart', '#2e8eff', teto, passo);
+    desenharVendasAds('graficoPlatEngaged', 'painelPlatEngaged', dias, 'engaged', 'adsEngaged', '#29e0c8', teto, passo);
+  }
+
+  function renderizarPlataformas(dados) {
+    if (!dados) return;
+    ultimoPlat = dados;
+    var sub = document.getElementById('platSub');
+    // ROAS por plataforma = vendas / gasto em ADs da plataforma
+    function roasTxt(v, g) {
+      if (!g) return '';
+      var r = v / g, cor = r >= 1 ? '#3ddc84' : '#ff6b6b';
+      return ' · ROAS <b style="color:' + cor + '">' + (Math.round(r * 100) / 100).toFixed(2).replace('.', ',') + 'x</b>';
+    }
+    var txt = 'Últimos ' + dados.dias.length + ' dias';
+    if (dados.adsDisponivel) {
+      txt += ' · Hotmart ' + formatarBRL(dados.totalHotmart) + ' (ADs ' + formatarBRL(dados.totalAdsHotmart) + ')' + roasTxt(dados.totalHotmart, dados.totalAdsHotmart) +
+             ' · Engaged ' + formatarBRL(dados.totalEngaged) + ' (ADs ' + formatarBRL(dados.totalAdsEngaged) + ')' + roasTxt(dados.totalEngaged, dados.totalAdsEngaged);
+    } else {
+      txt += ' · Hotmart ' + formatarBRL(dados.totalHotmart) + ' · Engaged ' + formatarBRL(dados.totalEngaged) +
+             ' · <span id="platAviso">gasto em ADs indisponível (Meta Ads)</span>';
+    }
+    sub.className = 'subtitulo';
+    sub.innerHTML = txt;
+    ajustarTamanhoVendas();
+  }
+
   // SLIDE 8 — EVENTO SQUADHUB x OX STAKEHOUSE. O n8n manda
   // {titulo, total, qtd, ticketMedio, dias:[{rotulo,total,qtd}], ultimas:[{quando,valor}]}.
   function renderizarEvento(dados) {
@@ -2249,6 +2410,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('plataformas', renderizarPlataformas, tudo.plataformas);
       aplicar('evento', renderizarEvento, tudo.evento);
     });
   }
@@ -2412,6 +2574,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('plataformas', renderizarPlataformas, tudo.plataformas);
       aplicar('evento', renderizarEvento, tudo.evento);
     }, function () {
       servidorRespondeu = true;
