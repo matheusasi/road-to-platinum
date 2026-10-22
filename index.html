@@ -948,7 +948,7 @@
       <div class="blocoVendas metade"><div class="rotulo">Acessos liberados</div><div class="valor" id="acLib">0</div></div>
       <div class="blocoVendas metade"><div class="rotulo">Liberados hoje</div><div class="valor" id="acHoje">0</div></div>
       <div class="blocoVendas metade"><div class="rotulo">Com problema</div><div class="valor" id="acProb">0</div></div>
-      <div class="blocoVendas metade"><div class="rotulo">Taxa de liberação</div><div class="valor" id="acPct">—</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Taxa de liberação</div><div class="valor" id="acPct">-</div></div>
       <div class="clearfix"></div>
     </div>
     <div class="servBaixo" id="acessosBaixo">
@@ -2258,7 +2258,7 @@
       pct.innerHTML = Math.round((a.liberados14 / a.total14) * 100) + '%';
       pct.className = 'valor' + (a.problemas > 0 ? ' alerta' : ' certo');
     } else {
-      pct.innerHTML = '—';
+      pct.innerHTML = '-';
       pct.className = 'valor';
     }
 
