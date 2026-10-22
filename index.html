@@ -2219,7 +2219,7 @@
                bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE) + '</div>';
     // alerta em linha propria (fora do bloco, que nao quebra linha): cliente que pagou e nao ficou Liberado
     if (dados.acessos && dados.acessos.problemas > 0) {
-      html += '<div class="platAlertaLinha">ATENÇÃO: ' + dados.acessos.problemas + (dados.acessos.problemas === 1 ? ' compra paga da Engaged sem acesso liberado na MemberKit' : ' compras pagas da Engaged sem acesso liberado na MemberKit') + ' — ver quadro Acessos MemberKit (log)</div>';
+      html += '<div class="platAlertaLinha">ATENÇÃO: ' + dados.acessos.problemas + (dados.acessos.problemas === 1 ? ' compra paga da Engaged sem acesso liberado na MemberKit' : ' compras pagas da Engaged sem acesso liberado na MemberKit') + ' - ver quadro Acessos MemberKit (log)</div>';
     }
     if (!dados.adsDisponivel) html += '<div><span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
     sub.className = 'subtitulo';
@@ -2276,11 +2276,11 @@
     var at = a.atencao || [];
     h = '';
     if (at.length === 0) {
-      h = '<tr class="tudocerto"><td colspan="3">Tudo certo — nenhuma compra paga sem acesso</td></tr>';
+      h = '<tr class="tudocerto"><td colspan="3">Tudo certo - nenhuma compra paga sem acesso</td></tr>';
     } else {
       for (i = 0; i < at.length; i++) {
         h += '<tr><td class="quando">' + textoSeguro(at[i].quando) + '</td><td class="detalhe">' + textoSeguro(at[i].produtos) +
-             (at[i].detalhe ? ' — ' + textoSeguro(at[i].detalhe) : '') +
+             (at[i].detalhe ? ' - ' + textoSeguro(at[i].detalhe) : '') +
              '</td><td class="status ' + classeStatus(at[i].status) + '">' + textoSeguro(statusCurto(at[i].status)) + '</td></tr>';
       }
     }
