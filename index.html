@@ -637,6 +637,35 @@
   .platItem { margin-right: 14px; color: #8a9bc0; }
   .platItem b { color: #eaf1ff; }
   .platAlertaLinha { color: #ff6b6b; font-weight: bold; margin-top: 4px; white-space: normal; }
+  /* Slide 'Acessos MemberKit': cartoes de resumo + duas tabelas (ultimas | atencao) */
+  #acessosResumo { padding: 14px 34px 0 34px; }
+  body.compacto #acessosResumo { padding: 8px 24px 0 24px; }
+  body.muitoCompacto #acessosResumo { padding: 6px 18px 0 18px; }
+  #acessosResumo .blocoVendas.metade { width: 23.5%; margin: 0 0.75%; }
+  #acessosResumo .valor.alerta { color: #ff6b6b; }
+  #acessosResumo .valor.certo { color: #3ddc84; }
+  #tabelaAcessos, #tabelaAtencao { width: 100%; border-collapse: collapse; font-size: 24px; table-layout: fixed; }
+  #tabelaAcessos col.cQuando { width: 150px; }
+  #tabelaAcessos col.cStatus { width: 215px; }
+  #tabelaAtencao col.cQuando { width: 150px; }
+  #tabelaAtencao col.cStatus { width: 215px; }
+  #tabelaAcessos td, #tabelaAtencao td { padding: 12px 6px; border-bottom: 1px solid rgba(46,142,255,0.12); color: #eaf1ff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #tabelaAcessos td.quando, #tabelaAtencao td.quando { color: #8a9bc0; }
+  #tabelaAcessos td.status, #tabelaAtencao td.status { text-align: right; font-weight: bold; }
+  #tabelaAcessos td.status.ok { color: #3ddc84; }
+  #tabelaAcessos td.status.erro, #tabelaAtencao td.status.erro { color: #ff6b6b; }
+  #tabelaAcessos td.status.sem, #tabelaAtencao td.status.sem { color: #ff9d2e; }
+  #tabelaAtencao td.detalhe { white-space: normal; color: #ffb3b3; font-size: 0.8em; }
+  #tabelaAcessos tr.vazio td, #tabelaAtencao tr.vazio td { color: #7c8fb3; text-align: center; border-bottom: 0; padding-top: 22px; white-space: normal; }
+  #tabelaAtencao tr.tudocerto td { color: #3ddc84; text-align: center; border-bottom: 0; padding-top: 22px; white-space: normal; }
+  body.compacto #tabelaAcessos, body.compacto #tabelaAtencao { font-size: 18px; }
+  body.compacto #tabelaAcessos td, body.compacto #tabelaAtencao td { padding: 7px 4px; }
+  body.compacto #tabelaAcessos col.cQuando, body.compacto #tabelaAtencao col.cQuando { width: 112px; }
+  body.compacto #tabelaAcessos col.cStatus, body.compacto #tabelaAtencao col.cStatus { width: 160px; }
+  body.muitoCompacto #tabelaAcessos, body.muitoCompacto #tabelaAtencao { font-size: 14px; }
+  body.muitoCompacto #tabelaAcessos td, body.muitoCompacto #tabelaAtencao td { padding: 5px 3px; }
+  body.muitoCompacto #tabelaAcessos col.cQuando, body.muitoCompacto #tabelaAtencao col.cQuando { width: 88px; }
+  body.muitoCompacto #tabelaAcessos col.cStatus, body.muitoCompacto #tabelaAtencao col.cStatus { width: 128px; }
   #eventoResumo { padding: 14px 34px 0 34px; }
   body.compacto #eventoResumo { padding: 8px 24px 0 24px; }
   body.muitoCompacto #eventoResumo { padding: 6px 18px 0 18px; }
@@ -899,6 +928,40 @@
             </span>
           </div>
           <canvas id="graficoLucroEngaged" width="440" height="430"></canvas>
+        </div>
+      </div>
+      <div class="clearfix"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       SLIDE — Acessos MemberKit. Compras pagas da Engaged e o que a liberacao de acesso
+       na MemberKit fez com cada uma (quadro "Acessos MemberKit (log)" do monday). Sem nome,
+       e-mail nem id do pedido na tela.
+       =================================================================== -->
+  <div class="slide" data-slide="acessos-memberkit" data-segundos="15">
+    <div class="topoServico">
+      <h1>Acessos MemberKit</h1>
+      <div class="subtitulo" id="acessosSub">&nbsp;</div>
+    </div>
+    <div id="acessosResumo">
+      <div class="blocoVendas metade"><div class="rotulo">Acessos liberados</div><div class="valor" id="acLib">0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Liberados hoje</div><div class="valor" id="acHoje">0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Com problema</div><div class="valor" id="acProb">0</div></div>
+      <div class="blocoVendas metade"><div class="rotulo">Taxa de liberação</div><div class="valor" id="acPct">—</div></div>
+      <div class="clearfix"></div>
+    </div>
+    <div class="servBaixo" id="acessosBaixo">
+      <div class="servEsq">
+        <div class="painelVendas" id="painelAcessosUltimas">
+          <div class="tituloSecao">Últimas compras</div>
+          <table id="tabelaAcessos"><colgroup><col class="cQuando"><col><col class="cStatus"></colgroup><tbody id="corpoAcessos"></tbody></table>
+        </div>
+      </div>
+      <div class="servDir">
+        <div class="painelVendas" id="painelAcessosAtencao">
+          <div class="tituloSecao">Precisa de atenção</div>
+          <table id="tabelaAtencao"><colgroup><col class="cQuando"><col><col class="cStatus"></colgroup><tbody id="corpoAtencao"></tbody></table>
         </div>
       </div>
       <div class="clearfix"></div>
@@ -1331,7 +1394,7 @@
   // body inteiro, entao precisa caber no mais alto dos dois — senao trocar de
   // slide cortaria o rodape de um deles.
   function conteudoCabe() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'acessosBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       // os slides ficam com visibility/opacity (nunca display:none), entao
@@ -1420,7 +1483,7 @@
   var MARGEM_RODAPE = 12;
 
   function esticarPaineis() {
-    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'eventoBaixo'];
+    var alvos = ['vendasBaixo', 'arrBaixo', 'cursosMesBaixo', 'servBaixoCons', 'servBaixoAsse', 'lucroBaixo', 'acessosBaixo', 'eventoBaixo'];
     var tela = alturaDaTela();
     for (var i = 0; i < alvos.length; i++) {
       var cont = document.getElementById(alvos[i]);
@@ -2142,12 +2205,6 @@
       if (gasto != null) h += '<span class="platItem">ADs <b>' + formatarBRL(gasto) + '</b></span>' + roasHtml(vendas, gasto);
       return h + (extra || '') + '</span>';
     }
-    // Engaged: quantos acessos a MemberKit liberou e, se houver, o alerta de compra paga sem acesso
-    function acessosHtml(a) {
-      if (!a) return '';
-      var h = '<span class="platItem">acessos <b>' + a.liberados14 + '</b>' + (a.liberadosHoje ? ' (hoje ' + a.liberadosHoje + ')' : '') + '</span>';
-      return h;
-    }
     var gH = dados.adsDisponivel ? dados.totalAdsHotmart : null;
     var gE = dados.adsDisponivel ? dados.totalAdsEngaged : null;
     var linha1 = 'Últimos ' + dados.dias.length + ' dias · vendas ' + formatarBRL(dados.totalVendas);
@@ -2159,7 +2216,7 @@
       }
     }
     var html = '<div>' + linha1 + '</div><div class="platResumo">' +
-               bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE, acessosHtml(dados.acessos)) + '</div>';
+               bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE) + '</div>';
     // alerta em linha propria (fora do bloco, que nao quebra linha): cliente que pagou e nao ficou Liberado
     if (dados.acessos && dados.acessos.problemas > 0) {
       html += '<div class="platAlertaLinha">ATENÇÃO: ' + dados.acessos.problemas + (dados.acessos.problemas === 1 ? ' compra paga da Engaged sem acesso liberado na MemberKit' : ' compras pagas da Engaged sem acesso liberado na MemberKit') + ' — ver quadro Acessos MemberKit (log)</div>';
@@ -2167,6 +2224,67 @@
     if (!dados.adsDisponivel) html += '<div><span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
     sub.className = 'subtitulo';
     sub.innerHTML = html;
+    ajustarTamanhoVendas();
+  }
+
+  // SLIDE — ACESSOS MEMBERKIT. O n8n manda lucro.acessos =
+  // {liberados14, liberadosHoje, problemas, total14, ultimas:[{quando,produtos,status,detalhe}], atencao:[...]}.
+  function classeStatus(st) {
+    if (st === 'Liberado') return 'ok';
+    if (st === 'Erro') return 'erro';
+    return 'sem';
+  }
+
+  // 'Sem turma cadastrada' nao cabe na coluna: na tela vira 'Sem turma'
+  function statusCurto(st) {
+    return st === 'Sem turma cadastrada' ? 'Sem turma' : st;
+  }
+
+  function textoSeguro(t) {
+    return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderizarAcessos(a) {
+    if (!a) return;
+    var sub = document.getElementById('acessosSub');
+    sub.innerHTML = 'Compras pagas da Engaged · últimos 14 dias · liberação automática na MemberKit';
+    document.getElementById('acLib').innerHTML = a.liberados14;
+    document.getElementById('acHoje').innerHTML = a.liberadosHoje;
+    var prob = document.getElementById('acProb');
+    prob.innerHTML = a.problemas;
+    prob.className = 'valor' + (a.problemas > 0 ? ' alerta' : (a.total14 > 0 ? ' certo' : ''));
+    var pct = document.getElementById('acPct');
+    if (a.total14 > 0) {
+      pct.innerHTML = Math.round((a.liberados14 / a.total14) * 100) + '%';
+      pct.className = 'valor' + (a.problemas > 0 ? ' alerta' : ' certo');
+    } else {
+      pct.innerHTML = '—';
+      pct.className = 'valor';
+    }
+
+    var ult = a.ultimas || [], h = '', i;
+    if (ult.length === 0) {
+      h = '<tr class="vazio"><td colspan="3">Nenhuma compra registrada ainda</td></tr>';
+    } else {
+      for (i = 0; i < ult.length; i++) {
+        h += '<tr><td class="quando">' + textoSeguro(ult[i].quando) + '</td><td>' + textoSeguro(ult[i].produtos) +
+             '</td><td class="status ' + classeStatus(ult[i].status) + '">' + textoSeguro(statusCurto(ult[i].status)) + '</td></tr>';
+      }
+    }
+    document.getElementById('corpoAcessos').innerHTML = h;
+
+    var at = a.atencao || [];
+    h = '';
+    if (at.length === 0) {
+      h = '<tr class="tudocerto"><td colspan="3">Tudo certo — nenhuma compra paga sem acesso</td></tr>';
+    } else {
+      for (i = 0; i < at.length; i++) {
+        h += '<tr><td class="quando">' + textoSeguro(at[i].quando) + '</td><td class="detalhe">' + textoSeguro(at[i].produtos) +
+             (at[i].detalhe ? ' — ' + textoSeguro(at[i].detalhe) : '') +
+             '</td><td class="status ' + classeStatus(at[i].status) + '">' + textoSeguro(statusCurto(at[i].status)) + '</td></tr>';
+      }
+    }
+    document.getElementById('corpoAtencao').innerHTML = h;
     ajustarTamanhoVendas();
   }
 
@@ -2312,6 +2430,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('acessos', renderizarAcessos, tudo.lucro && tudo.lucro.acessos);
       aplicar('evento', renderizarEvento, tudo.evento);
     });
   }
@@ -2475,6 +2594,7 @@
       aplicar('arr', renderizarArr, tudo.arr);
       aplicar('assessoria', renderizarAssessoria, tudo.assessoria);
       aplicar('lucro', renderizarLucro, tudo.lucro);
+      aplicar('acessos', renderizarAcessos, tudo.lucro && tudo.lucro.acessos);
       aplicar('evento', renderizarEvento, tudo.evento);
     }, function () {
       servidorRespondeu = true;
