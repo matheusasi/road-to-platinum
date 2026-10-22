@@ -636,6 +636,7 @@
   .platNome.eng { color: #29e0c8; }
   .platItem { margin-right: 14px; color: #8a9bc0; }
   .platItem b { color: #eaf1ff; }
+  .platAlertaLinha { color: #ff6b6b; font-weight: bold; margin-top: 4px; white-space: normal; }
   #eventoResumo { padding: 14px 34px 0 34px; }
   body.compacto #eventoResumo { padding: 8px 24px 0 24px; }
   body.muitoCompacto #eventoResumo { padding: 6px 18px 0 18px; }
@@ -2135,11 +2136,17 @@
     var sub = document.getElementById('lucroSub');
     // Duas linhas: o periodo (com o total) em cima e, embaixo, um bloco por plataforma
     // (nome colorido + vendas, gasto em ADs e ROAS), bem separados.
-    function bloco(nome, cls, vendas, gasto) {
+    function bloco(nome, cls, vendas, gasto, extra) {
       var h = '<span class="platBloco"><b class="platNome ' + cls + '">' + nome + '</b>' +
               '<span class="platItem">vendas <b>' + formatarBRL(vendas) + '</b></span>';
       if (gasto != null) h += '<span class="platItem">ADs <b>' + formatarBRL(gasto) + '</b></span>' + roasHtml(vendas, gasto);
-      return h + '</span>';
+      return h + (extra || '') + '</span>';
+    }
+    // Engaged: quantos acessos a MemberKit liberou e, se houver, o alerta de compra paga sem acesso
+    function acessosHtml(a) {
+      if (!a) return '';
+      var h = '<span class="platItem">acessos <b>' + a.liberados14 + '</b>' + (a.liberadosHoje ? ' (hoje ' + a.liberadosHoje + ')' : '') + '</span>';
+      return h;
     }
     var gH = dados.adsDisponivel ? dados.totalAdsHotmart : null;
     var gE = dados.adsDisponivel ? dados.totalAdsEngaged : null;
@@ -2152,7 +2159,11 @@
       }
     }
     var html = '<div>' + linha1 + '</div><div class="platResumo">' +
-               bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE) + '</div>';
+               bloco('Hotmart', 'hot', dados.totalVendasHotmart, gH) + bloco('Engaged', 'eng', dados.totalVendasEngaged, gE, acessosHtml(dados.acessos)) + '</div>';
+    // alerta em linha propria (fora do bloco, que nao quebra linha): cliente que pagou e nao ficou Liberado
+    if (dados.acessos && dados.acessos.problemas > 0) {
+      html += '<div class="platAlertaLinha">ATENÇÃO: ' + dados.acessos.problemas + (dados.acessos.problemas === 1 ? ' compra paga da Engaged sem acesso liberado na MemberKit' : ' compras pagas da Engaged sem acesso liberado na MemberKit') + ' — ver quadro Acessos MemberKit (log)</div>';
+    }
     if (!dados.adsDisponivel) html += '<div><span id="lucroAviso">gasto em ADs indisponível (Meta Ads)</span></div>';
     sub.className = 'subtitulo';
     sub.innerHTML = html;
